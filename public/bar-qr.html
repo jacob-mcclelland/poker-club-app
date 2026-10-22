@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Bartender QR - Bar Orders</title>
+  <link rel="icon" type="image/svg+xml" href="/img/favicon-staff.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#050505; --card:rgba(20,20,20,0.85); --border:rgba(255,255,255,0.1); --gold:#d4af37; --green:#00ff88; --dim:#888; --text:#fff; }
+    * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+    body { background:var(--bg); background:radial-gradient(circle at top left,#1a0020 0%,#050505 55%); color:var(--text); font-family:'Inter',-apple-system,sans-serif; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; }
+    .eyebrow { font-size:0.7rem; letter-spacing:2px; text-transform:uppercase; color:var(--dim); margin-bottom:6px; text-align:center; }
+    h1 { font-size:1.6rem; font-weight:800; text-transform:uppercase; letter-spacing:2px; margin-bottom:6px; text-align:center;
+         background:linear-gradient(to bottom,#fff,#888); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .tagline { color:var(--dim); font-size:0.9rem; text-align:center; margin-bottom:24px; max-width:340px; line-height:1.5; }
+    .qr-frame { background:#fff; border-radius:20px; padding:24px; box-shadow:0 8px 40px rgba(0,0,0,0.6); }
+    #qrcode { width:280px; height:280px; display:flex; align-items:center; justify-content:center; }
+    #qrcode img, #qrcode canvas { display:block; width:280px !important; height:280px !important; }
+    .qr-fallback { color:#000; font-size:0.85rem; text-align:center; width:280px; }
+    .url { margin-top:18px; font-size:0.85rem; color:var(--gold); font-weight:700; text-align:center; word-break:break-all; }
+    .actions { display:flex; gap:10px; margin-top:22px; }
+    .btn { border:none; border-radius:12px; padding:14px 22px; font-family:inherit; font-size:0.9rem; font-weight:700; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:transform 0.15s; }
+    .btn:active { transform:scale(0.96); }
+    .btn-open { background:var(--green); color:#000; }
+    .btn-print { background:rgba(255,255,255,0.1); color:var(--text); border:1px solid var(--border); }
+    .foot { margin-top:26px; color:var(--dim); font-size:0.78rem; text-align:center; max-width:320px; line-height:1.5; }
+
+    @media print {
+      body { background:#fff !important; color:#000; }
+      .qr-frame { box-shadow:none; border:1px solid #000; }
+      .eyebrow, .tagline, .foot { color:#000; }
+      h1 { -webkit-text-fill-color:#000; }
+      .url { color:#000; }
+      .actions { display:none; }
+    }
+    html.back-nav-on body { justify-content:flex-start; padding-top:calc(env(safe-area-inset-top, 0px) + 72px); }
+  </style>
+</head>
+<body>
+
+  <div class="eyebrow">All In Poker Club</div>
+  <h1>Bar Orders</h1>
+  <div class="tagline">Bartenders — scan to open tonight's live shot-round orders.</div>
+
+  <div class="qr-frame">
+    <div id="qrcode"><div class="qr-fallback">Loading QR…</div></div>
+  </div>
+
+  <div class="url" id="url">poker-club.example/bar.html</div>
+
+  <div class="actions">
+    <a class="btn btn-open" href="/bar.html">Open Bar Orders</a>
+    <button class="btn btn-print" onclick="window.print()">Print</button>
+  </div>
+
+  <div class="foot">Tip: print this and tape it behind the bar, or keep the page open on a tablet.</div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    (function () {
+      var url = location.origin + '/bar.html';
+      document.getElementById('url').textContent = url.replace(/^https?:\/\//, '');
+      var box = document.getElementById('qrcode');
+      if (typeof QRCode === 'undefined') {
+        box.innerHTML = '<div class="qr-fallback">Couldn\'t load the QR generator.<br>Open this link instead:<br><strong>' + url + '</strong></div>';
+        return;
+      }
+      box.innerHTML = '';
+      new QRCode(box, { text: url, width: 280, height: 280, colorDark: '#000000', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+    })();
+  </script>
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="/clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/gameday.html"></script>
+</body>
+</html>

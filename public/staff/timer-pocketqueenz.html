@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rainbow Big Stack &mdash; Wild Corgi Bar × All-In Poker</title>
+<style>
+  /* ============================================================
+     RAINBOW EXPLOSION SUPER STACK TIMER  —  standalone, self-contained
+     No build step, no imports. Double-click to open, or host at
+     /staff/timer-pocketqueenz.html
+     ============================================================ */
+  :root{
+    /* pocket.queenz rainbow neon on black */
+    --bg:#0a0512; --bg2:#160a2e;
+    --red:#ff2fd0; --blue:#00c3ff; --navy:#1a0f3a;
+    --fuse:#ffe600; --deton:#ff2fd0; --danger:#ff2f6e;
+    --timer:#ffffff; --now-sb:#ff8a00; --now-bb:#3be06a;
+    --next:#c9b3ff; --break:#00c3ff; --ink:#fff; --muted:#a98fd6;
+    --panel:rgba(22,10,46,.6); --panel-b:#4a2f7a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Arial Black','Impact',Arial,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1000px 620px at 12% -8%, rgba(255,47,208,.20), transparent 60%),
+      radial-gradient(1000px 620px at 88% -6%, rgba(0,195,255,.20), transparent 60%),
+      radial-gradient(900px 600px at 50% 118%, rgba(59,224,106,.16), transparent 60%),
+      linear-gradient(160deg,var(--bg2),var(--bg));
+    height:100vh;overflow:hidden;
+  }
+
+  .wrap{display:grid;grid-template-rows:auto 1fr auto auto;height:100vh;padding:14px 18px;gap:10px}
+
+  /* ---------- Chip legend ---------- */
+  .chipbar{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;
+    background:var(--panel);border:1px solid var(--panel-b);border-radius:12px;padding:6px 14px}
+  .chipbar .clab{font-family:Arial,sans-serif;font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+  .cchip{display:flex;align-items:center;gap:7px;font-family:Arial,sans-serif}
+  .cdisc{width:30px;height:30px;border-radius:50%;border:2px dashed rgba(255,255,255,.35);flex-shrink:0}
+  .cval{font-size:.92rem;font-weight:bold;color:#eee}
+  .c-w{background:#fff;border-color:rgba(0,0,0,.35)}
+  .c-r{background:#cc0000}
+  .c-b{background:#0044cc}
+  .c-g{background:#008800}
+  .c-k{background:#111;border-color:rgba(255,255,255,.4)}
+  .c-p{background:#ff5fa2;border-color:rgba(0,0,0,.3)}
+
+  /* ---------- Header ---------- */
+  .head{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  html.back-nav-on .head{padding-top:calc(60px + env(safe-area-inset-top, 0px))}
+  html.back-nav-on .sb-head{padding-top:calc(44px + env(safe-area-inset-top, 0px))}
+  .brand{display:flex;flex-direction:column;line-height:1}
+  .brand .script{
+    font-family:'Segoe Script','Brush Script MT','Bradley Hand',cursive;
+    font-size:1.35rem;color:var(--red);margin-bottom:1px;
+    text-shadow:0 0 14px rgba(224,30,43,.55);
+  }
+  .brand .title{font-size:2.3rem;letter-spacing:.01em;display:flex;align-items:center;gap:8px}
+  .brand .title .txt{
+    background:linear-gradient(92deg,#ff004c,#ff8a00,#ffe600,#3be06a,#00c3ff,#7a5cff,#ff2fd0);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 2px 10px rgba(0,195,255,.4));
+  }
+  /* bomb-pop photo (isolated from asset sheet) */
+  .bp{display:inline-block;border-radius:50%;background:conic-gradient(#ff004c,#ff8a00,#ffe600,#3be06a,#00c3ff,#7a5cff,#ff2fd0,#ff004c);box-shadow:0 0 6px rgba(255,255,255,.35)}
+  .bg-pop{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) rotate(10deg);height:122vh;width:auto;opacity:.55;mix-blend-mode:screen;z-index:-1;pointer-events:none}
+
+  /* ---------- Season standings scoreboard ---------- */
+  .scoreboard{position:fixed;inset:0;z-index:400;display:none;flex-direction:column;padding:14px 20px;
+    background:linear-gradient(160deg,rgba(5,10,28,.977),rgba(10,19,48,.977))}
+  .scoreboard.show{display:flex}
+  .sb-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-shrink:0}
+  .sb-title{font-size:1.75rem;letter-spacing:.01em;line-height:1.05;
+    background:linear-gradient(92deg,var(--red),#fff 50%,var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sb-sub{font-family:Arial,sans-serif;font-size:.82rem;color:var(--fuse);margin-top:3px}
+  .sb-count{text-align:center;font-family:Arial,sans-serif}
+  .sb-count .lab{font-size:.64rem;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+  .sb-count .val{font-size:3.4rem;font-weight:bold;color:var(--fuse);line-height:1}
+  .sb-games{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:14px;min-height:0;margin-top:8px}
+  .sb-col{background:var(--panel);border:1px solid var(--panel-b);border-radius:12px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  .sb-col h4{font-family:Arial,sans-serif;font-size:.88rem;letter-spacing:.05em;text-transform:uppercase;padding:8px 14px;border-bottom:1px solid var(--panel-b);flex-shrink:0;display:flex;align-items:center;gap:8px}
+  .sb-col.points h4{color:var(--now-bb)}
+  .sb-col.bounty h4{color:#ff5fa2}
+  .sb-col h4 .sb-hint{margin-left:auto;font-size:.64rem;color:var(--muted);letter-spacing:.03em;text-transform:none}
+  .sb-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(20,1fr);grid-auto-flow:column;gap:2px 10px;padding:5px 8px;min-height:0;overflow:hidden}
+  .sb-row{display:flex;align-items:center;gap:7px;padding:0 8px;border-radius:6px;font-family:Arial,sans-serif;font-size:.9rem;min-width:0;overflow:hidden}
+  .sb-row.tier-1{background:rgba(160,32,240,.40)}
+  .sb-row.tier-2{background:rgba(96,165,250,.35)}
+  .sb-row.tier-3{background:rgba(40,167,69,.28)}
+  .sb-rank{width:28px;text-align:right;color:#c9d6f7;font-weight:bold;flex-shrink:0}
+  .sb-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+  .sb-val{font-weight:bold;flex-shrink:0;font-family:'SF Mono',Monaco,monospace}
+  .sb-col.points .sb-val{color:#bcd0ff}
+  .sb-col.bounty .sb-val{color:#ffb3d4}
+  .sb-title-badge{font-size:.56rem;font-weight:bold;letter-spacing:.03em;text-transform:uppercase;padding:1px 6px;border-radius:20px;flex-shrink:0}
+  .sb-title-badge.shark{background:var(--now-bb);color:#04122e}
+  .sb-title-badge.hunter{background:#ff5fa2;color:#3a0018}
+  .sb-legend{flex-shrink:0;text-align:center;font-family:Arial,sans-serif;font-size:.74rem;color:var(--muted);padding:7px 4px 1px;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+  .sb-key{display:inline-block;width:15px;height:11px;border-radius:3px;vertical-align:middle;margin-right:2px}
+  .sb-key.tier-1{background:rgba(160,32,240,.6)}
+  .sb-key.tier-2{background:rgba(96,165,250,.6)}
+  .sb-key.tier-3{background:rgba(40,167,69,.55)}
+  .sb-note{color:var(--muted);font-family:Arial,sans-serif;font-size:.85rem;text-align:center;padding:14px}
+  .bp-big{height:clamp(150px,30vh,340px);width:calc(clamp(150px,30vh,340px)*var(--a));display:block}
+  .bp-sm{height:1.4em;width:1.4em;flex-shrink:0}
+  .bp-xs{height:1.05em;width:1.05em;vertical-align:-0.18em}
+  .rainbow-burst{height:clamp(150px,30vh,340px);aspect-ratio:1;border-radius:50%;position:relative;display:flex;align-items:center;justify-content:center;
+    background:conic-gradient(from 0turn,#ff004c,#ff8a00,#ffe600,#3be06a,#00c3ff,#7a5cff,#ff2fd0,#ff004c);
+    animation:rbspin 3.2s linear infinite;filter:drop-shadow(0 0 34px rgba(255,255,255,.45))}
+  .rainbow-burst::before{content:"";position:absolute;inset:23%;border-radius:50%;background:radial-gradient(circle,#160a2e,#0a0512)}
+  .rb-emblem{position:relative;z-index:1;font-size:clamp(46px,10vh,120px);animation:rbspin-rev 3.2s linear infinite}
+  @keyframes rbspin{to{transform:rotate(1turn)}}
+  @keyframes rbspin-rev{to{transform:rotate(-1turn)}}
+  .brand .stars{font-size:.7rem;letter-spacing:.35em;color:var(--red);margin-top:3px}
+  .brand .stars .w{color:#fff}
+  .brand .stars .b{color:var(--blue)}
+  .brand .tag{font-family:Arial,sans-serif;font-size:.78rem;color:var(--muted);margin-top:3px;letter-spacing:.04em}
+  .clockpill{
+    text-align:right;font-family:Arial,sans-serif
+  }
+  .clockpill .tod{font-size:1.7rem;color:var(--fuse);font-weight:bold}
+  .clockpill .status{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;margin-top:2px}
+  .status.on{color:#4be36b}
+  .status.off{color:var(--muted)}
+  .status.live{color:var(--danger);animation:pulse 1s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+  /* ---------- Main grid ---------- */
+  .main{display:grid;grid-template-columns:1fr 340px;gap:14px;min-height:0}
+
+  .stage{
+    position:relative;background:var(--panel);border:2px solid var(--panel-b);border-radius:16px;
+    display:flex;flex-direction:column;min-height:0;overflow:hidden;
+    box-shadow:inset 0 0 60px rgba(43,92,255,.08);
+  }
+  .stage.breakmode{border-color:var(--break);box-shadow:inset 0 0 80px rgba(43,92,255,.18)}
+
+  .lvlbar{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;flex-shrink:0}
+  .lvlname{font-size:1.5rem;color:var(--ink)}
+  .lvlname .num{color:var(--deton)}
+  .nextbomb{font-family:Arial,sans-serif;font-size:.82rem;color:var(--fuse);text-align:right}
+  .nextbomb b{font-size:1.05rem}
+  .nextbomb.dead{color:var(--muted)}
+
+  .time{
+    flex:1;display:flex;align-items:center;justify-content:center;min-height:0;
+    font-size:clamp(80px,20vh,320px);color:var(--timer);line-height:.9;font-weight:bold;
+    text-shadow:0 0 16px rgba(0,195,255,.55), 0 0 40px rgba(255,47,208,.4);
+  }
+  .time.warn{animation:tflash 1s infinite}
+  @keyframes tflash{0%,100%{color:var(--timer)}50%{color:var(--danger)}}
+  .time.paused{opacity:.5}
+
+  .blinds{display:flex;gap:14px;padding:6px 18px 4px;flex-shrink:0}
+  .bcard{
+    flex:1;background:rgba(0,0,0,.35);border:1px solid #3a2408;border-radius:12px;
+    padding:10px 14px;text-align:center;display:flex;flex-direction:column;justify-content:center;min-width:0
+  }
+  .bcard .lab{font-family:Arial,sans-serif;font-size:.72rem;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+  .bcard .val{font-size:clamp(22px,4.4vh,54px);font-weight:bold;line-height:1.05;white-space:nowrap}
+  .bcard.now .sb{color:var(--now-sb)}
+  .bcard.now .bb{color:var(--now-bb)}
+  .bcard.now .sl{color:#6b4a1a}
+  .bcard.next .val{color:var(--next);font-size:clamp(18px,3.2vh,40px)}
+  .breaknote{font-family:Arial,sans-serif;font-size:.9rem;color:var(--fuse);margin-top:6px}
+
+  .ctrls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:10px 12px 12px;flex-shrink:0}
+  .btn{
+    background:#1b1006;color:var(--ink);border:2px solid #3a2408;border-radius:10px;
+    padding:9px 14px;font-size:.82rem;font-weight:bold;font-family:inherit;cursor:pointer;transition:.15s
+  }
+  .btn:hover{border-color:var(--deton);background:#2a1808}
+  .btn.play{background:#10250f;border-color:#2f8f2f;color:#7be07b}
+  .btn.play.paused{background:#2a0f0f;border-color:var(--danger);color:#ff7b7b}
+  .btn.bomb{background:#2a0f00;border-color:var(--deton);color:var(--deton)}
+  .btn.bomb:hover{background:#3a1500}
+
+  /* ---------- Schedule sidebar ---------- */
+  .sched{background:var(--panel);border:2px solid var(--panel-b);border-radius:16px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  .sched h3{font-family:Arial,sans-serif;font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--fuse);padding:12px 14px;flex-shrink:0;border-bottom:1px solid #3a2408;text-align:center}
+  .schedlist{overflow-y:auto;padding:6px;flex:1}
+  .schedlist::-webkit-scrollbar{width:8px}
+  .schedlist::-webkit-scrollbar-thumb{background:#5a3410;border-radius:4px}
+  .row{
+    display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;margin-bottom:3px;
+    font-family:Arial,sans-serif;font-size:.82rem;cursor:pointer;border:1px solid transparent
+  }
+  .row:hover{background:rgba(255,255,255,.04)}
+  .row.cur{background:rgba(43,92,255,.20);border-color:var(--deton)}
+  .row.brk{color:var(--muted);font-style:italic}
+  .row.done{opacity:.42}
+  .row .t{width:58px;color:var(--fuse);flex-shrink:0;font-weight:bold}
+  .row.brk .t{color:#7a5320}
+  .row .d{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .row .b{flex-shrink:0}
+  .row.endmark{color:var(--danger);font-weight:bold;font-style:normal;border-top:1px dashed #5a3410;border-radius:0;margin-top:2px}
+
+  /* ---------- Footer ---------- */
+  .foot{display:flex;align-items:center;justify-content:space-between;font-family:Arial,sans-serif;font-size:.72rem;color:var(--muted)}
+  .foot .hint{opacity:.8}
+  .foot .keys b{color:var(--fuse)}
+
+  /* ---------- RAINBOW EXPLOSION OVERLAY ---------- */
+  .overlay{position:fixed;inset:0;display:none;z-index:1000;overflow:hidden;cursor:pointer}
+  .overlay.show{display:block}
+  /* Full-minute "going off" flash — energetic but ≤3 flashes/sec (WCAG-safe) */
+  .flash{position:absolute;inset:0;background:rgba(150,12,12,.55)}
+  .flash.hold{animation:holdbg .46s steps(1,end) infinite}
+  @keyframes holdbg{
+    0%{background:rgba(255,0,76,.8)} 25%{background:rgba(255,138,0,.8)}
+    50%{background:rgba(59,224,106,.8)} 75%{background:rgba(0,195,255,.8)}
+    100%{background:rgba(255,47,208,.8)}
+  }
+  /* corner readouts shown during a bomb pot */
+  .ov-corner{position:absolute;top:18px;z-index:6;font-family:Arial,sans-serif;
+    background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.18);border-radius:12px;
+    padding:8px 18px;text-align:center;min-width:120px}
+  .ov-corner.left{left:18px}
+  .ov-corner.right{right:18px}
+  .ov-lab{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;opacity:.85}
+  .ov-val{font-size:2.8rem;font-weight:bold;line-height:1.1}
+  .ov-corner.right .ov-val{color:var(--fuse)}
+  #fx{position:absolute;inset:0;width:100%;height:100%}
+  .shake{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+  .shake.go{animation:shake .12s infinite}
+  @keyframes shake{
+    0%{transform:translate(0,0) rotate(0)}
+    25%{transform:translate(-10px,6px) rotate(-1.2deg)}
+    50%{transform:translate(9px,-8px) rotate(1deg)}
+    75%{transform:translate(-7px,-5px) rotate(-.8deg)}
+    100%{transform:translate(8px,7px) rotate(1.1deg)}
+  }
+  .bigbomb{font-size:clamp(90px,20vw,280px);line-height:1;filter:drop-shadow(0 0 30px rgba(0,0,0,.6))}
+  .bigtext{
+    font-size:clamp(48px,11vw,150px);color:#fff;letter-spacing:.03em;
+    text-shadow:0 6px 0 #7a0000,0 0 40px rgba(0,0,0,.5);
+  }
+  .subtext{
+    font-size:clamp(20px,3.6vw,46px);color:#fff;background:var(--red);
+    padding:6px 22px;border-radius:12px;margin-top:14px;transform:rotate(-2deg);
+    box-shadow:0 6px 0 rgba(0,0,0,.35)
+  }
+  .whichtext{font-size:clamp(16px,2.4vw,30px);color:#fff;margin-top:22px;font-family:Arial,sans-serif;opacity:.9;letter-spacing:.1em}
+  .dismisshint{position:absolute;bottom:20px;left:0;right:0;text-align:center;color:rgba(255,255,255,.7);font-family:Arial,sans-serif;font-size:.9rem}
+
+  @media (max-width:820px){
+    .main{grid-template-columns:1fr}
+    .sched{display:none}
+    .brand .title{font-size:1.5rem}
+  }
+  .pq-logo{height:120px;width:auto;border-radius:50%;box-shadow:0 0 26px rgba(255,47,208,.55);flex-shrink:0}
+  .post-amt{display:inline-block;margin-top:12px;font-size:clamp(34px,7vw,96px);font-weight:bold;color:#0a0512;background:var(--fuse);padding:4px 26px;border-radius:16px;box-shadow:0 6px 0 rgba(0,0,0,.4);letter-spacing:.02em}
+</style>
+</head>
+<body>
+<img class="bg-pop" alt="" aria-hidden="true">
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="head">
+    <div class="brand">
+      <span class="script">pocket.queenz</span>
+      <span class="title"><span class="bp bp-sm ang-45l"></span><span class="txt">RAINBOW BIG STACK</span></span>
+      <span class="stars">★ <span class="w">★</span> <span class="b">★</span> ★ <span class="w">★</span> <span class="b">★</span> ★</span>
+      <span class="tag">Wild Corgi Bar · All-In Poker Club &nbsp;—&nbsp; pocket.queenz takeover · Wear your rainbow 🌈</span>
+    </div>
+    <img class="pq-logo" src="../img/pocket-queenz.png" alt="Pocket Queenz">
+    <div class="clockpill">
+      <div class="tod" id="todClock">--:--</div>
+      <div class="status on" id="bombStatus"><span class="bp bp-xs"></span> Rainbow Explosions Active</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- Timer stage -->
+    <div class="stage" id="stage">
+      <div class="lvlbar">
+        <div class="lvlname" id="lvlName">Level <span class="num">1</span></div>
+        <div class="nextbomb" id="nextBomb">Next <span class="bp bp-xs"></span> <b>at start</b></div>
+      </div>
+
+      <div class="time paused" id="timeDisp">20:00</div>
+
+      <div class="blinds">
+        <div class="bcard now">
+          <div class="lab" id="blindNowLab">Blinds Now</div>
+          <div class="val" id="blindNow"><span class="sb">25</span><span class="sl"> / </span><span class="bb">50</span></div>
+          <div class="breaknote" id="breakNote" style="display:none"></div>
+        </div>
+        <div class="bcard next">
+          <div class="lab">Next</div>
+          <div class="val" id="blindNext">50 / 100</div>
+        </div>
+      </div>
+
+      <div class="ctrls">
+        <button class="btn play paused" id="playBtn" onclick="TT.toggle()">▶ Start</button>
+        <button class="btn" onclick="TT.addMin()">+1:00</button>
+        <button class="btn" onclick="TT.subMin()">−1:00</button>
+        <button class="btn" onclick="TT.prev()">◀ Prev</button>
+        <button class="btn" onclick="TT.next()">Next ▶</button>
+        <button class="btn" onclick="TT.reset()">↻ Reset</button>
+        <button class="btn bomb" onclick="TT.manualBomb()"><span class="bp bp-xs ang-45r"></span> Trigger</button>
+        <button class="btn" id="muteBtn" onclick="TT.toggleMute()">🔊 Sound</button>
+        <button class="btn" onclick="toggleScores()">📊 Scores</button>
+      </div>
+    </div>
+
+    <!-- Schedule -->
+    <div class="sched">
+      <h3>Schedule &mdash; 7:00 PM Start</h3>
+      <div class="schedlist" id="schedList"></div>
+    </div>
+  </div>
+
+  <!-- CHIP LEGEND -->
+  <div class="chipbar">
+    <span class="clab">Chip Values</span>
+    <div class="cchip"><span class="cdisc c-w"></span><span class="cval">25</span></div>
+    <div class="cchip"><span class="cdisc c-r"></span><span class="cval">50</span></div>
+    <div class="cchip"><span class="cdisc c-b"></span><span class="cval">100</span></div>
+    <div class="cchip"><span class="cdisc c-g"></span><span class="cval">500</span></div>
+    <div class="cchip"><span class="cdisc c-k"></span><span class="cval">1,000</span></div>
+    <div class="cchip"><span class="cdisc c-p"></span><span class="cval">10,000</span></div>
+    <span class="clab" style="margin-left:8px">After chip-up: white = 5,000 (blinds shown as 1/2, 2/4&hellip;)</span>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="foot">
+    <span class="hint">pocket.queenz takeover · Wild Corgi Pub · Wear your rainbow 🌈 · Consolation game ~9:00</span>
+    <span class="keys"><b>Space</b> play/pause · <b>←/→</b> level · <b>B</b> test rainbow · <b>M</b> mute · <b>F</b> fullscreen</span>
+  </div>
+</div>
+
+<!-- SEASON STANDINGS SCOREBOARD (pre-game + breaks) -->
+<div class="scoreboard" id="scoreboard">
+  <div class="sb-head">
+    <div>
+      <div class="sb-title">Wild Corgi &mdash; Season Final Standings</div>
+      <div class="sb-sub" id="sbSub">Wild Corgi season standings &mdash; see where you stand</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:18px">
+      <div class="sb-count" id="sbCountWrap">
+        <div class="lab" id="sbCountLab">Game starts in</div>
+        <div class="val" id="sbCountdown">&mdash;</div>
+      </div>
+      <button class="btn" onclick="toggleScores()">Go to Timer &rarr;</button>
+    </div>
+  </div>
+  <div class="sb-games">
+    <div class="sb-col bounty">
+      <h4><span class="bp bp-xs ang-45r"></span> Bounty &mdash; The Pinks <span class="sb-hint">Game 1 · most bounties</span></h4>
+      <div class="sb-grid" id="sbBounty"><div class="sb-note">Loading&hellip;</div></div>
+    </div>
+    <div class="sb-col points">
+      <h4><span class="bp bp-xs"></span> Championship &mdash; Season Standings <span class="sb-hint">Game 2 · season points</span></h4>
+      <div class="sb-grid" id="sbPoints"><div class="sb-note">Loading standings&hellip;</div></div>
+    </div>
+  </div>
+  <div class="sb-legend">
+    <span><span class="sb-key tier-1"></span>Top 5</span>
+    <span><span class="sb-key tier-2"></span>Top 10</span>
+    <span><span class="sb-key tier-3"></span>Top 20</span>
+    <span>&nbsp;·&nbsp; 🃏 Card Shark = points leader &nbsp;·&nbsp; 🎯 Bounty Hunter = most bounties &nbsp;·&nbsp; T# = tie</span>
+  </div>
+</div>
+
+<!-- RAINBOW EXPLOSION OVERLAY -->
+<div class="overlay" id="overlay" onclick="TT.dismissBomb()">
+  <div class="flash" id="flash"></div>
+  <canvas id="fx"></canvas>
+  <div class="ov-corner left" id="ovClock"><div class="ov-lab">Blinds Clock</div><div class="ov-val">--:--</div></div>
+  <div class="ov-corner right" id="ovCount"><div class="ov-lab">Rainbow Explosion</div><div class="ov-val">1:00</div></div>
+  <div class="shake" id="shake">
+    <div class="bigbomb"><div class="rainbow-burst"><span class="rb-emblem">🌈</span></div></div>
+    <div class="bigtext" id="bigText">RAINBOW EXPLOSION!</div>
+    <div class="subtext">EVERYONE POSTS THE BIG BLIND</div>
+    <div class="whichtext" id="whichText"></div>
+  </div>
+  <div class="dismisshint">click anywhere to dismiss</div>
+</div>
+
+<script>
+"use strict";
+/* ================================================================
+   AUTO-REDIRECT (event day)  —  wired in staff/timer.html.
+   This file is the destination; no redirect needed here.
+   ================================================================ */
+
+/* ---------------- Blind structure ----------------
+   7:00 PM start · 20-min levels · 10-min breaks after every round
+   THROUGH the first chip-up; after that rounds run back-to-back.
+   Bomb pots fire at the START and MIDPOINT of every playing level
+   from 25/50 through 2,000/4,000, then stop at the chip-up to whites. */
+const START = { h: 19, m: 0 };           // 7:00 PM
+const BOMB_SECS = 60;                     // how long each bomb pot alert holds (seconds)
+const LEVELS = [
+  { play:true,  name:'Level 1',  sb:25,    bb:50,     dur:20, bomb:true },
+  { brk:true,   name:'Break',    dur:10 },
+  { play:true,  name:'Level 2',  sb:50,    bb:100,    dur:20, bomb:true },
+  { brk:true,   name:'Break',    dur:10 },
+  { play:true,  name:'Level 3',  sb:100,   bb:200,    dur:20, bomb:true },
+  { brk:true,   name:'Break',    dur:10 },
+  { play:true,  name:'Level 4',  sb:200,   bb:400,    dur:20, bomb:true },
+  { brk:true,   name:'Break &amp; Chip-Up', dur:10, chip:'Color up to 500 chips (green)' },
+  { play:true,  name:'Level 5',  sb:500,   bb:1000,   dur:20, bomb:true },
+  { play:true,  name:'Level 6',  sb:1000,  bb:2000,   dur:20, bomb:true },
+  { play:true,  name:'Level 7',  sb:2000,  bb:4000,   dur:20, bomb:true },
+  { brk:true,   name:'Chip-Up to Whites', dur:10, chip:'Color up to 5,000 chips (white)', endsBomb:true },
+  { play:true,  name:'Level 8',  sb:5000,  bb:10000,  dur:20 },
+  { play:true,  name:'Level 9',  sb:10000, bb:20000,  dur:20 },
+  { play:true,  name:'Level 10', sb:20000, bb:40000,  dur:20 },
+  { play:true,  name:'Level 11', sb:40000, bb:80000,  dur:20 },
+  { play:true,  name:'Level 12', sb:80000, bb:160000, dur:20 },
+];
+// index of the last level that still has bomb pots (2,000/4,000 = Level 7)
+const LAST_BOMB_IDX = LEVELS.reduce((a,l,i)=>l.bomb?i:a, -1);
+
+const fmt = n => n.toLocaleString('en-US');
+const mmss = s => `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+const POP = '<span class="bp bp-xs"></span>'; // inline bomb-pop icon
+const ANG = ['', 'ang-45l', 'ang-side', 'ang-45r', 'ang-back']; // schedule marker angle rotation
+const POP_SPIN = [];
+let _spinI=null,_spinK=0,_spinOff=0;
+function startPopSpin(){ const img=document.getElementById("popHero"); if(!img) return; _spinK=_spinOff; _spinOff=(_spinOff+1)%POP_SPIN.length; clearInterval(_spinI); const t=()=>{ img.src=POP_SPIN[_spinK%POP_SPIN.length]; _spinK++; }; t(); _spinI=setInterval(t,170); }
+function stopPopSpin(){ clearInterval(_spinI); _spinI=null; }
+
+/* ---------------- Timer engine ---------------- */
+const TT = {
+  idx: 0,
+  remain: LEVELS[0].dur*60,
+  running: false,
+  muted: false,
+  firedStart: false,
+  firedMid: false,
+  bombActive: false,
+
+  cur(){ return LEVELS[this.idx]; },
+  mid(){ const l=this.cur(); return l.play ? Math.floor(l.dur*60/2) : -1; },
+
+  setLevel(i, forward){
+    i = Math.max(0, Math.min(LEVELS.length-1, i));
+    this.idx = i;
+    this.remain = LEVELS[i].dur*60;
+    this.firedStart = false;
+    this.firedMid = false;
+    if(!forward){                       // prev / reset: never auto-fire
+      this.firedStart = true;
+      this.firedMid = true;
+    } else if(LEVELS[i].bomb && this.running){
+      this.fireBomb('start'); this.firedStart = true;   // flowed in while running
+    }
+    render();
+    scoreOverride = null; updateScoreboard();          // re-evaluate (auto-show during breaks)
+  },
+
+  toggle(){ this.running ? this.pause() : this.start(); },
+  start(){
+    this.running = true;
+    const l = this.cur();
+    if(l.bomb && !this.firedStart){ this.fireBomb('start'); this.firedStart = true; }
+    render();
+  },
+  pause(){ this.running = false; render(); },
+
+  addMin(){ this.remain += 60; render(); },
+  subMin(){ this.remain = Math.max(0, this.remain-60); render(); },
+  next(){ if(this.idx < LEVELS.length-1) this.setLevel(this.idx+1, true); },
+  prev(){ if(this.idx > 0) this.setLevel(this.idx-1, false); },
+  reset(){ this.running=false; this.setLevel(0, false); },
+
+  tick(){
+    updateTod();
+    updateScoreboard();
+    if(!this.running || this.remain<=0) return;
+    this.remain--;
+    // midpoint bomb pot
+    if(this.cur().bomb && !this.firedMid && this.remain === this.mid()){
+      this.fireBomb('mid'); this.firedMid = true;
+    }
+    if(this.remain <= 0){
+      levelEndSound();
+      const ending = this.cur();
+      setTimeout(()=>{
+        if(this.idx >= LEVELS.length-1){ this.running=false; render(); return; }
+        // after a break we pause & wait for the director (running=false), but
+        // still pass forward=true so the next level's START bomb pot fires on Play.
+        // rounds with no break after them flow straight on (still running).
+        if(ending.brk){ this.running=false; this.setLevel(this.idx+1, true); }
+        else{ this.setLevel(this.idx+1, true); }
+      }, 900);
+    }
+    render();
+  },
+
+  manualBomb(){ this.fireBomb('manual'); },
+  toggleMute(){ this.muted=!this.muted; document.getElementById('muteBtn').textContent = this.muted?'🔇 Muted':'🔊 Sound'; },
+
+  /* ---- bomb pot alert (auto-triggered; holds for BOMB_SECS) ---- */
+  fireBomb(kind){
+    const l = this.cur();
+    const bb = l.play ? fmt(l.bb) : '';
+    const which = kind==='mid' ? 'MID-LEVEL RAINBOW EXPLOSION'
+                : kind==='start' ? 'NEW LEVEL — RAINBOW EXPLOSION'
+                : 'RAINBOW EXPLOSION';
+    document.getElementById('whichText').innerHTML = bb ? `${which}<br><span class="post-amt">POST ${bb}</span>` : which;
+    document.getElementById('bigText').textContent = 'RAINBOW EXPLOSION!';
+
+    const ov = document.getElementById('overlay');
+    const sh = document.getElementById('shake');
+    const fl = document.getElementById('flash');
+
+    // clear any prior alert cleanly (e.g. rapid manual re-trigger)
+    clearTimeout(this._calmT); clearInterval(this._bombInt);
+
+    // energetic flash for the whole minute; shake + dense fireworks for the first 3s "detonation"
+    ov.classList.add('show'); sh.classList.add('go'); fl.className = 'flash hold';
+    startFireworks();
+    startPopSpin();
+    bombSound();
+
+    this.bombRemain = BOMB_SECS;
+    updateBombCorner();
+
+    // ease off the shake / thin the fireworks after the detonation, but keep it going off
+    this._calmT = setTimeout(()=>{ sh.classList.remove('go'); holdFireworks(); }, 3000);
+
+    // per-second countdown; periodic rumble; auto-dismiss at 0
+    this._bombInt = setInterval(()=>{
+      this.bombRemain--;
+      updateBombCorner();
+      if(this.bombRemain > 0 && this.bombRemain % 12 === 0) boom(0, 0.5);
+      if(this.bombRemain <= 0) this.dismissBomb();
+    }, 1000);
+  },
+  dismissBomb(){
+    document.getElementById('overlay').classList.remove('show');
+    document.getElementById('shake').classList.remove('go');
+    document.getElementById('flash').className = 'flash';
+    stopFireworks();
+    stopPopSpin();
+    clearTimeout(this._calmT); clearInterval(this._bombInt);
+  }
+};
+window.TT = TT;
+
+/* ---------------- Rendering ---------------- */
+function updateTod(){
+  const d = new Date();
+  let h = d.getHours(), m = d.getMinutes();
+  const ap = h>=12?'PM':'AM'; h = h%12 || 12;
+  document.getElementById('todClock').textContent = `${h}:${String(m).padStart(2,'0')} ${ap}`;
+}
+
+function nextPlayIndex(from){
+  for(let i=from+1;i<LEVELS.length;i++) if(LEVELS[i].play) return i;
+  return -1;
+}
+
+// once we've chipped up to whites (5,000+), blinds are shown as # of white chips (1/2, 2/4, ...)
+const WHITE = 5000;
+function blindDisplay(l){
+  if(l.sb >= WHITE) return { sb:String(l.sb/WHITE), bb:String(l.bb/WHITE), chips:true };
+  return { sb:fmt(l.sb), bb:fmt(l.bb), chips:false };
+}
+
+// corner readouts on the bomb-pot overlay: main blind clock (still running) + bomb countdown
+function updateBombCorner(){
+  document.querySelector('#ovClock .ov-val').textContent = mmss(Math.max(0, TT.remain));
+  document.querySelector('#ovCount .ov-val').textContent = mmss(Math.max(0, TT.bombRemain||0));
+}
+
+function render(){
+  const l = TT.cur();
+  const stage = document.getElementById('stage');
+  const t = document.getElementById('timeDisp');
+
+  document.getElementById('lvlName').innerHTML =
+    l.play ? `Level <span class="num">${l.name.replace(/\D/g,'')}</span>` : `<span style="color:var(--break)">${l.name}</span>`;
+
+  t.textContent = mmss(TT.remain);
+  t.classList.toggle('paused', !TT.running);
+  t.classList.toggle('warn', TT.running && TT.remain<=60 && TT.remain>0);
+
+  // blinds card
+  const now = document.getElementById('blindNow');
+  const note = document.getElementById('breakNote');
+  const nowLab = document.getElementById('blindNowLab');
+  if(l.play){
+    const b = blindDisplay(l);
+    now.innerHTML = `<span class="sb">${b.sb}</span><span class="sl"> / </span><span class="bb">${b.bb}</span>`;
+    nowLab.textContent = b.chips ? 'Blinds Now · white chips' : 'Blinds Now';
+    note.style.display='none';
+    stage.classList.remove('breakmode');
+  }else{
+    now.innerHTML = `<span style="color:var(--break)">ON BREAK</span>`;
+    nowLab.textContent = 'Blinds Now';
+    note.style.display = l.chip ? 'block':'none';
+    note.innerHTML = l.chip ? `🎨 ${l.chip}${l.endsBomb?' &nbsp;•&nbsp; <b style="color:var(--danger)">Rainbow pots END</b>':''}` : '';
+    stage.classList.add('breakmode');
+  }
+  const np = nextPlayIndex(TT.idx);
+  if(np<0){ document.getElementById('blindNext').textContent = '—'; }
+  else { const nb = blindDisplay(LEVELS[np]); document.getElementById('blindNext').textContent = `${nb.sb} / ${nb.bb}${nb.chips?' (whites)':''}`; }
+
+  // play button
+  const pb = document.getElementById('playBtn');
+  pb.textContent = TT.running ? '❚❚ Pause' : '▶ Start';
+  pb.classList.toggle('paused', !TT.running);
+
+  // bomb status
+  const st = document.getElementById('bombStatus');
+  const active = TT.idx <= LAST_BOMB_IDX;
+  st.innerHTML = active ? POP+' Rainbow Explosions Active' : '✔ Rainbow Explosions Ended (whites)';
+  st.className = 'status ' + (active?'on':'off');
+
+  // next-bomb countdown
+  const nb = document.getElementById('nextBomb');
+  if(!active || !l.bomb){
+    nb.className='nextbomb dead';
+    nb.innerHTML = active ? `Next ${POP} at next level` : 'Rainbow pots complete';
+  }else{
+    nb.className='nextbomb';
+    if(!TT.firedMid && TT.remain > TT.mid()){
+      nb.innerHTML = `Next ${POP} (mid) in <b>${mmss(TT.remain-TT.mid())}</b>`;
+    }else{
+      nb.innerHTML = `Next ${POP} at next level`;
+    }
+  }
+
+  renderSchedule();
+}
+
+function renderSchedule(){
+  const list = document.getElementById('schedList');
+  const base = new Date(); base.setHours(START.h, START.m, 0, 0);
+  let acc = 0, html = '', bombN = 0;
+  LEVELS.forEach((l,i)=>{
+    const when = new Date(base.getTime() + acc*60000);
+    let hh = when.getHours(); const ap = hh>=12?'PM':'AM'; hh = hh%12||12;
+    const tstr = `${hh}:${String(when.getMinutes()).padStart(2,'0')}`;
+    const cls = ['row'];
+    if(l.brk) cls.push('brk');
+    if(i===TT.idx) cls.push('cur'); else if(i<TT.idx) cls.push('done');
+    if(l.endsBomb) cls.push('endmark');
+    const bd = l.play ? blindDisplay(l) : null;
+    const desc = l.play ? `${l.name} &nbsp; ${bd.sb}/${bd.bb}${bd.chips?' w':''}`
+                        : (l.endsBomb ? `Chip-Up → Whites · ${POP} STOP` : l.name + (l.chip?' · chip-up':''));
+    const bomb = (l.play && l.bomb) ? `<span class="bp bp-xs ${ANG[bombN++ % ANG.length]}"></span>` : '';
+    html += `<div class="${cls.join(' ')}" onclick="TT.setLevel(${i}, ${i>TT.idx})">`
+          + `<span class="t">${tstr}</span><span class="d">${desc}</span><span class="b">${bomb}</span></div>`;
+    acc += l.dur;
+  });
+  list.innerHTML = html;
+}
+
+/* ---------------- Season standings scoreboard ---------------- */
+let sbRaw = [], sbMeta = {};
+let scoreVisible = false, scoreOverride = null;       // null = auto; true/false = manual
+const GAME_START_MIN = START.h*60 + START.m;          // 7:00 PM
+const SCORES_UNTIL_MIN = GAME_START_MIN - 10;          // scores/countdown until 6:58
+function nowMin(){ const d = new Date(); return d.getHours()*60 + d.getMinutes() + d.getSeconds()/60; }
+function esc(s){ return String(s==null?'':s).replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+window.__setStandings = function(raw, meta){
+  sbRaw = raw || []; sbMeta = meta || {};
+  if(sbMeta.season){
+    document.getElementById('sbSub').textContent = `${sbMeta.season} — Wild Corgi season standings, see where you stand`;
+  }
+  renderStandings();
+};
+window.__standingsFail = function(){
+  document.getElementById('sbPoints').innerHTML = '<div class="sb-note">Standings load unavailable — open on the live site.</div>';
+  document.getElementById('sbBounty').innerHTML = '';
+};
+
+// Championship ranking — mirrors the normal timer's buildChampionshipRanking:
+// every "qualified" player gets a berth first, then the top non-qualified fill up to 20
+// spots, and the remaining non-qualified are appended below. NOT a raw points sort.
+function buildChampionshipRanking(data){
+  const TOTAL_SPOTS = 20;
+  const byPts = (a,b)=> (b.points - a.points) || (b.gamesPlayed - a.gamesPlayed) || a.name.localeCompare(b.name);
+  const qualified = data.filter(p=>p.qualified).sort(byPts);
+  const nonQualified = data.filter(p=>!p.qualified).sort(byPts);
+  const spots = Math.max(0, TOTAL_SPOTS - qualified.length);
+  const top20 = [...qualified, ...nonQualified.slice(0, spots)].sort(byPts);
+  return [...top20, ...nonQualified.slice(spots)];
+}
+
+// tie-aware display ranks (mirrors the normal timer: tie = equal key + equal gamesPlayed)
+function computeRanks(list, tieEq){
+  list.forEach((p,i)=>{ p._r = (i>0 && tieEq(list[i-1],p)) ? list[i-1]._r : i+1; });
+  const counts = {}; list.forEach(p=> counts[p._r] = (counts[p._r]||0)+1);
+  list.forEach(p=> p._tied = counts[p._r] > 1);
+}
+function sbRow(p, val, badge){
+  const tier = p._r<=5 ? 'tier-1' : p._r<=10 ? 'tier-2' : p._r<=20 ? 'tier-3' : '';
+  const rk = (p._tied ? 'T' : '') + p._r;
+  return `<div class="sb-row ${tier}"><span class="sb-rank">${rk}</span>`
+       + `<span class="sb-name">${esc(p.name)}</span>${badge||''}`
+       + `<span class="sb-val">${val}</span></div>`;
+}
+function renderStandings(){
+  if(!sbRaw.length){
+    document.getElementById('sbPoints').innerHTML = '<div class="sb-note">No standings yet</div>';
+    document.getElementById('sbBounty').innerHTML = '<div class="sb-note">No bounties recorded</div>';
+    return;
+  }
+  // CHAMPIONSHIP (right): qualification-aware ranking, points values.
+  const champ = buildChampionshipRanking(sbRaw).slice(0, 40);
+  computeRanks(champ, (a,b)=> a.points===b.points && a.gamesPlayed===b.gamesPlayed);
+  const shark = ' <span class="sb-title-badge shark">🃏 Card Shark</span>';
+  // build HTML NOW (captures champ ranks) before bounty recomputes _r on the shared objects
+  const champHtml = champ.map((p,i)=> sbRow(p, Math.round(p.points||0), i===0?shark:'')).join('');
+  // BOUNTY (left): raw bounty ranking, bounty counts.
+  const bounty = sbRaw.filter(p=>p.bounties>0)
+    .sort((a,b)=> (b.bounties-a.bounties) || (b.gamesPlayed-a.gamesPlayed) || a.name.localeCompare(b.name))
+    .slice(0, 40);
+  computeRanks(bounty, (a,b)=> a.bounties===b.bounties && a.gamesPlayed===b.gamesPlayed);
+  const hunter = ' <span class="sb-title-badge hunter">🎯 Bounty Hunter</span>';
+  const bountyHtml = bounty.map((p,i)=> sbRow(p, p.bounties||0, i===0?hunter:'')).join('');
+  document.getElementById('sbPoints').innerHTML = champHtml;
+  document.getElementById('sbBounty').innerHTML = bountyHtml || '<div class="sb-note">No bounties recorded</div>';
+}
+
+function scoreboardShouldShow(){
+  if(scoreOverride !== null) return scoreOverride;
+  const t = nowMin();
+  const preGame = t < SCORES_UNTIL_MIN;               // before 6:50
+  const onBreak = TT.cur().brk === true && TT.remain <= 8*60 && TT.remain >= 2*60; // breaks: only 8:00->2:00 left
+  return preGame || onBreak;
+}
+function updateScoreboard(){
+  const show = scoreboardShouldShow();
+  scoreVisible = show;
+  document.getElementById('scoreboard').classList.toggle('show', show);
+  if(!show) return;
+  const wrap = document.getElementById('sbCountWrap');
+  const lab = document.getElementById('sbCountLab');
+  const cd = document.getElementById('sbCountdown');
+  if(TT.cur().brk){
+    lab.textContent = 'Back in';
+    cd.textContent = mmss(Math.max(0, TT.remain));
+    wrap.style.visibility = 'visible';
+  } else {
+    const game = new Date(); game.setHours(START.h, START.m, 0, 0);
+    const diff = Math.round((game - new Date())/1000);
+    if(diff > 0){
+      lab.textContent = 'Game starts in';
+      cd.textContent = diff >= 3600 ? `${Math.floor(diff/3600)}h ${Math.floor((diff%3600)/60)}m` : mmss(diff);
+      wrap.style.visibility = 'visible';
+    } else { wrap.style.visibility = 'hidden'; }
+  }
+}
+function toggleScores(){ scoreOverride = scoreVisible ? false : true; updateScoreboard(); }
+window.toggleScores = toggleScores;
+
+/* ---------------- Audio (Web Audio, no files) ---------------- */
+let _ac = null;
+function ac(){ if(!_ac) _ac = new (window.AudioContext||window.webkitAudioContext)(); if(_ac.state==='suspended') _ac.resume(); return _ac; }
+
+function boom(delay=0, gain=0.9){
+  if(TT.muted) return;
+  const c = ac(), t = c.currentTime + delay;
+  // low thump
+  const o=c.createOscillator(), g=c.createGain();
+  o.type='sine'; o.frequency.setValueAtTime(140,t); o.frequency.exponentialRampToValueAtTime(34,t+0.55);
+  g.gain.setValueAtTime(gain,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.75);
+  o.connect(g).connect(c.destination); o.start(t); o.stop(t+0.8);
+  // noise crack
+  const len=Math.floor(c.sampleRate*0.5), buf=c.createBuffer(1,len,c.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2);
+  const n=c.createBufferSource(); n.buffer=buf;
+  const f=c.createBiquadFilter(); f.type='lowpass'; f.frequency.setValueAtTime(2200,t); f.frequency.exponentialRampToValueAtTime(200,t+0.4);
+  const ng=c.createGain(); ng.gain.setValueAtTime(gain*0.7,t); ng.gain.exponentialRampToValueAtTime(0.001,t+0.5);
+  n.connect(f).connect(ng).connect(c.destination); n.start(t); n.stop(t+0.5);
+}
+function siren(){
+  if(TT.muted) return;
+  const c=ac(), t=c.currentTime;
+  const o=c.createOscillator(), g=c.createGain();
+  o.type='sawtooth'; o.frequency.setValueAtTime(420,t); o.frequency.linearRampToValueAtTime(900,t+0.35);
+  g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(0.35,t+0.05); g.gain.exponentialRampToValueAtTime(0.001,t+0.4);
+  o.connect(g).connect(c.destination); o.start(t); o.stop(t+0.42);
+}
+function bombSound(){ siren(); boom(0.28,0.95); boom(0.6,0.55); boom(0.95,0.4); }
+function levelEndSound(){
+  if(TT.muted) return;
+  const c=ac(); [0,0.18,0.36].forEach((dt,k)=>{
+    const t=c.currentTime+dt, o=c.createOscillator(), g=c.createGain();
+    o.type='square'; o.frequency.value=560+k*180;
+    g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(0.25,t+0.02); g.gain.exponentialRampToValueAtTime(0.001,t+0.15);
+    o.connect(g).connect(c.destination); o.start(t); o.stop(t+0.16);
+  });
+}
+
+/* ---------------- Fireworks (canvas particle burst) ---------------- */
+const canvas = document.getElementById('fx');
+const cx = canvas.getContext('2d');
+let parts = [], fxRun = false, fxRaf = null, lastBurst = 0, burstGap = 320, burstN = 60;
+const COLORS = ['#ff004c','#ff8a00','#ffe600','#3be06a','#00c3ff','#7a5cff','#ff2fd0']; // full rainbow
+
+function sizeCanvas(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+addEventListener('resize', sizeCanvas); sizeCanvas();
+
+function burst(x,y,n){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2, sp=2+Math.random()*7;
+    parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp - 2,life:1,
+      col:COLORS[(Math.random()*COLORS.length)|0], r:2+Math.random()*3});
+  }
+}
+function startFireworks(){
+  parts=[]; fxRun=true; lastBurst=0; burstGap=320; burstN=60;   // intense intro
+  burst(innerWidth/2, innerHeight/2, 90);
+  if(!fxRaf) fxRaf = requestAnimationFrame(fxLoop);
+}
+function holdFireworks(){ burstGap=650; burstN=48; }            // keeps going off, a touch thinner than the intro
+function stopFireworks(){ fxRun=false; }
+function fxLoop(ts){
+  cx.clearRect(0,0,canvas.width,canvas.height);
+  if(fxRun && ts-lastBurst > burstGap){
+    burst(innerWidth*(0.15+Math.random()*0.7), innerHeight*(0.15+Math.random()*0.5), burstN);
+    lastBurst = ts;
+  }
+  parts.forEach(p=>{
+    p.vy += 0.12; p.x += p.vx; p.y += p.vy; p.vx *= 0.99; p.life -= 0.014;
+  });
+  parts = parts.filter(p=>p.life>0);
+  parts.forEach(p=>{
+    cx.globalAlpha = Math.max(0,p.life);
+    cx.fillStyle = p.col;
+    cx.beginPath(); cx.arc(p.x,p.y,p.r,0,Math.PI*2); cx.fill();
+  });
+  cx.globalAlpha = 1;
+  if(fxRun || parts.length){ fxRaf = requestAnimationFrame(fxLoop); }
+  else { fxRaf = null; }
+}
+
+/* ---------------- Keyboard ---------------- */
+addEventListener('keydown', e=>{
+  if(e.target.tagName==='INPUT') return;
+  switch(e.key){
+    case ' ': e.preventDefault(); TT.toggle(); break;
+    case 'ArrowRight': TT.next(); break;
+    case 'ArrowLeft': TT.prev(); break;
+    case 'b': case 'B': TT.manualBomb(); break;
+    case 'm': case 'M': TT.toggleMute(); break;
+    case 'f': case 'F':
+      if(!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+      else document.exitFullscreen?.();
+      break;
+    case 'Escape': if(document.getElementById('overlay').classList.contains('show')) TT.dismissBomb(); break;
+  }
+});
+
+/* ---------------- Boot ---------------- */
+updateTod();
+render();
+document.querySelector('.bg-pop').src = '../img/pocket-queenz.png'; // faded logo watermark
+updateScoreboard();
+setInterval(()=>TT.tick(), 1000);
+</script>
+
+<!-- Live Wild Corgi standings (points + bounties). Hosted-only; degrades gracefully offline. -->
+<script type="module">
+  import { PokerAPI } from '../firebase-api.js';
+  (async () => {
+    try {
+      const res = await PokerAPI.getLeaderboard({ venue: 'Wild Corgi' });
+      if (res && res.status === 'success') {
+        window.__setStandings(res.standings || [], { season: res.seasonName, champDate: res.championshipDate });
+      } else if (window.__standingsFail) window.__standingsFail();
+    } catch (e) {
+      console.error('standings load failed', e);
+      if (window.__standingsFail) window.__standingsFail();
+    }
+  })();
+</script>
+<script src="/back-nav.js?v=1" data-home="/gameday.html" data-z="500"></script>
+</body>
+</html>

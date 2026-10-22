@@ -1,0 +1,15 @@
+node_modules/
+functions/node_modules/
+.env
+functions/.env
+*.local
+.firebase/
+firebase-debug*.log
+firestore-debug.log
+ui-debug.log
+database-debug.log
+pubsub-debug.log
+__pycache__/
+*.pyc
+.build-manifest.txt
+demo/screenshots/out/

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tonight - All-In Poker Staff</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon" type="image/svg+xml" href="/img/favicon-staff.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* Palette mirrors gameday.html so this reads as the same staff surface. */
+    :root {
+      --bg-color: #050505;
+      --card-bg: rgba(20, 20, 20, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-gold: #d4af37;
+      --accent-blue: #00aaff;
+      --accent-green: #00ff88;
+      --accent-orange: #ff9900;
+      --accent-purple: #cc66ff;
+      --accent-red: #ff4444;
+      --text-main: #ffffff;
+      --text-dim: #888888;
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-color);
+      background: radial-gradient(circle at top right, #001a33 0%, #050505 60%);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    a { color: var(--accent-blue); }
+    button { font-family: inherit; }
+
+    .topbar {
+      display: flex; align-items: center; gap: 12px;
+      padding: 18px 16px 10px; max-width: 760px; margin: 0 auto;
+    }
+    .back {
+      width: 42px; height: 42px; flex: none; border-radius: 12px; text-decoration: none;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--card-bg); border: 1px solid var(--card-border); color: var(--accent-blue); font-size: 1.2rem;
+    }
+    .title { flex: 1; min-width: 0; }
+    .title h1 { font-size: 1.35rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; line-height: 1.1; }
+    .title .sub { color: var(--text-dim); font-size: 0.8rem; font-weight: 600; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .refresh {
+      flex: none; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main);
+      border-radius: 12px; padding: 10px 14px; font-weight: 700; font-size: 0.85rem; cursor: pointer;
+    }
+    .refresh.spinning { opacity: 0.6; }
+
+    .wrap { max-width: 760px; margin: 0 auto; padding: 0 16px 80px; }
+
+    .picker { display: flex; gap: 8px; margin: 6px 0 16px; }
+    .picker select {
+      flex: 1; min-width: 0; background: #000; color: #fff; border: 1px solid var(--card-border);
+      border-radius: 12px; padding: 12px; font-size: 0.95rem; font-family: inherit; font-weight: 600;
+    }
+
+    .alert-card { background: rgba(255,68,68,0.08); border: 1px solid rgba(255,68,68,0.35); border-radius: 18px; padding: 16px 18px; margin-bottom: 16px; }
+    .alert-head { display: flex; align-items: center; gap: 10px; font-weight: 800; color: var(--accent-red); text-transform: uppercase; letter-spacing: 1px; font-size: 0.82rem; }
+    .alert-sub { color: var(--text-dim); font-size: 0.84rem; margin: 6px 0 12px; line-height: 1.45; }
+    .alert-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid rgba(255,68,68,0.18); }
+    .alert-game { font-weight: 700; font-size: 0.9rem; }
+    .alert-detail { color: var(--text-dim); font-size: 0.76rem; margin-top: 3px; line-height: 1.4; }
+    .alert-fix { flex: none; background: var(--accent-red); color: #fff; text-decoration: none; font-weight: 800; font-size: 0.76rem; padding: 9px 14px; border-radius: 10px; text-transform: uppercase; }
+
+    .section-label {
+      font-size: 0.72rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px;
+      margin: 26px 0 12px 4px; display: flex; align-items: center; gap: 10px;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--card-border); }
+
+    .card {
+      background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--card-border);
+      border-radius: 20px; padding: 18px; margin-bottom: 14px; box-shadow: var(--glass-shadow);
+      border-left: 4px solid var(--accent, var(--card-border));
+    }
+    .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+    .card-title { font-weight: 800; font-size: 1rem; letter-spacing: 0.02em; }
+    .card-note { color: var(--text-dim); font-size: 0.8rem; font-weight: 600; }
+
+    .games { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 600px) { .games { grid-template-columns: 1fr; } }
+    .game { --accent: var(--accent-blue); }
+    .game.g2 { --accent: var(--accent-purple); }
+    .stat-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    .stat { flex: 1; background: rgba(255,255,255,0.04); border-radius: 12px; padding: 10px; text-align: center; }
+    .stat .n { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
+    .stat .l { color: var(--text-dim); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
+    .stat.here .n { color: var(--accent-green); }
+    .stat.coming .n { color: var(--accent-gold); }
+
+    .list-label { font-size: 0.72rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px; margin: 12px 0 6px; }
+    .row {
+      display: flex; align-items: center; gap: 10px; padding: 10px 8px; border-radius: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.95rem;
+    }
+    .row:last-child { border-bottom: none; }
+    .row .num { color: var(--text-dim); font-size: 0.75rem; width: 22px; text-align: right; font-variant-numeric: tabular-nums; flex: none; }
+    .row .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+    .row .act {
+      flex: none; background: rgba(255,255,255,0.06); border: 1px solid var(--card-border); color: var(--text-main);
+      border-radius: 9px; padding: 7px 11px; font-size: 0.76rem; font-weight: 700; cursor: pointer;
+    }
+    .row .act.primary { background: var(--accent-green); color: #000; border-color: transparent; }
+    .row .act:disabled { opacity: 0.5; cursor: default; }
+    .row.arrived .name { color: var(--text-dim); text-decoration: line-through; }
+    .empty { color: var(--text-dim); font-size: 0.85rem; padding: 8px; text-align: center; }
+
+    .credit { --accent: var(--accent-gold); }
+    .field { position: relative; margin-bottom: 10px; }
+    .player-input {
+      width: 100%; background: #000; border: 2px solid var(--card-border); border-radius: 14px; color: #fff;
+      font-size: 1.05rem; padding: 14px; outline: none;
+    }
+    .player-input:focus { border-color: var(--accent-gold); }
+    .suggestions {
+      position: absolute; left: 0; right: 0; top: 100%; z-index: 20;
+      background: #111; border: 1px solid var(--card-border); border-radius: 14px; margin-top: 6px;
+      max-height: 240px; overflow-y: auto; box-shadow: var(--glass-shadow); display: none;
+    }
+    .suggestions.open { display: block; }
+    .suggestion { padding: 13px 16px; border-bottom: 1px solid var(--card-border); cursor: pointer; font-size: 0.95rem; }
+    .suggestion:last-child { border-bottom: none; }
+    .suggestion .aka { color: var(--text-dim); font-size: 0.8rem; margin-left: 6px; }
+    .suggestion.new { color: var(--accent-gold); }
+    .toggle { display: flex; gap: 6px; margin-bottom: 12px; }
+    .toggle button {
+      flex: 1; background: rgba(255,255,255,0.04); border: 1px solid var(--card-border); color: var(--text-dim);
+      border-radius: 12px; padding: 11px; font-weight: 700; font-size: 0.85rem; cursor: pointer;
+    }
+    .toggle button.active { background: rgba(212,175,55,0.15); border-color: var(--accent-gold); color: var(--accent-gold); }
+    .go {
+      width: 100%; background: var(--accent-gold); color: #000; border: none; border-radius: 14px;
+      padding: 15px; font-size: 1rem; font-weight: 800; cursor: pointer;
+    }
+    .go:disabled { opacity: 0.5; cursor: default; }
+    .result { margin-top: 10px; font-size: 0.88rem; line-height: 1.45; padding: 10px 12px; border-radius: 12px; display: none; }
+    .result.ok { display: block; background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.3); color: #c8ffe4; }
+    .result.warn { display: block; background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.35); color: #f3e3a8; }
+    .result.err { display: block; background: rgba(255,68,68,0.08); border: 1px solid rgba(255,68,68,0.35); color: #ffc9c9; }
+    .hint { color: var(--text-dim); font-size: 0.78rem; line-height: 1.45; margin-top: 10px; }
+
+    .shots { --accent: #ff6b35; }
+    /* Player requests queue */
+    .pr-req { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .pr-req:last-child { border-bottom: none; }
+    .pr-req .line { font-weight: 700; line-height: 1.4; }
+    .pr-req .meta { color: var(--text-dim); font-size: 0.78rem; margin: 3px 0 8px; }
+    .pr-req .words { color: var(--text-dim); font-size: 0.84rem; font-style: italic; margin-bottom: 8px; }
+    .pr-req .detail { background: rgba(0,0,0,0.35); border: 1px solid var(--card-border); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; font-size: 0.84rem; line-height: 1.5; }
+    .pr-req .detail .ft { color: var(--text-dim); }
+    .pr-req .detail .warn { color: #f3e3a8; }
+    .pr-req .detail .chg { color: #c8ffe4; }
+    .pr-req .acts { display: flex; gap: 8px; }
+    .pr-req .acts button { flex: 1; border-radius: 12px; padding: 11px; font-weight: 800; font-size: 0.9rem; cursor: pointer; border: 1px solid var(--card-border); font-family: inherit; }
+    .pr-req .accept { background: var(--accent-green); color: #000; border-color: transparent; }
+    .pr-req .respond { background: rgba(255,255,255,0.05); color: #fff; }
+    .pr-req .decline { background: rgba(255,68,68,0.12); color: #ffc9c9; }
+    .pr-req .acts button:disabled { opacity: 0.5; }
+    .pr-req .reply-row { display: flex; gap: 8px; margin-top: 8px; }
+    .pr-req .reply-row input { flex: 1; min-width: 0; background: #000; border: 2px solid var(--card-border); border-radius: 12px; color: #fff; padding: 10px 12px; font-size: 0.95rem; outline: none; font-family: inherit; }
+    .pr-req .reply-row button { border-radius: 12px; padding: 10px 14px; font-weight: 800; cursor: pointer; border: 1px solid var(--card-border); background: var(--accent-blue); color: #000; font-family: inherit; }
+    .pr-req .out { margin-top: 8px; font-size: 0.86rem; }
+    .shot-row { display: flex; align-items: center; gap: 10px; padding: 9px 4px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
+    .shot-row:last-child { border-bottom: none; }
+    .shot-row .who { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+    .shot-row .meta { color: var(--text-dim); font-size: 0.78rem; flex: none; font-variant-numeric: tabular-nums; }
+    .pill { flex: none; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding: 4px 8px; border-radius: 999px; }
+    .pill.open { background: rgba(255,107,53,0.18); color: #ffb08a; }
+    .pill.done { background: rgba(0,255,136,0.12); color: var(--accent-green); }
+
+    .links { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 8px; }
+    .link {
+      display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff;
+      background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 14px; font-weight: 700; font-size: 0.9rem;
+    }
+    .link span { font-size: 1.2rem; }
+    .footer { color: var(--text-dim); font-size: 0.75rem; text-align: center; margin-top: 22px; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 50;
+      background: #1a1a1a; border: 1px solid var(--accent-gold); color: #fff; padding: 10px 16px; border-radius: 999px;
+      font-size: 0.85rem; font-weight: 600; display: none; max-width: 90vw;
+    }
+    :focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 2px; }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <a class="back" data-back-nav href="gameday.html" aria-label="Back to Game Day">&#8592;</a>
+    <div class="title">
+      <h1>Tonight</h1>
+      <div class="sub" id="headerSub">Loading schedule&hellip;</div>
+    </div>
+    <button class="refresh" id="refreshBtn" onclick="refreshAll()">&#8635; Refresh</button>
+  </div>
+
+  <div class="wrap">
+
+    <div class="picker">
+      <select id="eventSelect" onchange="onEventChange()" aria-label="Game night"><option>Loading&hellip;</option></select>
+    </div>
+
+    <div id="unfinalizedAlert"></div>
+
+    <div class="section-label">Credit a player</div>
+    <div class="card credit">
+      <div class="card-head"><div class="card-title">Give attendance points (+10)</div><div class="card-note" id="creditContext"></div></div>
+      <div class="field">
+        <input class="player-input" id="creditName" placeholder="Player name" autocomplete="off" autocapitalize="words">
+        <div class="suggestions" id="creditSuggest"></div>
+      </div>
+      <div class="toggle">
+        <button type="button" id="creditG1" class="active" onclick="setCreditGame(1)">Game 1</button>
+        <button type="button" id="creditG2" onclick="setCreditGame(2)">Game 2</button>
+      </div>
+      <button class="go" id="creditBtn" onclick="submitCredit()">Add 10 points</button>
+      <div class="result" id="creditResult"></div>
+      <div class="hint">Works on any night in the list above, including games that are already finalized. If the player already has a top-10 finish for that game, nothing is added (their placement already includes attendance).</div>
+    </div>
+
+    <div class="games">
+      <div class="card game g1" id="gameCard1">
+        <div class="card-head"><div class="card-title" id="g1Title">Game 1</div><div class="card-note" id="g1Note"></div></div>
+        <div class="stat-row">
+          <div class="stat here"><div class="n" id="g1Here">0</div><div class="l">Checked in</div></div>
+          <div class="stat coming"><div class="n" id="g1Coming">0</div><div class="l">On the way</div></div>
+        </div>
+        <div class="list-label">On the way (RSVP, not here yet)</div>
+        <div id="g1Rsvp"><div class="empty">&hellip;</div></div>
+        <div class="list-label">Checked in</div>
+        <div id="g1Ci"><div class="empty">&hellip;</div></div>
+      </div>
+      <div class="card game g2" id="gameCard2">
+        <div class="card-head"><div class="card-title" id="g2Title">Game 2</div><div class="card-note" id="g2Note"></div></div>
+        <div class="stat-row">
+          <div class="stat here"><div class="n" id="g2Here">0</div><div class="l">Checked in</div></div>
+          <div class="stat coming"><div class="n" id="g2Coming">0</div><div class="l">On the way</div></div>
+        </div>
+        <div class="list-label">On the way (RSVP, not here yet)</div>
+        <div id="g2Rsvp"><div class="empty">&hellip;</div></div>
+        <div class="list-label">Checked in</div>
+        <div id="g2Ci"><div class="empty">&hellip;</div></div>
+      </div>
+    </div>
+
+    <div id="shotsSection">
+      <div class="section-label">Shot rounds</div>
+      <div class="card shots">
+        <div class="card-head"><div class="card-title">Tonight at the bar</div><div class="card-note" id="shotsNote"></div></div>
+        <div id="shotsList"><div class="empty">&hellip;</div></div>
+      </div>
+    </div>
+
+    <div class="section-label">Jump to</div>
+    <div class="links">
+      <a class="link" href="director.html"><span>&#128081;</span>Director</a>
+      <a class="link" href="checkin.html"><span>&#9989;</span>Kiosk</a>
+      <a class="link" href="bar.html"><span>&#127867;</span>Bar</a>
+      <a class="link" href="new-players.html"><span>&#128075;</span>New players</a>
+    </div>
+
+    <div class="footer" id="footerBar">&mdash;</div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script type="module">
+  // NOTE: import firebase-api with the SAME ?v as staff-auth.js so both resolve
+  // to one module instance (a second URL re-runs initializeApp).
+  import { PokerAPI, PlayerSearch, PokerSession, db, collection, query, where, orderBy, limit, getDocs, getDoc, doc, functions, httpsCallable } from './firebase-api.js?v=6';
+  import { requireStaff } from './staff-auth.js';
+
+  await requireStaff();
+
+  let currentVenue = 'Tight End';
+  let currentDate = null;          // M/D/YYYY (from schedule)
+  let currentEventType = 'Regular';
+  let dailyStats = null;
+  let directory = [];              // [{ name, aliases }]
+  let creditGame = 1;
+  let refreshTimer = null;
+
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  function toast(msg) {
+    const el = $('toast'); el.textContent = msg; el.style.display = 'block';
+    clearTimeout(el._t); el._t = setTimeout(() => el.style.display = 'none', 2600);
+  }
+  const isToday = () => currentDate && PokerSession.datesMatch(currentDate, PokerSession.todayStr());
+  const gameLabel = n => PokerSession.gameLabel(n, currentEventType).replace(' · 7PM', '').replace(' · 9PM', '');
+
+  // ── Schedule picker (same approach as director.html) ──────────────────────
+  async function loadSchedule() {
+    const sel = $('eventSelect');
+    try {
+      const [upRes, histRes] = await Promise.allSettled([
+        PokerAPI.getSchedule({ historical: false }),
+        PokerAPI.getSchedule({ historical: true })
+      ]);
+      const upcoming = upRes.status === 'fulfilled' ? (upRes.value.schedule || []) : [];
+      const historical = histRes.status === 'fulfilled' ? (histRes.value.schedule || []) : [];
+      const seen = new Set(); const all = [];
+      const push = (g, isPast) => {
+        const venue = g.venue || g.location || '';
+        const key = g.date + '|' + venue;
+        if (seen.has(key)) return;
+        seen.add(key); all.push({ ...g, venue, isPast });
+      };
+      upcoming.forEach(g => push(g, false));
+      historical.forEach(g => push(g, true));
+      all.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      sel.innerHTML = '';
+      if (!all.length) { sel.innerHTML = '<option>No games found</option>'; return; }
+
+      // Default: tonight if scheduled, else the most recent past night.
+      const today = PokerSession.todayStr();
+      let autoIdx = all.findIndex(g => PokerSession.datesMatch(g.date, today));
+      if (autoIdx < 0) autoIdx = all.findIndex(g => g.isPast);
+      if (autoIdx < 0) autoIdx = 0;
+
+      all.forEach((g, i) => {
+        const opt = document.createElement('option');
+        opt.value = g.date + '|' + g.venue + '|' + (g.type || 'Regular');
+        let label = `${g.date}  —  ${g.venue}`;
+        if (g.type && g.type !== 'Regular') label += `  (${g.type})`;
+        if (PokerSession.datesMatch(g.date, today)) label = '★ ' + label;
+        else if (g.isPast) label = '↩ ' + label;
+        opt.textContent = label;
+        sel.appendChild(opt);
+      });
+      sel.selectedIndex = autoIdx;
+      applyEventSelection();
+    } catch (e) {
+      console.error('loadSchedule error:', e);
+      sel.innerHTML = '<option>Error loading schedule</option>';
+    }
+  }
+
+  function applyEventSelection() {
+    const val = $('eventSelect').value;
+    if (!val || !val.includes('|')) return;
+    const [date, venue, type] = val.split('|');
+    currentDate = date; currentVenue = venue; currentEventType = type || 'Regular';
+    $('headerSub').textContent = `${currentVenue}  —  ${currentDate}${isToday() ? '' : '  (past night)'}`;
+    $('g1Title').textContent = gameLabel(1);
+    $('g2Title').textContent = gameLabel(2);
+    $('creditG1').textContent = gameLabel(1);
+    $('creditG2').textContent = gameLabel(2);
+    $('creditContext').textContent = `${currentVenue} · ${currentDate}`;
+    $('creditResult').className = 'result';
+    refreshAll();
+  }
+  window.onEventChange = applyEventSelection;
+
+  // ── Refresh ───────────────────────────────────────────────────────────────
+  window.refreshAll = async function () {
+    if (!currentDate) return;
+    const btn = $('refreshBtn');
+    btn.classList.add('spinning');
+    await Promise.allSettled([fetchDailyStats(), loadUnfinalized(), loadShots()]);
+    $('footerBar').textContent = 'Updated ' + new Date().toLocaleTimeString();
+    btn.classList.remove('spinning');
+    clearInterval(refreshTimer);
+    refreshTimer = setInterval(() => window.refreshAll(), 30000);
+  };
+
+  async function fetchDailyStats() {
+    try {
+      dailyStats = await PokerAPI.getDailyStats({ date: currentDate, venue: currentVenue });
+      renderGame(1); renderGame(2);
+    } catch (e) {
+      console.error('getDailyStats error:', e);
+      ['g1Rsvp', 'g1Ci', 'g2Rsvp', 'g2Ci'].forEach(id => $(id).innerHTML = '<div class="empty">Could not load</div>');
+    }
+  }
+
+  function renderGame(n) {
+    const g = (dailyStats && dailyStats['game' + n]) || {};
+    const here = g.checkedIn || [];
+    const rsvps = g.rsvpList || [];
+    const coming = rsvps.filter(p => !p.arrived);
+    $(`g${n}Here`).textContent = here.length;
+    $(`g${n}Coming`).textContent = coming.length;
+    $(`g${n}Note`).textContent = rsvps.length ? `${rsvps.length} RSVP'd` : '';
+
+    const rsvpEl = $(`g${n}Rsvp`);
+    rsvpEl.innerHTML = coming.length
+      ? coming.map((p, i) => `
+        <div class="row">
+          <span class="num">${i + 1}</span>
+          <span class="name">${esc(p.name)}</span>
+          <button class="act primary" onclick="checkInFromRsvp(${JSON.stringify(p.name)}, ${n})">Check in</button>
+        </div>`).join('')
+      : `<div class="empty">${rsvps.length ? 'Everyone who RSVP’d is here' : 'No RSVPs'}</div>`;
+
+    const ciEl = $(`g${n}Ci`);
+    ciEl.innerHTML = here.length
+      ? here.map((p, i) => `
+        <div class="row">
+          <span class="num">${i + 1}</span>
+          <span class="name">${esc(p.name)}</span>
+          <button class="act" onclick="removeCheckin(${JSON.stringify(p.name)}, ${n})">Remove</button>
+        </div>`).join('')
+      : '<div class="empty">No check-ins yet</div>';
+  }
+
+  window.checkInFromRsvp = async function (name, gameNum) {
+    if (!confirm(`Check in ${name} for ${gameLabel(gameNum)}?`)) return;
+    try {
+      const r = await PokerAPI.checkin({ player: name, date: currentDate, gameNum, venue: currentVenue });
+      if (r.status === 'success' || r.status === 'duplicate') { toast(`✓ ${name} checked in`); fetchDailyStats(); }
+      else toast(r.message || 'Check-in failed');
+    } catch (e) { toast('Error: ' + e.message); }
+  };
+
+  window.removeCheckin = async function (name, gameNum) {
+    if (!confirm(`Remove ${name} from ${gameLabel(gameNum)}?`)) return;
+    try {
+      await PokerAPI.removeCheckin({ player: name, date: currentDate, gameNum, venue: currentVenue });
+      toast(`Removed ${name}`); fetchDailyStats();
+    } catch (e) { toast('Error: ' + e.message); }
+  };
+
+  // ── Unfinalized games (same scan the hubs use) ────────────────────────────
+  async function loadUnfinalized() {
+    const host = $('unfinalizedAlert');
+    try {
+      const res = await PokerAPI.getUnfinalizedGames();
+      const games = (res && res.games) || [];
+      if (!games.length) { host.innerHTML = ''; return; }
+      const rows = games.map(g => {
+        const what = g.issue === 'NEVER_SCORED' ? 'no results entered' : `${g.eliminations} places entered, never submitted`;
+        return `<div class="alert-row"><div>
+          <div class="alert-game">${esc(g.venue)} &middot; ${esc(g.date)} &middot; Game ${g.gameNum}</div>
+          <div class="alert-detail">${g.checkins} checked in &middot; ${what} &middot; ${g.daysLate} days ago</div>
+        </div><a class="alert-fix" href="director.html">Fix</a></div>`;
+      }).join('');
+      host.innerHTML = `<div class="alert-card">
+        <div class="alert-head"><span>&#9888;</span><span>${games.length} game${games.length > 1 ? 's' : ''} not finalized</span></div>
+        <div class="alert-sub">Nobody in ${games.length > 1 ? 'these games' : 'this game'} has attendance points yet. Open Director, pick the date, and finalize.</div>
+        ${rows}</div>`;
+    } catch (e) { host.innerHTML = ''; }
+  }
+
+  // ── Credit a player ───────────────────────────────────────────────────────
+  async function loadDirectory() {
+    try {
+      const res = await PokerAPI.getPlayerList();
+      directory = res.directory || (res.players || []).map(name => ({ name, aliases: [] }));
+    } catch (e) { console.error('getPlayerList error:', e); }
+  }
+
+  const creditInput = $('creditName');
+  const suggestBox = $('creditSuggest');
+  creditInput.addEventListener('input', () => {
+    const q = creditInput.value.trim();
+    $('creditResult').className = 'result';
+    if (!q) { suggestBox.className = 'suggestions'; suggestBox.innerHTML = ''; return; }
+    const hits = PlayerSearch.search(directory, q, { limit: 8 }).slice(0, 8);
+    const exact = hits.some(h => h.name.toLowerCase() === q.toLowerCase());
+    suggestBox.innerHTML = hits.map(h =>
+      `<div class="suggestion" data-name="${esc(h.name)}">${esc(h.name)}${h.aka ? `<span class="aka">(aka ${esc(h.aka)})</span>` : ''}</div>`
+    ).join('') + (exact ? '' : `<div class="suggestion new" data-name="${esc(q)}">Use "${esc(q)}" as typed</div>`);
+    suggestBox.className = 'suggestions open';
+  });
+  suggestBox.addEventListener('click', e => {
+    const item = e.target.closest('.suggestion');
+    if (!item) return;
+    creditInput.value = item.dataset.name;
+    suggestBox.className = 'suggestions'; suggestBox.innerHTML = '';
+  });
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.field')) { suggestBox.className = 'suggestions'; }
+  });
+  creditInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); suggestBox.className = 'suggestions'; submitCredit(); } });
+
+  window.setCreditGame = function (n) {
+    creditGame = n;
+    $('creditG1').classList.toggle('active', n === 1);
+    $('creditG2').classList.toggle('active', n === 2);
+  };
+
+  window.submitCredit = async function () {
+    const name = creditInput.value.trim();
+    const out = $('creditResult');
+    if (!name) { out.className = 'result warn'; out.textContent = 'Type a player name first.'; return; }
+    if (!currentDate) { out.className = 'result warn'; out.textContent = 'Pick a game night first.'; return; }
+    // Match the roster spelling when the typed name resolves to one entry,
+    // so the credit lands on the same name the leaderboard already uses.
+    const best = PlayerSearch.best(directory.map(d => d.name), name);
+    const player = best && best.toLowerCase() === name.toLowerCase() ? best : name;
+    if (!confirm(`Give ${player} 10 attendance points for ${gameLabel(creditGame)} on ${currentDate} (${currentVenue})?`)) return;
+    const btn = $('creditBtn'); btn.disabled = true;
+    out.className = 'result'; out.textContent = '';
+    try {
+      const r = await PokerAPI.addAttendanceCredit({ player, date: currentDate, gameNum: creditGame, venue: currentVenue });
+      const cls = (r.status === 'success' || r.status === 'restored') ? 'ok' : 'warn';
+      out.className = 'result ' + cls;
+      out.textContent = r.message || r.status;
+      if (cls === 'ok') { creditInput.value = ''; fetchDailyStats(); }
+    } catch (e) {
+      out.className = 'result err';
+      out.textContent = (e.code === 'functions/permission-denied')
+        ? 'Your account is not marked as staff. Ask an admin to set your role.'
+        : 'Could not add credit: ' + (e.message || 'unknown error');
+    } finally { btn.disabled = false; }
+  };
+
+  // ── Shot rounds (today only; the bar view is bound to today the same way) ─
+  async function loadShots() {
+    const section = $('shotsSection');
+    if (!isToday()) { section.style.display = 'none'; return; }
+    section.style.display = '';
+    const list = $('shotsList');
+    try {
+      const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
+      const snap = await getDocs(query(collection(db, 'shotRounds'), where('timestamp', '>=', startOfDay), orderBy('timestamp', 'desc'), limit(200)));
+      const rounds = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+        .filter(r => (r.status || 'pending') !== 'draft')
+        .filter(r => !currentVenue || (r.venue || '') === currentVenue);
+      const isClosed = r => r.status === 'closed' || r.status === 'filled';
+      const shotsIn = r => (r.players || []).reduce((a, p) => a + (p.shots || []).reduce((b, s) => b + (Number(s.qty) || 0), 0), 0);
+      const open = rounds.filter(r => !isClosed(r));
+      const poured = rounds.length - open.length;
+      const total = rounds.reduce((a, r) => a + shotsIn(r), 0);
+      $('shotsNote').textContent = rounds.length ? `${rounds.length} rounds · ${total} shots · ${poured} poured` : '';
+      if (!rounds.length) { list.innerHTML = '<div class="empty">No shot rounds yet tonight</div>'; return; }
+      list.innerHTML = rounds.slice(0, 12).map(r => {
+        const t = r.timestamp && r.timestamp.toDate ? r.timestamp.toDate().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : '';
+        const who = (r.submitter && r.submitter.name) || 'Unknown';
+        const n = (r.players || []).length;
+        return `<div class="shot-row">
+          <span class="who">${esc(who)}${n > 1 ? ` <span class="meta">+${n - 1}</span>` : ''}</span>
+          <span class="meta">${shotsIn(r)} shots · ${esc(r.gameLabel || '')} · ${t}</span>
+          <span class="pill ${isClosed(r) ? 'done' : 'open'}">${isClosed(r) ? 'poured' : 'open'}</span>
+        </div>`;
+      }).join('') + (rounds.length > 12 ? `<div class="empty">+${rounds.length - 12} more on the bar page</div>` : '');
+    } catch (e) {
+      console.error('shotRounds error:', e);
+      list.innerHTML = '<div class="empty">Could not load shot rounds</div>';
+    }
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  loadDirectory();
+  loadSchedule();
+</script>
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="/clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/gameday.html"></script>
+</body>
+</html>

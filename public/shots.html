@@ -1,0 +1,2585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Shot Round - All-In Poker Club</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon" type="image/svg+xml" href="/img/favicon-staff.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050505;
+      --card: rgba(20,20,20,0.85);
+      --border: rgba(255,255,255,0.09);
+      --gold: #d4af37;
+      --blue: #00aaff;
+      --green: #00ff88;
+      --red: #ff4444;
+      --dim: #888;
+      --text: #ffffff;
+      --suit-hearts: #ff4d6d;
+      --suit-diamonds: #ff8c42;
+      --suit-clubs: #00d4aa;
+      --suit-spades: #a78bfa;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      background: radial-gradient(circle at top right, #001a33 0%, #050505 60%);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      padding-top: var(--safe-top);
+    }
+
+    .header {
+      text-align: center;
+      padding: 28px 20px 14px;
+    }
+    .header-subtitle {
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      color: var(--dim);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      background: linear-gradient(to bottom, #fff, #888);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Keep real scrollable space below the content: mobile browsers need it
+       to bring a focused input above the on-screen keyboard when the page is
+       still short (few cards yet). */
+    .container { max-width: 480px; margin: 0 auto; padding: 0 16px calc(30vh + var(--safe-bottom)); }
+
+    /* ── Context bar (venue + game, auto-detected) ── */
+    .context-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: rgba(212,175,55,0.08);
+      border: 1px solid rgba(212,175,55,0.25);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 14px;
+    }
+    .ctx-main { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; font-weight: 700; min-width: 0; }
+    .ctx-venue { color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ctx-dot { color: var(--dim); }
+    .ctx-game { color: var(--text); white-space: nowrap; }
+    .ctx-change {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--dim);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 0 14px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      text-transform: uppercase;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .ctx-change:active { border-color: var(--gold); color: var(--gold); }
+
+    /* ── Paused banner (between-games window) ── */
+    .paused-banner {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: rgba(255,68,68,0.1);
+      border: 1px solid rgba(255,68,68,0.3);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+    .paused-banner .pb-icon { font-size: 1.2rem; line-height: 1.3; flex-shrink: 0; }
+    .paused-banner .pb-text { font-size: 0.85rem; line-height: 1.45; }
+    .paused-banner .pb-text strong { color: var(--red); font-weight: 700; }
+
+    .ctx-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .ctx-panel-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--dim);
+      margin: 4px 0 8px;
+    }
+    .ctx-btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+    .ctx-opt {
+      flex: 1;
+      min-width: 110px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      color: var(--dim);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 11px 8px;
+      transition: all 0.2s;
+    }
+    .ctx-opt.active { background: rgba(212,175,55,0.16); border-color: var(--gold); color: var(--gold); }
+    .ctx-done {
+      width: 100%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      color: var(--text);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 11px;
+      margin-top: 8px;
+    }
+
+    .step {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 14px;
+      backdrop-filter: blur(12px);
+      /* backdrop-filter makes each step its own stacking context, so a step's
+         absolutely-positioned dropdown would be painted UNDER later steps.
+         position + z-index lets the submitter step's name dropdown sit on top. */
+      position: relative;
+    }
+    /* "Who's ordering?" is the first step and its name list opens downward over
+       the steps below it — keep it above those siblings so no names are hidden. */
+    #step-submitter { z-index: 20; }
+    .step-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+
+    /* Search inputs */
+    .search-wrap { position: relative; }
+    .search-input {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 16px; /* >=16px prevents iOS focus-zoom */
+      padding: 13px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--gold); }
+    .search-input::placeholder { color: var(--dim); }
+
+    .suggestions {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0; right: 0;
+      background: #1a1a1a;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      list-style: none;
+      z-index: 100;
+      max-height: 240px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      display: none;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+    }
+    .suggestions li {
+      padding: 13px 14px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: background 0.15s;
+    }
+    .suggestions li:last-child { border-bottom: none; }
+    .suggestions li:active, .suggestions li:hover { background: rgba(255,255,255,0.07); }
+    .suggestions .hint { color: var(--dim); font-size: 0.8em; }
+
+    /* Dropup variant — used where the input sits at the bottom of the page
+       (Build the order), so the list opens upward instead of off-screen. */
+    .suggestions.dropup {
+      top: auto;
+      bottom: calc(100% + 4px);
+      border-radius: 10px 10px 0 0;
+      box-shadow: 0 -8px 32px rgba(0,0,0,0.8);
+    }
+
+    /* Submitter badge */
+    .submitter-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      background: rgba(0,170,255,0.12);
+      border: 1px solid rgba(0,170,255,0.3);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+    .submitter-badge .badge-icon { color: var(--blue); font-size: 1rem; }
+    .submitter-badge .clear-btn {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--dim);
+      font-size: 1.2rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Suit selector */
+    .suit-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .suit-btn {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--dim);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 14px 4px;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .suit-btn .suit-symbol { font-size: 1.6rem; line-height: 1; }
+    .suit-btn .suit-name { font-size: 0.65rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+    .suit-btn:active { transform: scale(0.94); }
+    .suit-btn[data-suit="hearts"].active   { background: rgba(255,77,109,0.18); border-color: var(--suit-hearts); color: var(--suit-hearts); }
+    .suit-btn[data-suit="diamonds"].active { background: rgba(255,140,66,0.18); border-color: var(--suit-diamonds); color: var(--suit-diamonds); }
+    .suit-btn[data-suit="clubs"].active    { background: rgba(0,212,170,0.18); border-color: var(--suit-clubs); color: var(--suit-clubs); }
+    .suit-btn[data-suit="spades"].active   { background: rgba(167,139,250,0.18); border-color: var(--suit-spades); color: var(--suit-spades); }
+
+    /* Player cards */
+    .player-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+    .player-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .player-name-label {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text);
+    }
+    .remove-player-btn {
+      background: none;
+      border: none;
+      color: var(--dim);
+      font-size: 1.3rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s;
+    }
+    .remove-player-btn:active { color: var(--red); }
+
+    /* Payment toggle (per player) */
+    .pay-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .pay-row-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--dim);
+    }
+    .pay-seg {
+      display: inline-flex;
+      gap: 4px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2px;
+      margin-left: auto;
+    }
+    .pay-opt {
+      background: none;
+      border: none;
+      border-radius: 6px;
+      color: var(--dim);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0 14px;
+      min-height: 44px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s;
+    }
+    .pay-opt.active[data-pay="card"] { background: rgba(0,170,255,0.2); color: var(--blue); }
+    .pay-opt.active[data-pay="cash"] { background: rgba(0,255,136,0.2); color: var(--green); }
+
+    /* Shot row */
+    .shot-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .shot-select-wrap { flex: 1; min-width: 0; position: relative; }
+    .shot-select {
+      width: 100%;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 16px;
+      padding: 11px 10px;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 28px;
+      cursor: pointer;
+    }
+    .shot-select:focus { border-color: var(--gold); }
+    .shot-select option { background: #1a1a1a; color: var(--text); }
+    .shot-custom-input {
+      flex: 1;
+      min-width: 0;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 16px;
+      padding: 11px 10px;
+      outline: none;
+      display: none;
+    }
+    .shot-custom-input::placeholder { color: var(--dim); }
+
+    /* Qty stepper */
+    .qty-stepper {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .qty-btn {
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 1.2rem;
+      font-weight: 600;
+      min-height: 44px;
+      padding: 0 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      line-height: 1;
+      transition: background 0.15s;
+    }
+    .qty-btn:active { background: rgba(255,255,255,0.1); }
+    .qty-val {
+      font-size: 0.95rem;
+      font-weight: 700;
+      min-width: 22px;
+      text-align: center;
+    }
+    .remove-shot-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.25);
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 0;
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 2px;
+      transition: color 0.15s;
+      flex-shrink: 0;
+    }
+    .remove-shot-btn:active { color: var(--red); }
+
+    .add-shot-btn {
+      background: none;
+      border: 1px dashed rgba(255,255,255,0.2);
+      border-radius: 7px;
+      color: var(--dim);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 9px 12px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      margin-top: 4px;
+      width: 100%;
+    }
+    .add-shot-btn:active { border-color: var(--gold); color: var(--gold); }
+
+    /* Total bar */
+    .total-bar {
+      background: rgba(212,175,55,0.1);
+      border: 1px solid rgba(212,175,55,0.3);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 14px;
+    }
+    .total-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+    .total-text {
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.4;
+      color: var(--text);
+    }
+
+    /* Submit — a normal (non-sticky) block between "Which table" and
+       "Build the order", so it never overlaps the player-search dropdown
+       that lives at the bottom of the page. */
+    .submit-block {
+      padding: 0 0 14px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .submit-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #d4af37, #b8941f);
+      border: none;
+      border-radius: 14px;
+      color: #000;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      padding: 18px;
+      text-transform: uppercase;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(212,175,55,0.35);
+    }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled {
+      background: rgba(255,255,255,0.1);
+      color: var(--dim);
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    /* Receipt overlay (full-screen, scrollable — stays up so player can show it to the bartender) */
+    .success-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .success-overlay.show { opacity: 1; pointer-events: all; }
+
+    .receipt-header {
+      padding: calc(var(--safe-top) + 24px) 20px 14px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .receipt-check { font-size: 0.8rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--green); margin-bottom: 4px; }
+    .receipt-meta { font-size: 0.85rem; color: var(--dim); }
+
+    .receipt-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 20px; }
+
+    .house-hero {
+      background: rgba(212,175,55,0.12);
+      border: 2px solid rgba(212,175,55,0.45);
+      border-radius: 14px;
+      text-align: center;
+      padding: 22px 16px 18px;
+      margin-bottom: 12px;
+    }
+    .house-hero-count { font-size: 4rem; font-weight: 800; color: var(--gold); line-height: 1; }
+    .house-hero-label { font-size: 0.95rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); opacity: 0.75; margin-top: 4px; }
+
+    .receipt-other-shots { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+    .receipt-shot-chip {
+      background: rgba(255,255,255,0.07); border: 1px solid var(--border);
+      border-radius: 8px; padding: 7px 12px; font-size: 0.9rem; font-weight: 700;
+    }
+    .receipt-shot-chip b { color: var(--gold); }
+
+    .receipt-divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+
+    .receipt-player-row {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 12px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .receipt-player-row:last-child { border-bottom: none; }
+    .rp-name { font-weight: 700; font-size: 0.95rem; min-width: 0; }
+    .rp-right { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+    .rp-shots { font-size: 0.88rem; color: #ccc; text-align: right; }
+    .rp-pay { font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; padding: 2px 7px; border-radius: 5px; flex-shrink: 0; }
+    .rp-pay.card { color: var(--dim); border: 1px solid rgba(255,255,255,0.16); }
+    .rp-pay.cash { color: #000; background: var(--green); }
+
+    .receipt-footer {
+      padding: 12px 20px calc(12px + var(--safe-bottom));
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .receipt-new-btn {
+      width: 100%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 16px;
+      text-align: center;
+    }
+    .receipt-new-btn:active { background: rgba(255,255,255,0.14); }
+    .receipt-undo-btn {
+      width: 100%; background: none; border: none; color: var(--dim);
+      cursor: pointer; font-family: inherit; font-size: 0.85rem; font-weight: 600;
+      padding: 10px; text-align: center; min-height: 44px;
+      text-decoration: underline; text-underline-offset: 3px;
+    }
+    .receipt-undo-btn:active { color: var(--red); }
+
+    /* Notification bell — keeps notifications reachable from the shots page,
+       since the main app's FAB becomes the Shots shortcut during the window. */
+    .noti-bell {
+      position: fixed;
+      top: calc(var(--safe-top) + 14px);
+      right: 14px;
+      width: 44px;
+      height: 44px;
+      background: rgba(20,20,20,0.7);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      color: var(--dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 50;
+      text-decoration: none;
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+    }
+    .noti-bell:active { transform: scale(0.92); }
+
+    /* ── Table cards (other people's live orders on this table) ── */
+    .card-row {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-top: 10px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .card-row:active { background: rgba(255,255,255,0.07); border-color: var(--gold); }
+    .card-row.filled, .card-row.done { opacity: 0.55; }
+    .card-row-main { flex: 1; min-width: 0; }
+    .card-row-name { font-weight: 700; font-size: 0.95rem; }
+    .card-row-shots { font-size: 0.82rem; color: var(--dim); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-status {
+      font-size: 0.56rem; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 6px; flex-shrink: 0;
+    }
+    .card-status.draft   { color: var(--blue);  border: 1px solid rgba(0,170,255,0.4); }
+    .card-status.pending { color: var(--gold);  border: 1px solid rgba(212,175,55,0.45); }
+    .card-status.pouring { color: var(--green); border: 1px solid rgba(0,255,136,0.45); }
+    .card-status.filled,
+    .card-status.closed  { color: var(--dim);   border: 1px solid var(--border); }
+    .card-chevron { color: var(--dim); font-size: 1.2rem; flex-shrink: 0; line-height: 1; }
+
+    /* ── Receipt: "who ordered" label + big all-shots summary + view footer ── */
+    .receipt-section-label {
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--dim); margin: 2px 0 8px;
+    }
+    .receipt-allshots {
+      margin-top: 20px;
+      background: rgba(212,175,55,0.10);
+      border: 1px solid rgba(212,175,55,0.35);
+      border-radius: 14px;
+      padding: 16px 16px 18px;
+    }
+    .allshots-title {
+      font-size: 0.7rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 12px;
+    }
+    .allshots-list { display: flex; flex-wrap: wrap; gap: 10px 16px; }
+    .allshots-item { font-size: 1.5rem; font-weight: 800; color: #fff; line-height: 1.15; }
+    .allshots-item b { color: var(--gold); }
+
+    /* Tappable cash/card tag on the receipt (until the bar marks it paid) */
+    .rp-pay.editable { cursor: pointer; position: relative; }
+    .rp-pay.editable::after { content: ' ⇄'; font-size: 0.8em; opacity: 0.7; }
+
+    /* Per-shot note (special request — not a shot itself) */
+    .shot-block { margin-bottom: 10px; }
+    .shot-block .shot-row { margin-bottom: 0; }
+    .shot-note-wrap { margin-top: 3px; padding-left: 2px; }
+    .add-note-btn {
+      background: none; border: none; color: var(--dim); cursor: pointer;
+      font-family: inherit; font-size: 0.75rem; font-weight: 600;
+      padding: 6px 2px; min-height: 36px; text-align: left;
+      text-decoration: underline; text-underline-offset: 2px;
+    }
+    .add-note-btn:active { color: var(--gold); }
+    .note-input {
+      width: 100%; background: rgba(212,175,55,0.06);
+      border: 1px solid rgba(212,175,55,0.35); border-radius: 8px;
+      color: var(--text); font-family: inherit; font-size: 16px; padding: 11px 12px; outline: none;
+    }
+    .note-input::placeholder { color: var(--dim); }
+    .note-input:focus { border-color: var(--gold); }
+    /* Note on the receipt, under a player */
+    .rp-note { font-size: 0.85rem; color: var(--gold); font-style: italic; padding: 1px 0 8px; }
+
+    .receipt-primary-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #d4af37, #b8941f);
+      border: none; border-radius: 12px; color: #000;
+      cursor: pointer; font-family: inherit; font-size: 0.95rem; font-weight: 800;
+      padding: 16px; text-align: center; margin-bottom: 8px;
+    }
+    .receipt-primary-btn:active { transform: scale(0.98); }
+    .receipt-close-btn {
+      width: 100%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid var(--border);
+      border-radius: 12px; color: var(--text);
+      cursor: pointer; font-family: inherit; font-size: 0.95rem; font-weight: 700;
+      padding: 16px; text-align: center;
+    }
+    .receipt-close-btn:active { background: rgba(255,255,255,0.14); }
+    .receipt-locked-note {
+      text-align: center; color: var(--green); font-weight: 700; font-size: 0.85rem;
+      padding: 10px; margin-bottom: 6px;
+    }
+
+    /* ── Warning modal (editing someone else's card) ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.82);
+      z-index: 1200; display: none; align-items: center; justify-content: center; padding: 24px;
+    }
+    .modal-overlay.show { display: flex; }
+    .warn-modal {
+      background: #161616; border: 1px solid rgba(255,68,68,0.4);
+      border-radius: 16px; padding: 22px; max-width: 360px; width: 100%; text-align: center;
+    }
+    .warn-modal h3 { color: var(--red); font-size: 1.1rem; font-weight: 800; margin-bottom: 8px; }
+    .warn-modal p { color: #ccc; font-size: 0.9rem; line-height: 1.5; margin-bottom: 18px; }
+    .warn-modal p strong { color: #fff; }
+    .warn-buttons { display: flex; gap: 10px; }
+    .warn-buttons button {
+      flex: 1; min-height: 48px; border-radius: 10px; font-family: inherit;
+      font-size: 0.9rem; font-weight: 700; cursor: pointer; border: none;
+    }
+    #warn-cancel { background: rgba(255,255,255,0.1); color: var(--text); }
+    #warn-proceed { background: var(--red); color: #fff; }
+
+    .hidden { display: none !important; }
+
+    /* Crash banner — unmissable, since a silent failure here means someone at
+       the bar can't order and we'd otherwise have zero idea it happened. */
+    .crash-banner {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 9999;
+      background: #3a0d0d;
+      border-bottom: 2px solid var(--red);
+      padding: calc(12px + var(--safe-top)) 16px 12px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+    }
+    .crash-banner.show { display: flex; }
+    .crash-banner-text { flex: 1; font-size: 0.85rem; line-height: 1.4; color: #fff; }
+    .crash-banner-text strong { color: #ff8a8a; }
+    .crash-reload-btn {
+      background: var(--red); color: #fff; border: none; border-radius: 8px;
+      padding: 10px 16px; font-family: inherit; font-size: 0.85rem; font-weight: 700;
+      cursor: pointer; flex-shrink: 0; min-height: 44px;
+    }
+    html.back-nav-on .header { padding-left: 60px; }
+  </style>
+</head>
+<body>
+
+<!-- Crash banner: shown by the global error handler below if something throws. -->
+<div class="crash-banner" id="crash-banner">
+  <div class="crash-banner-text"><strong>Something went wrong.</strong> Tap Reload — if it keeps happening, tell the director.</div>
+  <button class="crash-reload-btn" type="button" onclick="location.reload()">Reload</button>
+</div>
+
+<a class="noti-bell" href="/announcements.html" aria-label="Announcements">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+  </svg>
+</a>
+
+<div class="header">
+  <div class="header-subtitle">All In Poker Club</div>
+  <h1>Shot Round</h1>
+</div>
+
+<div class="container">
+
+  <!-- Auto-detected venue + game context -->
+  <div class="context-bar" id="context-bar">
+    <div class="ctx-main">
+      <span class="ctx-venue" id="ctx-venue">Loading…</span>
+      <span class="ctx-dot" id="ctx-dot" style="display:none">·</span>
+      <span class="ctx-game" id="ctx-game"></span>
+    </div>
+    <button class="ctx-change" id="ctx-change">Change</button>
+  </div>
+
+  <div class="paused-banner hidden" id="paused-banner">
+    <span class="pb-icon">⏸</span>
+    <span class="pb-text"><strong>Shot rounds are paused between games.</strong><br>They reopen at <strong>8:50 PM</strong> for the 9 PM game.</span>
+  </div>
+
+  <div class="ctx-panel hidden" id="ctx-panel">
+    <div class="ctx-panel-label">Venue</div>
+    <div class="ctx-btn-row" id="ctx-venue-btns"></div>
+    <div class="ctx-panel-label">Game</div>
+    <div class="ctx-btn-row" id="ctx-game-btns"></div>
+    <button class="ctx-done" id="ctx-done">Done</button>
+  </div>
+
+  <!-- Step 1: Who's ordering -->
+  <div class="step" id="step-submitter">
+    <div class="step-label">Who's ordering?</div>
+    <div class="search-wrap" id="submitter-wrap">
+      <input class="search-input" id="submitter-input" type="text" placeholder="Search your name..." autocomplete="off">
+      <ul class="suggestions" id="submitter-suggestions"></ul>
+    </div>
+    <div id="submitter-badge" class="hidden submitter-badge">
+      <span class="badge-icon">👤</span>
+      <span id="submitter-name-text"></span>
+      <button class="clear-btn" id="submitter-clear" title="Change">✕</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Which table -->
+  <div class="step" id="step-table">
+    <div class="step-label">Which table?</div>
+    <div class="suit-grid">
+      <button class="suit-btn" data-suit="hearts">
+        <span class="suit-symbol">♥</span>
+        <span class="suit-name">Hearts</span>
+      </button>
+      <button class="suit-btn" data-suit="diamonds">
+        <span class="suit-symbol">♦</span>
+        <span class="suit-name">Diamonds</span>
+      </button>
+      <button class="suit-btn" data-suit="clubs">
+        <span class="suit-symbol">♣</span>
+        <span class="suit-name">Clubs</span>
+      </button>
+      <button class="suit-btn" data-suit="spades">
+        <span class="suit-symbol">♠</span>
+        <span class="suit-name">Spades</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Total -->
+  <div class="total-bar hidden" id="total-bar">
+    <div class="total-label">Total</div>
+    <div class="total-text" id="total-text"></div>
+  </div>
+
+  <!-- Submit — sits above "Build the order" (below "Which table") so it never
+       overlaps the player-search dropdown, which lives at the page bottom. -->
+  <div class="submit-block">
+    <button class="submit-btn" id="submit-btn" disabled>Submit Round</button>
+  </div>
+
+  <!-- Live cards already on this table — everyone entering shots sees these -->
+  <div class="step hidden" id="step-cards">
+    <div class="step-label">Other cards on this table</div>
+    <div id="card-list"></div>
+  </div>
+
+  <!-- Step 3: Add players — the search box stays PUT, anchored right under the
+       submit area. New cards insert newest-first below it, pushing older cards
+       down, so the box never moves and you never scroll to add the next name. -->
+  <div class="step" id="step-players">
+    <div class="step-label">Build the order</div>
+    <div class="search-wrap">
+      <input class="search-input" id="player-input" type="text" placeholder="Search player name to add..." autocomplete="off">
+      <ul class="suggestions" id="player-suggestions"></ul>
+    </div>
+    <div id="player-list"></div>
+  </div>
+
+</div>
+
+<!-- Warning before editing or deleting someone else's card -->
+<div class="modal-overlay" id="warn-overlay">
+  <div class="warn-modal">
+    <h3 id="warn-title">This is someone else's card</h3>
+    <p id="warn-text">This card was started by <strong id="warn-owner">another player</strong>. It's usually better to <strong>start a new card</strong> for extra shots. Only edit theirs if you absolutely have to.</p>
+    <div class="warn-buttons">
+      <button id="warn-cancel" type="button">Cancel</button>
+      <button id="warn-proceed" type="button">Edit anyway</button>
+    </div>
+  </div>
+</div>
+
+<!-- Receipt overlay — confirmation after submit, and tap-to-view for any card -->
+<div class="success-overlay" id="success-overlay">
+  <div class="receipt-header">
+    <div class="receipt-check" id="receipt-check">✓ Sent to bar</div>
+    <div class="receipt-meta" id="receipt-meta"></div>
+  </div>
+  <div class="receipt-body">
+    <div id="receipt-house"></div>
+    <div class="receipt-section-label" id="receipt-players-label">Who ordered &amp; how they're paying</div>
+    <div id="receipt-players"></div>
+    <div class="receipt-allshots" id="receipt-allshots"></div>
+  </div>
+  <div class="receipt-footer" id="receipt-footer">
+    <div class="receipt-locked-note hidden" id="receipt-locked-note">🔒 Poured &amp; locked by the bar</div>
+    <button class="receipt-primary-btn hidden" id="receipt-edit-btn" type="button">Edit this card</button>
+    <button class="receipt-new-btn hidden" id="success-new-btn" type="button">Start New Card</button>
+    <button class="receipt-close-btn hidden" id="receipt-close-btn" type="button">Close</button>
+    <button class="receipt-undo-btn hidden" id="undo-btn" type="button">Edit / Undo this order</button>
+    <button class="receipt-close-btn hidden" id="receipt-app-btn" type="button" onclick="window.BackNav ? BackNav.go() : (location.href = '/')">Back to the app</button>
+  </div>
+</div>
+
+<script type="module">
+  import { PokerAPI, PlayerSearch, PokerSession } from './firebase-api.js?v=16';
+  import { pickReopenCard, REOPEN_MS } from './shots-reopen.js?v=1';
+  import {
+    db, app, auth, collection, doc, getDoc, addDoc, deleteDoc, getDocs, setDoc, query,
+    where, orderBy, limit, onSnapshot, serverTimestamp, increment
+  } from './firebase-api.js?v=16';
+  import { shotOrders } from './shot-orders.js?v=1';
+  import { cleanOrder } from './shot-order-clean.js?v=1';
+
+  // shotRounds / shotOptions go through shotDb, signed in to this device's
+  // anonymous account (the rules refuse signed-out writes). `db` and `auth`
+  // stay the poker app's own, for everything else and the Google sign-in.
+  const { db: shotDb, ready: shotsReady } = shotOrders(app);
+
+  // ── Crash visibility ─────────────────────────────────────────────────────────
+  // A JS error here used to fail completely silently — the page just goes inert
+  // and we'd have zero idea it happened (this is how a full-night outage went
+  // undiagnosed). Any uncaught error or rejection now shows an unmissable banner
+  // and best-effort logs it, so a repeat is actually diagnosable.
+  let crashReported = false;
+  function reportCrash(message, extra) {
+    const banner = document.getElementById('crash-banner');
+    if (banner) banner.classList.add('show');
+    if (crashReported) return; // only log the FIRST error — a cascade shouldn't spam
+    crashReported = true;
+    try {
+      PokerAPI.logClientError({
+        source: 'shots.html',
+        page: 'shots',
+        action: 'uncaught',
+        message: String(message || '').slice(0, 500),
+        severity: 'error',
+        context: extra || {}
+      }).catch(() => {});
+    } catch (e) {}
+  }
+  window.addEventListener('error', (e) => {
+    reportCrash(e.message, { filename: e.filename, lineno: e.lineno });
+  });
+  window.addEventListener('unhandledrejection', (e) => {
+    const reason = e.reason;
+    reportCrash(reason && reason.message ? reason.message : String(reason));
+  });
+
+  // ── State ──────────────────────────────────────────────────────────────────
+  let playerDirectory = [];
+  let shotOptions = [];   // [{ id, name, count }] sorted by count desc
+  let submitter = null;   // { name }
+  let selectedTable = null;
+  let playerCards = [];   // [{ name, payment, shots: [{ type, qty }] }]
+  let cardLocked = false;        // true from Submit through the receipt — pauses live draft writes
+  let resumePending = false;     // true until the first cards snapshot resolves a saved pointer
+
+  // ── Shared live cards ───────────────────────────────────────────────────────
+  // Every card is one shotRounds doc with a lifecycle status:
+  //   'draft'   → being built, streams live to everyone on the table (bar hides these)
+  //   'pending' → submitted, the bartender now sees & can pour it
+  //   'filled'  → poured by the bar → locked (no more edits)
+  // The card I'm currently building/editing lives in the editor below and is
+  // tracked by myCardId; everyone else's cards render in #step-cards.
+  let liveCards = [];            // all of today's shotRounds (filtered for render)
+  let cardsUnsub = null;         // onSnapshot handle
+  let myCardId = null;           // shotRounds doc id the editor is bound to
+  let editingForeign = false;    // true when myCardId was started by another device
+  let cardSaveTimer = null;      // debounce handle for live draft writes
+  let pendingResumeId = null;    // a saved draft id to re-open once cards load
+  let reopenChecked = false;     // set once the saved receipt has been resolved
+  let reopenPending = false;     // a recent sent receipt may reopen; holds autofill and draft saves like resumePending
+  let reopenCancelPointerHandler = null;
+  let reopenCancelKeyHandler = null;
+  let draftWasResumed = false;   // a saved draft was reopened, so never reopen a sent receipt
+  let viewingCard = null;        // card shown in the receipt overlay
+  let receiptMode = 'submitted'; // 'submitted' | 'view'
+
+  // Tonight's resolved context (venue + which game), auto-detected, overridable
+  let ctx = { venue: '', eventType: 'Regular', gameNum: 1, sessionDate: '' };
+  let tonightEntries = [];
+  let gameManuallySet = false;
+
+  const KNOWN_VENUES = ['Tight End', 'Wild Corgi'];
+  const DEFAULT_SHOT_NAMES = ['House', 'Pickle', 'Whiskey', 'Tequila', 'Jameson', 'Jim Beam', 'Espolon', 'Dobel'];
+
+  // Stable per-device id so a card knows which device "owns" it (drives the
+  // edit-someone-else's-card warning). Survives reloads; falls back if storage
+  // is unavailable (private mode).
+  const clientId = (() => {
+    try {
+      let id = localStorage.getItem('shotsClientId');
+      if (!id) { id = 'c_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36); localStorage.setItem('shotsClientId', id); }
+      return id;
+    } catch (e) { return 'c_' + Math.random().toString(36).slice(2, 10); }
+  })();
+
+  const POINTER_KEY = 'shotsMyCard'; // { id, sessionDate, venue, gameNum, table }
+  const LAST_SENT_KEY = 'shotsLastSent'; // { id, sentAt, sessionDate, venue, table }
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+  async function init() {
+    await Promise.all([loadPlayers(), loadShotOptions(), resolveContext()]);
+    bindSubmitterSearch();
+    bindPlayerSearch();
+    bindTableButtons();
+    bindContextPanel();
+    bindSubmit();
+    bindReceiptButtons();
+    bindWarnModal();
+    const lastSent = readLastSent();
+    const reopenAge = lastSent ? Date.now() - lastSent.sentAt : NaN;
+    reopenPending = new URLSearchParams(location.search).get('new') !== '1'
+      && !!(lastSent && lastSent.id)
+      && Number.isFinite(reopenAge)
+      && reopenAge >= 0
+      && reopenAge <= REOPEN_MS
+      && PokerSession.datesMatch(lastSent.sessionDate || '', ctx.sessionDate || PokerSession.todayStr());
+    if (reopenPending) {
+      reopenCancelPointerHandler = () => cancelReopen();
+      reopenCancelKeyHandler = () => cancelReopen();
+      document.addEventListener('pointerdown', reopenCancelPointerHandler, { capture: true, once: true });
+      document.addEventListener('keydown', reopenCancelKeyHandler, { capture: true, once: true });
+    } else {
+      reopenChecked = true;
+    }
+    tryAutoFillSubmitter(); // non-blocking — fills in if signed in, no-op if not
+    restorePointerMeta();   // re-select last table so we re-join its live cards
+    subscribeCards();       // live feed of everyone's cards on this table
+    refreshTimeState();
+    // A phone left open should transition across the 7:50/8:50 boundaries.
+    setInterval(refreshTimeState, 30000);
+  }
+
+  function removeReopenCancelListeners() {
+    if (reopenCancelPointerHandler) {
+      document.removeEventListener('pointerdown', reopenCancelPointerHandler, { capture: true });
+      reopenCancelPointerHandler = null;
+    }
+    if (reopenCancelKeyHandler) {
+      document.removeEventListener('keydown', reopenCancelKeyHandler, { capture: true });
+      reopenCancelKeyHandler = null;
+    }
+  }
+
+  function cancelReopen() {
+    if (!reopenPending) return;
+    reopenPending = false;
+    reopenChecked = true;
+    removeReopenCancelListeners();
+    tryAutoFillSubmitter();
+  }
+
+  // Re-evaluate the time-driven state: which game we're in (unless manually
+  // overridden) and whether ordering is currently paused between games.
+  function refreshTimeState() {
+    const prevGame = ctx.gameNum;
+    if (!gameManuallySet) ctx.gameNum = PokerSession.currentGameNum();
+    renderContext();
+    updateSubmitState();
+    // Game rolled over at the cutoff → the live card list is scoped per game.
+    if (ctx.gameNum !== prevGame) renderCardList();
+  }
+
+  async function loadPlayers() {
+    try {
+      const result = await PokerAPI.getPlayerList();
+      playerDirectory = result.directory || [];
+    } catch (e) {
+      console.error('Player load failed:', e);
+    }
+  }
+
+  async function loadShotOptions() {
+    try {
+      const snap = await getDocs(query(collection(shotDb, 'shotOptions'), orderBy('count', 'desc')));
+      if (snap.empty) {
+        await seedShotOptions();
+      } else {
+        shotOptions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        // House is always offered first regardless of count
+        const houseIdx = shotOptions.findIndex(o => o.id === 'house');
+        if (houseIdx > 0) {
+          const [house] = shotOptions.splice(houseIdx, 1);
+          shotOptions.unshift(house);
+        } else if (houseIdx === -1) {
+          shotOptions.unshift({ id: 'house', name: 'House', count: 0 });
+        }
+      }
+    } catch (e) {
+      console.error('Shot options load failed:', e);
+      shotOptions = DEFAULT_SHOT_NAMES.map(n => ({ id: slugify(n), name: n, count: 0 }));
+    }
+  }
+
+  async function seedShotOptions() {
+    // increment(0) creates the count field at 0 if absent and is a no-op if a
+    // concurrent first-use already bumped it — so two phones seeding an empty
+    // collection at once can never clobber a real count. House-first ordering
+    // is handled in loadShotOptions(), so no count sentinel is needed.
+    await shotsReady();
+    await Promise.all(DEFAULT_SHOT_NAMES.map(name =>
+      setDoc(doc(shotDb, 'shotOptions', slugify(name)), { name, count: increment(0) }, { merge: true })
+    ));
+    shotOptions = DEFAULT_SHOT_NAMES.map(name => ({ id: slugify(name), name, count: 0 }));
+  }
+
+  function slugify(s) {
+    return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+  }
+
+  // A usable shot name must contain at least one letter/number — keeps
+  // emoji/punctuation-only write-ins out of the order and out of shotOptions.
+  function isValidShotType(t) {
+    return typeof t === 'string' && /[a-z0-9]/i.test(t);
+  }
+
+  // A write-in worth SAVING as a reusable dropdown option: a short drink name,
+  // not a rambling sentence ("any snob except butterscotch..."). Rejected names
+  // still go on the order — they just don't pollute the shot dropdown.
+  function isReasonableShotName(t) {
+    const v = String(t || '').trim();
+    return v.length > 0 && v.length <= 20 && v.split(/\s+/).length <= 3;
+  }
+
+  // ── Context (venue + game) ─────────────────────────────────────────────────
+  async function resolveContext() {
+    const { today, entries } = await PokerSession.getTonight();
+    tonightEntries = entries;
+    ctx.sessionDate = today;
+    ctx.gameNum = PokerSession.currentGameNum();
+
+    if (entries.length >= 1) {
+      ctx.venue = entries[0].venue;
+      ctx.eventType = entries[0].eventType || 'Regular';
+      ctx.sessionDate = entries[0].date || today;
+    } else {
+      ctx.venue = '';          // no schedule tonight — prompt the user
+      ctx.eventType = 'Regular';
+    }
+    loadNightOverride();
+    renderContext();
+    // If venue couldn't be detected, open the picker so it's never blank.
+    if (!ctx.venue) openContextPanel();
+  }
+
+  function renderContext() {
+    const venueEl = document.getElementById('ctx-venue');
+    const dotEl = document.getElementById('ctx-dot');
+    const gameEl = document.getElementById('ctx-game');
+    venueEl.textContent = ctx.venue || 'Select venue';
+    venueEl.style.color = ctx.venue ? '' : 'var(--red)';
+    dotEl.style.display = ctx.venue ? '' : 'none';
+    gameEl.textContent = ctx.venue ? PokerSession.gameLabel(ctx.gameNum, ctx.eventType) : '';
+  }
+
+  function bindContextPanel() {
+    document.getElementById('ctx-change').addEventListener('click', () => {
+      const panel = document.getElementById('ctx-panel');
+      panel.classList.contains('hidden') ? openContextPanel() : closeContextPanel();
+    });
+    document.getElementById('ctx-done').addEventListener('click', closeContextPanel);
+  }
+
+  function openContextPanel() {
+    const panel = document.getElementById('ctx-panel');
+    // Venue options = known venues (plus any scheduled venue not in the list)
+    const venues = Array.from(new Set([...tonightEntries.map(e => e.venue), ...KNOWN_VENUES].filter(Boolean)));
+    const venueBox = document.getElementById('ctx-venue-btns');
+    venueBox.innerHTML = '';
+    venues.forEach(v => {
+      const b = document.createElement('button');
+      b.className = 'ctx-opt' + (v === ctx.venue ? ' active' : '');
+      b.textContent = v;
+      b.addEventListener('click', () => {
+        ctx.venue = v;
+        const match = tonightEntries.find(e => e.venue === v);
+        if (match) { ctx.eventType = match.eventType || 'Regular'; ctx.sessionDate = match.date || ctx.sessionDate; }
+        loadNightOverride();
+        renderContext();
+        persistPointerMeta();
+        scheduleCardSave();  // keep my card's venue current
+        renderCardList();
+        openContextPanel(); // refresh active states + game labels
+      });
+      venueBox.appendChild(b);
+    });
+
+    const gameBox = document.getElementById('ctx-game-btns');
+    gameBox.innerHTML = '';
+    [1, 2].forEach(n => {
+      const b = document.createElement('button');
+      b.className = 'ctx-opt' + (n === ctx.gameNum ? ' active' : '');
+      b.textContent = PokerSession.gameLabel(n, ctx.eventType);
+      b.addEventListener('click', () => {
+        ctx.gameNum = n;
+        gameManuallySet = true;
+        renderContext();
+        updateSubmitState();
+        persistPointerMeta();
+        scheduleCardSave();  // keep my card's game current
+        renderCardList();
+        openContextPanel();
+      });
+      gameBox.appendChild(b);
+    });
+
+    panel.classList.remove('hidden');
+  }
+
+  function closeContextPanel() {
+    document.getElementById('ctx-panel').classList.add('hidden');
+  }
+
+  // ── Submitter search ───────────────────────────────────────────────────────
+  function setSubmitter(name) {
+    submitter = { name };
+    const input = document.getElementById('submitter-input');
+    if (input) input.value = '';
+    document.getElementById('submitter-wrap').classList.add('hidden');
+    const badge = document.getElementById('submitter-badge');
+    badge.classList.remove('hidden');
+    document.getElementById('submitter-name-text').textContent = name;
+    updateSubmitState();
+    persistPointerMeta();
+    scheduleCardSave();
+  }
+
+  async function tryAutoFillSubmitter() {
+    try {
+      await auth.authStateReady();
+      const user = auth.currentUser;
+      if (!user) return;
+      const snap = await getDoc(doc(db, 'userProfiles', user.uid));
+      const name = snap.exists() ? snap.data().linkedName : null;
+      // Don't overwrite a submitter already set by a resumed/edited card, and
+      // don't touch playerCards while a resume or receipt reopen is pending.
+      if (name && !submitter && !resumePending && !reopenPending) {
+        setSubmitter(name);
+        autoAddSubmitterAsPlayer(name);
+      }
+    } catch (e) {}
+  }
+
+  // The person entering the order will usually be having a shot themselves —
+  // start their card automatically (removable via the ✕ like any other) so
+  // they aren't stuck typing their own name twice. Only on a genuinely fresh
+  // order (never when resuming/editing a card, which loads its own players).
+  function autoAddSubmitterAsPlayer(name) {
+    if (playerCards.length) return;
+    addPlayerCard(name);
+  }
+
+  function bindSubmitterSearch() {
+    const input = document.getElementById('submitter-input');
+    const list  = document.getElementById('submitter-suggestions');
+
+    input.addEventListener('input', () => renderSuggestions(input, list, name => {
+      setSubmitter(name);
+      autoAddSubmitterAsPlayer(name);
+      list.style.display = 'none';
+    }));
+
+    document.getElementById('submitter-clear').addEventListener('click', () => {
+      submitter = null;
+      document.getElementById('submitter-wrap').classList.remove('hidden');
+      document.getElementById('submitter-badge').classList.add('hidden');
+      input.value = '';
+      input.focus();
+      updateSubmitState();
+      persistPointerMeta();
+      scheduleCardSave();
+    });
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('#step-submitter')) list.style.display = 'none';
+    });
+  }
+
+  // ── Player search ──────────────────────────────────────────────────────────
+  function bindPlayerSearch() {
+    const input = document.getElementById('player-input');
+    const list  = document.getElementById('player-suggestions');
+
+    // Proactively bring the input above the on-screen keyboard on focus, with
+    // room below it for the suggestion dropdown.
+    input.addEventListener('focus', () => {
+      requestAnimationFrame(() => input.scrollIntoView({ block: 'center', behavior: 'smooth' }));
+    });
+
+    input.addEventListener('input', () => renderSuggestions(input, list, name => {
+      if (playerCards.find(c => c.name.toLowerCase() === name.toLowerCase())) {
+        input.value = '';
+        list.style.display = 'none';
+        return;
+      }
+      addPlayerCard(name);
+      input.value = '';
+      list.style.display = 'none';
+    }));
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('#step-players')) list.style.display = 'none';
+    });
+  }
+
+  function renderSuggestions(input, listEl, onSelect) {
+    const val = input.value.trim();
+    listEl.innerHTML = '';
+    if (!val) { listEl.style.display = 'none'; return; }
+
+    const matches = PlayerSearch.search(playerDirectory, val, { limit: 8 });
+    if (!matches.length) {
+      const li = document.createElement('li');
+      li.style.cssText = 'color:var(--dim);font-style:italic;font-size:0.85rem';
+      li.textContent = 'No matching players found';
+      listEl.appendChild(li);
+      listEl.style.display = 'block';
+      return;
+    }
+
+    matches.forEach(({ name, aka }) => {
+      const li = document.createElement('li');
+      li.innerHTML = escapeHtml(name) + (aka ? ` <span class="hint">(aka ${escapeHtml(aka)})</span>` : '');
+      li.addEventListener('mousedown', e => { e.preventDefault(); onSelect(name); });
+      listEl.appendChild(li);
+    });
+    listEl.style.display = 'block';
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  // ── Table buttons ──────────────────────────────────────────────────────────
+  function bindTableButtons() {
+    document.querySelectorAll('.suit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.suit-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedTable = btn.dataset.suit;
+        updateSubmitState();
+        persistPointerMeta();
+        scheduleCardSave();   // my card follows my table choice
+        renderCardList();     // show this table's other cards
+      });
+    });
+  }
+
+  // ── Player cards ───────────────────────────────────────────────────────────
+  function addPlayerCard(name) {
+    // Newest card on TOP — it appears directly under the search box (which
+    // never moves) and pushes the older cards down.
+    playerCards.unshift({ name, payment: 'card', note: '', shots: [newShot()] });
+    renderPlayerCards();
+    updateTotal();
+    updateSubmitState();
+    scheduleCardSave();
+  }
+
+  function newShot() {
+    return { type: 'House', qty: 1, custom: false, note: '' };
+  }
+
+  function renderPlayerCards() {
+    const container = document.getElementById('player-list');
+    container.innerHTML = '';
+
+    playerCards.forEach((card, cardIdx) => {
+      const el = document.createElement('div');
+      el.className = 'player-card';
+
+      const header = document.createElement('div');
+      header.className = 'player-card-header';
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'player-name-label';
+      nameSpan.textContent = card.name;
+      header.appendChild(nameSpan);
+
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'remove-player-btn';
+      removeBtn.textContent = '✕';
+      removeBtn.addEventListener('click', () => {
+        playerCards.splice(cardIdx, 1);
+        renderPlayerCards();
+        updateTotal();
+        updateSubmitState();
+        scheduleCardSave();
+      });
+      header.appendChild(removeBtn);
+      el.appendChild(header);
+
+      // Payment toggle — defaults to Card, flip to Cash as needed.
+      const payRow = document.createElement('div');
+      payRow.className = 'pay-row';
+      const payLabel = document.createElement('span');
+      payLabel.className = 'pay-row-label';
+      payLabel.textContent = 'Paying with';
+      payRow.appendChild(payLabel);
+
+      const paySeg = document.createElement('div');
+      paySeg.className = 'pay-seg';
+      [['card', '💳 Card'], ['cash', '💵 Cash']].forEach(([val, label]) => {
+        const opt = document.createElement('button');
+        opt.className = 'pay-opt' + (card.payment === val ? ' active' : '');
+        opt.dataset.pay = val;
+        opt.textContent = label;
+        opt.addEventListener('click', () => {
+          card.payment = val;
+          paySeg.querySelectorAll('.pay-opt').forEach(o => o.classList.toggle('active', o.dataset.pay === val));
+          scheduleCardSave();
+        });
+        paySeg.appendChild(opt);
+      });
+      payRow.appendChild(paySeg);
+      el.appendChild(payRow);
+
+      card.shots.forEach((shot, shotIdx) => {
+        el.appendChild(buildShotRow(card, shot, shotIdx));
+      });
+
+      const addBtn = document.createElement('button');
+      addBtn.className = 'add-shot-btn';
+      addBtn.textContent = '+ Add another shot';
+      addBtn.addEventListener('click', () => {
+        card.shots.push(newShot());
+        renderPlayerCards();
+        scheduleCardSave();
+      });
+      el.appendChild(addBtn);
+
+      container.appendChild(el);
+    });
+  }
+
+  function buildShotRow(card, shot, shotIdx) {
+    const row = document.createElement('div');
+    row.className = 'shot-row';
+
+    const selectWrap = document.createElement('div');
+    selectWrap.className = 'shot-select-wrap';
+
+    const select = document.createElement('select');
+    select.className = 'shot-select';
+    shotOptions.forEach(opt => {
+      const o = document.createElement('option');
+      o.value = opt.name;
+      o.textContent = opt.name;
+      if (opt.name === shot.type && !shot.custom) o.selected = true;
+      select.appendChild(o);
+    });
+    const customOpt = document.createElement('option');
+    customOpt.value = '__custom__';
+    customOpt.textContent = '✏ Write in...';
+    if (shot.custom) customOpt.selected = true;
+    select.appendChild(customOpt);
+
+    const customInput = document.createElement('input');
+    customInput.className = 'shot-custom-input';
+    customInput.type = 'text';
+    customInput.placeholder = 'Shot name only (e.g. Fireball)';
+    customInput.autocomplete = 'off';
+    if (shot.custom) {
+      customInput.value = shot.type;
+      customInput.style.display = 'block';
+      select.style.display = 'none';
+    }
+
+    select.addEventListener('change', () => {
+      if (select.value === '__custom__') {
+        select.style.display = 'none';
+        customInput.style.display = 'block';
+        customInput.focus();
+        shot.custom = true;
+        shot.type = '';
+        updateTotal();
+      } else {
+        shot.type = select.value;
+        shot.custom = false;
+        updateTotal();
+        scheduleCardSave();
+      }
+    });
+    customInput.addEventListener('input', () => {
+      shot.type = customInput.value.trim();
+      updateTotal();
+      scheduleCardSave();
+    });
+    customInput.addEventListener('blur', () => {
+      const v = customInput.value.trim();
+      // Abandoned empty OR with no usable characters → revert just THIS line to
+      // House. Mutate only this row (no full re-render) so a tap on this row's
+      // qty stepper that triggered the blur still lands.
+      if (!isValidShotType(v)) {
+        shot.custom = false;
+        shot.type = 'House';
+        customInput.style.display = 'none';
+        select.style.display = '';
+        const hasHouse = shotOptions.some(o => o.name === 'House');
+        select.value = hasHouse ? 'House' : (shotOptions[0] ? shotOptions[0].name : 'House');
+        shot.type = select.value;
+        updateTotal();
+        scheduleCardSave();
+      }
+    });
+
+    selectWrap.appendChild(select);
+    selectWrap.appendChild(customInput);
+    row.appendChild(selectWrap);
+
+    const stepper = document.createElement('div');
+    stepper.className = 'qty-stepper';
+
+    const minusBtn = document.createElement('button');
+    minusBtn.className = 'qty-btn';
+    minusBtn.textContent = '−';
+    minusBtn.addEventListener('click', () => {
+      if (shot.qty > 1) { shot.qty--; qtyVal.textContent = shot.qty; updateTotal(); scheduleCardSave(); }
+    });
+
+    const qtyVal = document.createElement('span');
+    qtyVal.className = 'qty-val';
+    qtyVal.textContent = shot.qty;
+
+    const plusBtn = document.createElement('button');
+    plusBtn.className = 'qty-btn';
+    plusBtn.textContent = '+';
+    plusBtn.addEventListener('click', () => {
+      shot.qty++;
+      qtyVal.textContent = shot.qty;
+      updateTotal();
+      scheduleCardSave();
+    });
+
+    stepper.appendChild(minusBtn);
+    stepper.appendChild(qtyVal);
+    stepper.appendChild(plusBtn);
+    row.appendChild(stepper);
+
+    if (card.shots.length > 1) {
+      const removeShot = document.createElement('button');
+      removeShot.className = 'remove-shot-btn';
+      removeShot.textContent = '✕';
+      removeShot.addEventListener('click', () => {
+        card.shots.splice(shotIdx, 1);
+        renderPlayerCards();
+        updateTotal();
+        scheduleCardSave();
+      });
+      row.appendChild(removeShot);
+    }
+
+    // Wrap the controls together with an optional note for THIS shot.
+    const block = document.createElement('div');
+    block.className = 'shot-block';
+    block.appendChild(row);
+    block.appendChild(buildShotNote(shot));
+    return block;
+  }
+
+  // Optional per-shot note (special request). Discreet link that opens a small
+  // input; never counts as a shot and never becomes a dropdown option. Per-shot
+  // so a note on one of a person's shots doesn't blanket their others.
+  function buildShotNote(shot) {
+    const wrap = document.createElement('div');
+    wrap.className = 'shot-note-wrap';
+
+    const btn = document.createElement('button');
+    btn.className = 'add-note-btn';
+    btn.textContent = '📝 Note';
+
+    const input = document.createElement('input');
+    input.className = 'note-input';
+    input.type = 'text';
+    input.placeholder = 'Note for this shot — e.g. no peppermint';
+    input.autocomplete = 'off';
+    input.value = shot.note || '';
+
+    const hasNote = !!(shot.note && shot.note.trim());
+    btn.style.display = hasNote ? 'none' : '';
+    input.style.display = hasNote ? 'block' : 'none';
+
+    btn.addEventListener('click', () => {
+      btn.style.display = 'none';
+      input.style.display = 'block';
+      input.focus();
+    });
+    input.addEventListener('input', () => {
+      shot.note = input.value;
+      scheduleCardSave();
+    });
+    input.addEventListener('blur', () => {
+      // Abandoned empty → collapse back to the link.
+      if (!input.value.trim()) {
+        shot.note = '';
+        input.style.display = 'none';
+        btn.style.display = '';
+        scheduleCardSave();
+      }
+    });
+
+    wrap.appendChild(btn);
+    wrap.appendChild(input);
+    return wrap;
+  }
+
+  // ── Total ──────────────────────────────────────────────────────────────────
+  function computeTotals() {
+    const totals = {};
+    playerCards.forEach(card => {
+      card.shots.forEach(shot => {
+        if (!isValidShotType(shot.type)) return;
+        const type = shot.type.trim();
+        totals[type] = (totals[type] || 0) + shot.qty;
+      });
+    });
+    return totals;
+  }
+
+  // Derive a card's shot totals from its stored `players` array — the single
+  // source of truth. We do NOT trust a stored `total` map: a map field written
+  // with setDoc(merge:true) is deep-merged by Firestore, so stale keys pile up
+  // (phantom/duplicate shots). `players` is an array, which merge REPLACES, so
+  // it always reflects the real order.
+  function totalsFrom(players) {
+    const t = {};
+    (players || []).forEach(p => (p.shots || []).forEach(s => {
+      const type = String(s.type || '').trim();
+      if (!type) return;
+      t[type] = (t[type] || 0) + (Number(s.qty) || 0);
+    }));
+    return t;
+  }
+
+  function updateTotal() {
+    const totals = computeTotals();
+    const bar = document.getElementById('total-bar');
+    const text = document.getElementById('total-text');
+
+    if (!Object.keys(totals).length || !playerCards.length) {
+      bar.classList.add('hidden');
+      return;
+    }
+    bar.classList.remove('hidden');
+    text.textContent = Object.entries(totals)
+      .map(([type, qty]) => `${qty > 1 ? qty + '× ' : ''}${type}`)
+      .join(', ');
+  }
+
+  // ── Submit state ───────────────────────────────────────────────────────────
+  // Host assistant override (docs/host-assistant-spec.md): a staff member can
+  // close ordering for the night from tonight.html. nightOverrides/{key} is
+  // public read; shotsOpen === false closes the page until it is reopened.
+  let overrideClosed = false;
+  function nightOverrideKey(date, venue) {
+    const [m, d, y] = String(date || '').split('/');
+    const v = String(venue || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}_${v}`;
+  }
+  // Live listener on the selected night's override, so a page that was open
+  // before the host closed ordering stops accepting rounds within seconds.
+  // Switching venue drops the previous listener, so a late response from the
+  // old venue can never apply to the new one.
+  let overrideUnsub = null;
+  function loadNightOverride() {
+    if (overrideUnsub) { overrideUnsub(); overrideUnsub = null; }
+    overrideClosed = false;
+    if (!ctx.venue || !ctx.sessionDate) { updateSubmitState(); return; }
+    try {
+      overrideUnsub = onSnapshot(doc(db, 'nightOverrides', nightOverrideKey(ctx.sessionDate, ctx.venue)), (snap) => {
+        overrideClosed = !!(snap.exists() && snap.data().shotsOpen === false);
+        updateSubmitState();
+      }, () => { overrideClosed = false; updateSubmitState(); });
+    } catch (e) { overrideClosed = false; updateSubmitState(); }
+  }
+  function shotsOpenNow() {
+    return PokerSession.isShotsOpen(PokerSession.nowMinutes(), ctx.eventType) && !overrideClosed;
+  }
+
+  function updateSubmitState() {
+    const open = shotsOpenNow();
+    const banner = document.getElementById('paused-banner');
+    banner.classList.toggle('hidden', open);
+    if (overrideClosed) banner.querySelector('.pb-text').innerHTML = '<strong>Shot ordering is closed for tonight.</strong><br>The host turned it off.';
+
+    const btn = document.getElementById('submit-btn');
+
+    // If I re-opened my already-sent card and the bar started pouring it, the
+    // shots are locked — block re-submit so a stale edit can't change a poured order.
+    if (editingCardPoured()) {
+      btn.disabled = true;
+      btn.textContent = 'Shots locked (pouring)';
+      return;
+    }
+
+    const ready = open && submitter && selectedTable && playerCards.length > 0 && ctx.venue;
+    btn.disabled = !ready;
+
+    // Keep the idle label correct (but never clobber the in-flight "Submitting...").
+    if (btn.textContent !== 'Submitting...') {
+      if (!open) btn.textContent = 'Paused Between Games';
+      else btn.textContent = isEditingExisting() ? 'Update & Send' : 'Submit Round';
+    }
+  }
+
+  // ── Card lifecycle helpers (status + poured/paid flags; 'filled' = legacy) ──
+  function cardPoured(c) { return !!(c && (c.poured || c.status === 'closed' || c.status === 'filled')); }
+  function cardPaid(c)   { return !!(c && (c.paid   || c.status === 'closed')); }
+  function cardClosed(c) { return !!(c && (c.status === 'closed' || c.status === 'filled')); }
+
+  // True when the editor is bound to a card the bar has started pouring (shots locked).
+  function editingCardPoured() {
+    if (!myCardId) return false;
+    return cardPoured(liveCards.find(c => c.id === myCardId));
+  }
+
+  // True when the editor is bound to a card that's already been sent (pending),
+  // so the submit button reads "Update & Send" instead of "Submit Round".
+  function isEditingExisting() {
+    if (!myCardId) return false;
+    const c = liveCards.find(c => c.id === myCardId);
+    return !!(c && (c.status === 'pending' || c.status === 'closed' || c.poured || c.paid));
+  }
+
+  // ── Submit ─────────────────────────────────────────────────────────────────
+  function bindSubmit() {
+    document.getElementById('submit-btn').addEventListener('click', submitRound);
+  }
+
+  async function submitRound() {
+    if (!submitter || !selectedTable || !playerCards.length || !ctx.venue) return;
+    // Hard guard: never accept a round during the between-games pause or
+    // while the host has closed ordering for the night.
+    if (!shotsOpenNow()) {
+      updateSubmitState();
+      return;
+    }
+    // Never let a stale edit re-submit a card the bar already started pouring.
+    if (editingCardPoured()) { updateSubmitState(); return; }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    // We're finalizing — cancel any debounced draft write AND latch cardLocked so
+    // a late-firing edit can't write a stale 'draft' back over the sent card.
+    if (cardSaveTimer) { clearTimeout(cardSaveTimer); cardSaveTimer = null; }
+    cardLocked = true;
+
+    const total = computeTotals();
+    const payload = buildCardPayload('pending');
+    payload.submittedAt = serverTimestamp();
+    payload.timestamp = serverTimestamp(); // the bar sees the order at submit time
+
+    try {
+      await shotsReady();
+      // Reuse the live draft doc if we have one (so its identity/history is kept);
+      // otherwise create the card straight as pending.
+      if (myCardId) {
+        const updatePayload = { ...payload };
+        delete updatePayload.clientId;   // keep the original owner when sending an edited card
+        await setDoc(doc(shotDb, 'shotRounds', myCardId), updatePayload, { merge: true });
+      } else {
+        const ref = await addDoc(collection(shotDb, 'shotRounds'), payload);
+        myCardId = ref.id;
+      }
+
+      // Increment usage counts (also auto-creates write-in types for next time).
+      // doc(shotDb,'shotOptions','') throws synchronously, so the empty-slug guard —
+      // not the .catch — is what keeps a bad type from failing a saved order.
+      Object.keys(total).forEach(type => {
+        const slug = slugify(type);
+        if (!slug) return;
+        const known = shotOptions.find(o => o.id === slug);
+        // Don't let a rambling write-in become a permanent dropdown option —
+        // it still rides on this order, it just isn't saved for reuse.
+        if (!known && slug !== 'house' && !isReasonableShotName(type)) return;
+        const ref = doc(shotDb, 'shotOptions', slug);
+        const data = { count: increment(1) };
+        // Only set the display name when creating a brand-new option (or the
+        // protected House default) so we never clobber an existing option's
+        // canonical casing with a write-in variant ("jameson" → "Jameson").
+        if (slug === 'house') data.name = 'House';
+        else if (!known) data.name = type.trim();
+        setDoc(ref, data, { merge: true }).catch(() => {});
+      });
+
+      // The card is sent — drop the "resume this draft" pointer so a reload won't
+      // re-open the editor on it (myCardId stays in memory for Undo).
+      clearPointerMeta();
+      saveLastSent({
+        id: myCardId,
+        sentAt: Date.now(),
+        sessionDate: ctx.sessionDate || PokerSession.todayStr(),
+        venue: ctx.venue || '',
+        table: selectedTable || ''
+      });
+
+      viewingCard = { id: myCardId, ...payload, status: 'pending', poured: false, paid: false };
+      receiptMode = 'submitted';
+      buildReceipt(viewingCard);
+      renderReceiptFooter('submitted', viewingCard);
+      showReceipt();
+      // No separate listener — the live cards feed (subscribeCards) refreshes the
+      // open receipt, locking Undo the moment the bar starts pouring.
+    } catch (err) {
+      console.error('Submit failed:', err);
+      cardLocked = false;
+      btn.disabled = false;
+      btn.textContent = isEditingExisting() ? 'Update & Send' : 'Submit Round';
+      alert('Failed to submit. Check your connection and try again.');
+    }
+  }
+
+  // ── Receipt ────────────────────────────────────────────────────────────────
+  // Renders any card (the one just submitted, or one tapped from the list).
+  function buildReceipt(card) {
+    const table = card.table;
+    const suitLabels = { hearts: '♥ Hearts', diamonds: '♦ Diamonds', clubs: '♣ Clubs', spades: '♠ Spades' };
+    const gameLabel = card.gameLabel || PokerSession.gameLabel(card.gameNum || 1, card.eventType || 'Regular');
+    document.getElementById('receipt-meta').textContent =
+      `${card.venue || ''} · ${suitLabels[table] || ''} · ${gameLabel}`;
+
+    // Header line reflects where the card is in its life.
+    const checkEl = document.getElementById('receipt-check');
+    const poured = cardPoured(card), closed = cardClosed(card);
+    if (closed) { checkEl.textContent = '✓ Poured & paid'; checkEl.style.color = 'var(--green)'; }
+    else if (poured) { checkEl.textContent = '🍸 Being poured'; checkEl.style.color = 'var(--green)'; }
+    else if ((card.status || 'pending') === 'draft') { checkEl.textContent = '✎ Being built'; checkEl.style.color = 'var(--blue)'; }
+    else { checkEl.textContent = '✓ Sent to bar'; checkEl.style.color = 'var(--green)'; }
+
+    // Group totals with case-insensitive House matching so a write-in
+    // "house"/"House" never splits and every non-House shot always surfaces.
+    // Derived from players (never the stored `total` map — see totalsFrom).
+    const totalMap = totalsFrom(card.players);
+    let houseCount = 0;
+    const others = [];
+    Object.entries(totalMap).forEach(([t, q]) => {
+      q = Number(q) || 0;
+      if (q <= 0) return;
+      if (String(t).trim().toLowerCase() === 'house') houseCount += q;
+      else others.push([t, q]);
+    });
+    others.sort((a, b) => b[1] - a[1]);
+
+    // House hero on top (the emphasis to keep).
+    const houseEl = document.getElementById('receipt-house');
+    houseEl.innerHTML = houseCount > 0
+      ? `<div class="house-hero"><div class="house-hero-count">${houseCount}</div><div class="house-hero-label">House Shots</div></div>`
+      : '';
+
+    // Per-player: who ordered what + how they're paying. Cash/Card stays tappable
+    // until the bar marks the order paid (rung into the POS).
+    const paymentEditable = !cardPaid(card) && !!card.id;
+    const playersLabel = document.getElementById('receipt-players-label');
+    if (playersLabel) playersLabel.textContent = paymentEditable
+      ? "Who ordered — tap a tag to switch cash/card until it's rung up"
+      : 'Who ordered & how they paid';
+
+    const playersEl = document.getElementById('receipt-players');
+    playersEl.innerHTML = '';
+    (card.players || []).forEach((player, idx) => {
+      const row = document.createElement('div');
+      row.className = 'receipt-player-row';
+      const nameEl = document.createElement('span');
+      nameEl.className = 'rp-name';
+      nameEl.textContent = player.name;
+      const right = document.createElement('div');
+      right.className = 'rp-right';
+      const shotsEl = document.createElement('span');
+      shotsEl.className = 'rp-shots';
+      shotsEl.textContent = (player.shots || []).map(s => `${s.qty > 1 ? s.qty + '× ' : ''}${s.type}`).join(' + ');
+      const pay = player.payment === 'cash' ? 'cash' : 'card';
+      const payEl = document.createElement('span');
+      payEl.className = `rp-pay ${pay}` + (paymentEditable ? ' editable' : '');
+      payEl.textContent = pay === 'cash' ? 'Cash' : 'Card';
+      if (paymentEditable) {
+        payEl.title = 'Tap to switch cash / card';
+        payEl.addEventListener('click', () => setPlayerPayment(card, idx, pay === 'cash' ? 'card' : 'cash'));
+      }
+      right.appendChild(shotsEl);
+      right.appendChild(payEl);
+      row.appendChild(nameEl);
+      row.appendChild(right);
+      playersEl.appendChild(row);
+      (player.shots || []).forEach(s => {
+        if (!s.note) return;
+        const noteEl = document.createElement('div');
+        noteEl.className = 'rp-note';
+        noteEl.textContent = `📝 ${s.type} — ${s.note}`;
+        playersEl.appendChild(noteEl);
+      });
+    });
+
+    // Big "all shots to make" summary at the bottom (House included).
+    const allParts = [];
+    if (houseCount > 0) allParts.push(['House', houseCount]);
+    others.forEach(([t, q]) => allParts.push([t, q]));
+    const grand = allParts.reduce((a, [, q]) => a + q, 0);
+    const allEl = document.getElementById('receipt-allshots');
+    if (grand > 0) {
+      allEl.classList.remove('hidden');
+      allEl.innerHTML =
+        `<div class="allshots-title">All shots to make · ${grand}</div>
+         <div class="allshots-list">${allParts.map(([t, q]) => `<span class="allshots-item"><b>${q}×</b> ${escapeHtml(t)}</span>`).join('')}</div>`;
+    } else {
+      allEl.classList.add('hidden');
+      allEl.innerHTML = '';
+    }
+  }
+
+  // ── Delete / Undo ──────────────────────────────────────────────────────────
+  // Shared by "Undo" right after submitting (myCardId) and "Delete this card"
+  // from the view-mode receipt (any card, mine or someone else's), so a card
+  // made by mistake or a duplicate can always be removed up until the bar
+  // starts pouring it.
+  async function performDelete(id) {
+    const undoBtn = document.getElementById('undo-btn');
+    undoBtn.textContent = 'Removing…';
+    undoBtn.disabled = true;
+    try {
+      if (id) {
+        // Final check — block delete once the bar has started pouring it.
+        const snap = await getDoc(doc(shotDb, 'shotRounds', id));
+        if (snap.exists() && cardPoured(snap.data())) {
+          undoBtn.textContent = 'Being poured ✓';
+          undoBtn.disabled = true;
+          undoBtn.style.color = 'var(--green)';
+          undoBtn.style.textDecoration = 'none';
+          return;
+        }
+        await shotsReady();
+        await deleteDoc(doc(shotDb, 'shotRounds', id));
+      }
+      if (id) {
+        const lastSent = readLastSent();
+        if (lastSent && lastSent.id === id) clearLastSent();
+      }
+      if (myCardId === id) {
+        // Keep the filled-in order in memory so the player lands back on it;
+        // the next edit creates a fresh draft doc.
+        myCardId = null;
+        editingForeign = false;
+        cardLocked = false;
+        clearPointerMeta();
+        const btn = document.getElementById('submit-btn');
+        btn.disabled = false;
+        btn.textContent = 'Submit Round';
+        updateSubmitState();
+      }
+      receiptMode = 'submitted';
+      viewingCard = null;
+      hideReceipt();
+      renderCardList();
+    } catch (err) {
+      console.error('Delete failed:', err);
+      undoBtn.textContent = 'Delete this card';
+      undoBtn.disabled = false;
+      alert('Could not delete the card. Check your connection and try again.');
+    }
+  }
+
+  function undoSubmit() {
+    return performDelete(myCardId);
+  }
+
+  // "Delete this card" from the view-mode receipt — own cards delete right
+  // away (same low-friction Undo already gives you); someone else's asks for
+  // confirmation first, same as editing a foreign card does.
+  function deleteViewedCard() {
+    const card = viewingCard;
+    if (!card || !card.id || cardPoured(card)) return;
+    if (card.clientId === clientId) performDelete(card.id);
+    else openWarn(card, 'delete');
+  }
+
+  // ── Reset ──────────────────────────────────────────────────────────────────
+  function resetForm() {
+    submitter = null;
+    selectedTable = null;
+    playerCards = [];
+    myCardId = null;          // editor is unbound — next card is brand new
+    editingForeign = false;
+    cardLocked = false;
+    viewingCard = null;
+    receiptMode = 'submitted';
+    clearPointerMeta();
+    clearLastSent();
+
+    hideReceipt();
+    document.getElementById('submitter-wrap').classList.remove('hidden');
+    document.getElementById('submitter-badge').classList.add('hidden');
+    document.getElementById('submitter-input').value = '';
+    document.querySelectorAll('.suit-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('player-list').innerHTML = '';
+    document.getElementById('player-input').value = '';
+    document.getElementById('total-bar').classList.add('hidden');
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Submit Round';
+
+    // New round: drop any manual game override and re-derive from the clock,
+    // refresh the paused/submit state, and reload options so newly written-in
+    // shots appear in the dropdown.
+    gameManuallySet = false;
+    refreshTimeState();
+    loadShotOptions();
+    renderCardList(); // selectedTable is null now → the list hides
+  }
+
+  // ════════════════════════════════════════════════════════════════════════
+  //  Shared live cards — feed, list, draft writes, view/edit/lock, persistence
+  // ════════════════════════════════════════════════════════════════════════
+
+  let warnPendingCard = null; // card awaiting the "edit someone else's" confirm
+
+  function tsMillis(o) {
+    const ts = o.timestamp || o.updatedAt;
+    if (!ts) return 0;
+    if (ts.toMillis) return ts.toMillis();
+    if (ts.seconds) return ts.seconds * 1000;
+    return 0;
+  }
+
+  // A card belongs in the current view when it's the same table, game, venue
+  // and tonight's session.
+  function cardMatchesScope(c) {
+    return c.table === selectedTable &&
+           (c.gameNum || 1) === ctx.gameNum &&
+           (c.venue || '') === ctx.venue &&
+           PokerSession.datesMatch(c.sessionDate || '', ctx.sessionDate || PokerSession.todayStr());
+  }
+
+  // Live feed of every card today (bounded to today so we don't download the
+  // whole history). Same single-field range + orderBy as bar.html → no index.
+  function subscribeCards() {
+    if (cardsUnsub) { cardsUnsub(); cardsUnsub = null; }
+    const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
+    const qy = query(
+      collection(shotDb, 'shotRounds'),
+      where('timestamp', '>=', startOfDay),
+      orderBy('timestamp', 'desc'),
+      limit(200)
+    );
+    cardsUnsub = onSnapshot(qy, snap => {
+      // cleanOrder: one malformed card must not break the feed or the editor.
+      liveCards = snap.docs.map(d => ({ id: d.id, ...cleanOrder(d.data()) }));
+
+      // Re-open a saved in-progress draft once the live feed first arrives.
+      // resumePending also held back any save until now, so we can't orphan the
+      // pointed-at card by creating a duplicate before we've resolved it.
+      if (resumePending) {
+        const card = pendingResumeId ? liveCards.find(c => c.id === pendingResumeId) : null;
+        if (!card && snap.metadata && snap.metadata.fromCache) {
+          // A cache-only miss is inconclusive.
+        } else {
+          resumePending = false;
+          pendingResumeId = null;
+          if (card && card.clientId === clientId && (card.status || 'draft') === 'draft' && !cardPoured(card)) {
+            loadCardIntoEditor(card, false, true);
+            draftWasResumed = true;
+          } else {
+            // Pointer was stale or already sent — drop it and flush any edit the
+            // user made during the resume window as a brand-new draft.
+            clearPointerMeta();
+            if (hasEditorContent() && !myCardId) scheduleCardSave();
+          }
+        }
+      }
+
+      if (!resumePending && !reopenChecked) {
+        const movedOn = draftWasResumed
+          || !reopenPending
+          || document.getElementById('success-overlay').classList.contains('show');
+        if (movedOn) {
+          reopenChecked = true;
+          reopenPending = false;
+        } else {
+          const lastSent = readLastSent();
+          const sessionDate = ctx.sessionDate || PokerSession.todayStr();
+          const forceNew = new URLSearchParams(location.search).get('new') === '1';
+          const now = Date.now();
+          const card = pickReopenCard({
+            lastSent,
+            cards: liveCards,
+            sessionDate,
+            venue: ctx.venue || '',
+            clientId,
+            now,
+            forceNew,
+            draftResumed: draftWasResumed,
+            datesMatch: (a, b) => PokerSession.datesMatch(a || '', b || '')
+          });
+
+          if (card) {
+            selectedTable = card.table;
+            document.querySelectorAll('.suit-btn').forEach(b => b.classList.toggle('active', b.dataset.suit === selectedTable));
+            if (!cardPoured(card)) loadCardIntoEditor(card, false, true);
+            // Loading the editor arms a draft save; this card is already sent.
+            if (cardSaveTimer) { clearTimeout(cardSaveTimer); cardSaveTimer = null; }
+            clearPointerMeta();
+            myCardId = card.id;
+            cardLocked = true;
+            viewingCard = card;
+            receiptMode = 'submitted';
+            buildReceipt(card);
+            renderReceiptFooter('submitted', card);
+            reopenChecked = true;
+            reopenPending = false;
+            removeReopenCancelListeners();
+            showReceipt();
+            if (lastSent) saveLastSent(lastSent);
+            renderCardList();
+          } else if (snap.metadata && snap.metadata.fromCache) {
+            // Keep the receipt until a server snapshot confirms it is missing.
+          } else {
+            reopenChecked = true;
+            reopenPending = false;
+            removeReopenCancelListeners();
+            if (lastSent && !forceNew) {
+              const age = now - lastSent.sentAt;
+              const cardIsMissing = !liveCards.some(c => c.id === lastSent.id);
+              const isAnotherNight = !PokerSession.datesMatch(lastSent.sessionDate || '', sessionDate || '');
+              if (cardIsMissing || isAnotherNight || (Number.isFinite(age) && age > REOPEN_MS)) {
+                clearLastSent();
+              }
+            }
+            tryAutoFillSubmitter();
+          }
+        }
+      }
+
+      syncMyCardState();
+      renderCardList();
+      refreshOpenReceipt();
+    }, err => console.warn('Cards listen failed', err));
+  }
+
+  // Keep an open receipt (submitted OR view) in sync with the live card — this
+  // is what locks Undo the instant the bar starts pouring, flips the payment
+  // tags to locked when it's marked paid, etc.
+  function refreshOpenReceipt() {
+    const overlay = document.getElementById('success-overlay');
+    if (!overlay.classList.contains('show') || !viewingCard) return;
+    const fresh = liveCards.find(c => c.id === viewingCard.id);
+    if (!fresh) return; // not in the feed yet (e.g. just-submitted) — keep last-known
+    viewingCard = fresh;
+    buildReceipt(fresh);
+    renderReceiptFooter(receiptMode, fresh);
+  }
+
+  function syncMyCardState() {
+    // If the card I re-opened was poured while I edited, reflect the lock.
+    if (editingCardPoured()) updateSubmitState();
+  }
+
+  function statusLabel(c) {
+    if (cardClosed(c)) return 'Done';
+    if (cardPoured(c)) return 'Pouring';
+    if ((c.status || 'draft') === 'pending') return 'Sent';
+    return 'Building';
+  }
+  function statusClass(c) {
+    if (cardClosed(c)) return 'closed';
+    if (cardPoured(c)) return 'pouring';
+    if ((c.status || 'draft') === 'pending') return 'pending';
+    return 'draft';
+  }
+
+  function renderCardList() {
+    const sec = document.getElementById('step-cards');
+    const listEl = document.getElementById('card-list');
+    if (!selectedTable) { sec.classList.add('hidden'); listEl.innerHTML = ''; return; }
+
+    // Everyone else's cards on this table (mine is the editor above).
+    const cards = liveCards.filter(cardMatchesScope).filter(c => c.id !== myCardId);
+    if (!cards.length) { sec.classList.add('hidden'); listEl.innerHTML = ''; return; }
+
+    cards.sort((a, b) => {
+      const af = cardClosed(a) ? 1 : 0;
+      const bf = cardClosed(b) ? 1 : 0;
+      if (af !== bf) return af - bf;       // active cards first, closed (done) last
+      return tsMillis(b) - tsMillis(a);    // newest first within a group
+    });
+
+    sec.classList.remove('hidden');
+    listEl.innerHTML = '';
+    cards.forEach(c => listEl.appendChild(buildCardRow(c)));
+  }
+
+  function buildCardRow(c) {
+    const row = document.createElement('div');
+    row.className = 'card-row' + (cardClosed(c) ? ' done' : '');
+
+    const main = document.createElement('div');
+    main.className = 'card-row-main';
+    const nameEl = document.createElement('div');
+    nameEl.className = 'card-row-name';
+    const who = (c.submitter && c.submitter.name) ? c.submitter.name : 'Unnamed';
+    nameEl.textContent = (c.clientId === clientId) ? `${who} (you)` : who;
+    const shotsEl = document.createElement('div');
+    shotsEl.className = 'card-row-shots';
+    const summary = Object.entries(totalsFrom(c.players))
+      .filter(([, q]) => Number(q) > 0)
+      .map(([t, q]) => `${Number(q) > 1 ? q + '× ' : ''}${t}`).join(', ');
+    shotsEl.textContent = summary || 'No shots yet';
+    main.appendChild(nameEl);
+    main.appendChild(shotsEl);
+
+    const chip = document.createElement('span');
+    chip.className = 'card-status ' + statusClass(c);
+    chip.textContent = statusLabel(c);
+
+    const chev = document.createElement('span');
+    chev.className = 'card-chevron';
+    chev.textContent = '›';
+
+    row.appendChild(main);
+    row.appendChild(chip);
+    row.appendChild(chev);
+    row.addEventListener('click', () => viewCard(c.id));
+    return row;
+  }
+
+  // True only when the editor holds at least one real shot worth sharing.
+  function hasEditorContent() {
+    return playerCards.some(c => c.shots.some(s => isValidShotType(s.type)));
+  }
+
+  function buildCardPayload(status) {
+    // NOTE: we intentionally do NOT store a `total` map. It's a Firestore map,
+    // and every merge write deep-merges it (stale keys accumulate → phantom
+    // shots). Readers derive the total from `players` (an array, which merge
+    // replaces cleanly). See totalsFrom().
+    const payload = {
+      venue: ctx.venue,
+      eventType: ctx.eventType,
+      gameNum: ctx.gameNum,
+      gameLabel: PokerSession.gameLabel(ctx.gameNum, ctx.eventType),
+      sessionDate: ctx.sessionDate || PokerSession.todayStr(),
+      table: selectedTable,
+      submitter: { name: submitter ? submitter.name : '' },
+      players: playerCards.map(card => ({
+        name: card.name,
+        payment: card.payment === 'cash' ? 'cash' : 'card',
+        shots: card.shots.filter(s => isValidShotType(s.type)).map(s => {
+          const shot = { type: s.type.trim(), qty: s.qty };
+          const note = (s.note || '').trim();
+          if (note) shot.note = note;   // per-shot special request, stored only when present
+          return shot;
+        })
+      })),
+      clientId,
+      updatedAt: serverTimestamp()
+    };
+    if (status) payload.status = status;
+    return payload;
+  }
+
+  function scheduleCardSave() {
+    // cardLocked: a submit is finalizing (don't write a stale draft back over it).
+    // resumePending and reopenPending hold writes until their snapshots resolve.
+    if (cardLocked || resumePending || reopenPending) return;
+    if (cardSaveTimer) clearTimeout(cardSaveTimer);
+    cardSaveTimer = setTimeout(saveCardNow, 300);
+  }
+
+  // Persist the live draft (debounced). Creates the card on first real content,
+  // updates it after, and deletes it if emptied — all under one stable id so a
+  // duplicate is never created.
+  async function saveCardNow() {
+    cardSaveTimer = null;
+    if (!selectedTable || !ctx.venue) return;
+
+    if (!hasEditorContent()) {
+      // Emptied a draft I own → delete it so it stops showing for everyone.
+      if (myCardId && !editingForeign) {
+        const mine = liveCards.find(c => c.id === myCardId);
+        if (!mine || ((mine.status || 'draft') === 'draft' && mine.clientId === clientId)) {
+          try { await shotsReady(); await deleteDoc(doc(shotDb, 'shotRounds', myCardId)); } catch (e) {}
+          myCardId = null;
+          clearPointerMeta();
+        }
+      }
+      return;
+    }
+
+    try {
+      if (!myCardId) {
+        // Pre-mint the id so myCardId is set before the write lands — the feed
+        // then excludes my own card from the "other cards" list immediately.
+        const ref = doc(collection(shotDb, 'shotRounds'));
+        myCardId = ref.id;
+        editingForeign = false;
+        persistPointerMeta();
+        const payload = buildCardPayload('draft');
+        payload.timestamp = serverTimestamp();
+        await shotsReady();
+        await setDoc(ref, payload);
+      } else {
+        const existing = liveCards.find(c => c.id === myCardId);
+        if (cardPoured(existing)) return;    // shots locked once the bar starts pouring
+        // buildCardPayload() with no status arg omits the status field, so a
+        // merge can never revert a 'pending' card back to 'draft' (the submit race).
+        const payload = buildCardPayload();
+        delete payload.clientId;             // keep the original owner (don't hijack on edit)
+        await shotsReady();
+        await setDoc(doc(shotDb, 'shotRounds', myCardId), payload, { merge: true });
+      }
+    } catch (e) { console.warn('Card save failed', e); }
+  }
+
+  // Tap a card → show its receipt (read-only view).
+  function viewCard(id) {
+    const card = liveCards.find(c => c.id === id);
+    if (!card) return;
+    viewingCard = card;
+    receiptMode = 'view';
+    buildReceipt(card);
+    renderReceiptFooter('view', card);
+    showReceipt();
+  }
+
+  // Flip a player's cash/card on a card from the receipt — allowed (even after
+  // the bar starts pouring) until the order is marked paid (rung into the POS).
+  async function setPlayerPayment(card, index, method) {
+    if (cardPaid(card) || !card.id) return;
+    const players = (card.players || []).map((p, i) =>
+      i === index ? { ...p, payment: method === 'cash' ? 'cash' : 'card' } : p);
+    // Optimistic local refresh so the tag flips instantly.
+    if (viewingCard && viewingCard.id === card.id) {
+      viewingCard = { ...card, players };
+      buildReceipt(viewingCard);
+      renderReceiptFooter(receiptMode, viewingCard);
+    }
+    try {
+      await shotsReady();
+      await setDoc(doc(shotDb, 'shotRounds', card.id), { players, updatedAt: serverTimestamp() }, { merge: true });
+    } catch (e) { console.warn('Payment update failed', e); }
+  }
+
+  // Pull a card back into the editor. Own cards load straight in; someone
+  // else's only after the warning. A poured card is never editable.
+  function loadCardIntoEditor(card, foreign, silent) {
+    if (cardPoured(card)) return; // shots are locked once the bar starts pouring
+    const lastSent = readLastSent();
+    if (lastSent && lastSent.id === card.id) clearLastSent();
+    cardLocked = false;
+    selectedTable = card.table || selectedTable;
+    document.querySelectorAll('.suit-btn').forEach(b => b.classList.toggle('active', b.dataset.suit === selectedTable));
+
+    if (card.submitter && card.submitter.name) setSubmitter(card.submitter.name);
+
+    playerCards = (card.players || []).map(p => ({
+      name: p.name,
+      payment: p.payment === 'cash' ? 'cash' : 'card',
+      shots: (p.shots && p.shots.length ? p.shots : [{ type: 'House', qty: 1 }]).map(s => ({
+        type: s.type || 'House',
+        qty: Math.max(1, Number(s.qty) || 1),
+        custom: !shotOptions.some(o => o.name === s.type),
+        note: s.note || ''
+      }))
+    }));
+
+    myCardId = card.id;
+    editingForeign = !!foreign;
+    persistPointerMeta();
+
+    receiptMode = 'submitted';
+    viewingCard = null;
+    hideReceipt();
+
+    renderPlayerCards();
+    updateTotal();
+    updateSubmitState();
+    renderCardList();
+    // Show the top of "Build the order" — the search box plus the first cards.
+    if (!silent) document.getElementById('step-players').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ── Receipt footer modes ────────────────────────────────────────────────
+  function renderReceiptFooter(mode, card) {
+    const poured = cardPoured(card), paid = cardPaid(card), closed = cardClosed(card);
+    const mine = !!(card && card.clientId === clientId);
+    const lockNote = document.getElementById('receipt-locked-note');
+    const editBtn = document.getElementById('receipt-edit-btn');
+    const newBtn = document.getElementById('success-new-btn');
+    const closeBtn = document.getElementById('receipt-close-btn');
+    const undoBtn = document.getElementById('undo-btn');
+    const appBtn = document.getElementById('receipt-app-btn');
+    [lockNote, editBtn, newBtn, closeBtn, undoBtn, appBtn].forEach(el => el && el.classList.add('hidden'));
+    if (window.BackNav && BackNav.ios) appBtn.classList.remove('hidden');
+
+    // Reset undo styling each time it surfaces.
+    undoBtn.disabled = false;
+    undoBtn.style.color = '';
+    undoBtn.style.textDecoration = '';
+    undoBtn.textContent = 'Edit / Undo this order';
+
+    if (mode === 'submitted') {
+      newBtn.classList.remove('hidden');
+      undoBtn.classList.remove('hidden');
+      if (poured) {
+        // Once pouring starts the order can't be pulled back.
+        undoBtn.disabled = true;
+        undoBtn.textContent = closed ? 'Poured & paid ✓' : 'Being poured ✓';
+        undoBtn.style.color = 'var(--green)';
+        undoBtn.style.textDecoration = 'none';
+      }
+    } else { // view
+      closeBtn.classList.remove('hidden');
+      if (closed) {
+        lockNote.textContent = '🔒 Poured & paid — closed';
+        lockNote.classList.remove('hidden');
+      } else if (poured) {
+        // Shots locked; the cash/card tags above stay tappable until it's paid.
+        lockNote.textContent = paid ? '🔒 Poured & paid' : '🍸 Being poured — shots locked';
+        lockNote.classList.remove('hidden');
+      } else {
+        editBtn.classList.remove('hidden');
+        editBtn.textContent = mine ? 'Edit this card' : 'Edit this card…';
+        // Delete stays available up until the bar starts pouring — this is how
+        // an accidental duplicate card gets cleaned up.
+        undoBtn.classList.remove('hidden');
+        undoBtn.textContent = mine ? 'Delete this card' : 'Delete this card…';
+      }
+    }
+  }
+
+  function bindReceiptButtons() {
+    document.getElementById('success-new-btn').addEventListener('click', resetForm);
+    document.getElementById('undo-btn').addEventListener('click', () => {
+      if (receiptMode === 'view') deleteViewedCard();
+      else undoSubmit();
+    });
+    document.getElementById('receipt-close-btn').addEventListener('click', () => {
+      receiptMode = 'submitted';
+      viewingCard = null;
+      hideReceipt();
+    });
+    document.getElementById('receipt-edit-btn').addEventListener('click', () => {
+      const card = viewingCard;
+      if (!card || cardPoured(card)) return;  // shots locked once pouring starts
+      if (card.clientId === clientId) loadCardIntoEditor(card, false, false);
+      else openWarn(card);
+    });
+  }
+
+  function showReceipt() { document.getElementById('success-overlay').classList.add('show'); }
+  function hideReceipt() { document.getElementById('success-overlay').classList.remove('show'); }
+
+  // ── Warn-before-touching-someone-else's-card modal (edit or delete) ───────
+  let warnAction = 'edit'; // 'edit' | 'delete'
+
+  function openWarn(card, action) {
+    warnPendingCard = card;
+    warnAction = action === 'delete' ? 'delete' : 'edit';
+    const owner = (card.submitter && card.submitter.name) ? card.submitter.name : 'another player';
+    const title = document.getElementById('warn-title');
+    const text = document.getElementById('warn-text');
+    const proceed = document.getElementById('warn-proceed');
+    if (warnAction === 'delete') {
+      title.textContent = "Delete someone else's card?";
+      text.innerHTML = `This card was started by <strong>${escapeHtml(owner)}</strong>. Deleting it can't be undone — only do this if it's a duplicate or a mistake.`;
+      proceed.textContent = 'Delete anyway';
+    } else {
+      title.textContent = "This is someone else's card";
+      text.innerHTML = `This card was started by <strong>${escapeHtml(owner)}</strong>. It's usually better to <strong>start a new card</strong> for extra shots. Only edit theirs if you absolutely have to.`;
+      proceed.textContent = 'Edit anyway';
+    }
+    document.getElementById('warn-overlay').classList.add('show');
+  }
+  function bindWarnModal() {
+    document.getElementById('warn-cancel').addEventListener('click', () => {
+      warnPendingCard = null;
+      document.getElementById('warn-overlay').classList.remove('show');
+    });
+    document.getElementById('warn-proceed').addEventListener('click', () => {
+      const card = warnPendingCard;
+      const action = warnAction;
+      warnPendingCard = null;
+      document.getElementById('warn-overlay').classList.remove('show');
+      if (!card) return;
+      if (action === 'delete') performDelete(card.id);
+      else loadCardIntoEditor(card, true, false);
+    });
+  }
+
+  // ── Local pointer (resume my card across reload/app-close/logout) ─────────
+  function persistPointerMeta() {
+    try {
+      localStorage.setItem(POINTER_KEY, JSON.stringify({
+        id: myCardId || null,
+        sessionDate: ctx.sessionDate || PokerSession.todayStr(),
+        venue: ctx.venue || '',
+        gameNum: ctx.gameNum,
+        table: selectedTable || ''
+      }));
+    } catch (e) {}
+  }
+  function clearPointerMeta() {
+    try { localStorage.removeItem(POINTER_KEY); } catch (e) {}
+  }
+  function saveLastSent(card) {
+    try { localStorage.setItem(LAST_SENT_KEY, JSON.stringify(card)); } catch (e) {}
+  }
+  function clearLastSent() {
+    try { localStorage.removeItem(LAST_SENT_KEY); } catch (e) {}
+  }
+  function readLastSent() {
+    try { return JSON.parse(localStorage.getItem(LAST_SENT_KEY) || 'null'); } catch (e) { return null; }
+  }
+  function restorePointerMeta() {
+    try {
+      const p = JSON.parse(localStorage.getItem(POINTER_KEY) || 'null');
+      if (!p) return;
+      const sd = ctx.sessionDate || PokerSession.todayStr();
+      if (p.sessionDate !== sd) { clearPointerMeta(); return; }   // stale (old night)
+      if (p.venue && ctx.venue && p.venue !== ctx.venue) return;  // different venue tonight
+      if (p.table) {
+        selectedTable = p.table;
+        document.querySelectorAll('.suit-btn').forEach(b => b.classList.toggle('active', b.dataset.suit === p.table));
+      }
+      pendingResumeId = p.id || null;
+      // Hold off creating any new draft until the first snapshot resolves this
+      // pointer — otherwise a fast early edit would orphan the saved card.
+      resumePending = !!pendingResumeId;
+      updateSubmitState();
+    } catch (e) {}
+  }
+
+  init();
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));
+    });
+  }
+</script>
+<script src="/update-check.js"></script>
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="./clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/" data-z="150"></script>
+</body>
+</html>

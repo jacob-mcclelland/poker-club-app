@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Event Publisher — Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/img/favicon-admin.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#050508; --card-bg:rgba(20,20,25,0.7); --border:rgba(255,255,255,0.08); --gold:#d4af37; --blue:#3b82f6; --green:#10b981; --red:#ef4444; --purple:#a855f7; --text:#f8fafc; --muted:#94a3b8; --corgi:#3b82f6; --tight:#d4af37; --surface2:#1c1c1c; }
+    * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+    body { background:var(--bg); color:var(--text); font-family:'Inter',-apple-system,sans-serif; min-height:100vh; display:flex; flex-direction:column; overflow-x:hidden; }
+    #authGuard { position:fixed; inset:0; background:var(--bg); z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:16px; }
+    .spinner { width:40px; height:40px; border:3px solid rgba(255,255,255,0.1); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    #authMsg { color:var(--gold); font-weight:700; font-size:0.9rem; letter-spacing:1px; text-transform:uppercase; text-align:center; padding:0 24px; }
+    .auth-sign-in-btn { background:var(--gold); color:#000; border:none; padding:12px 28px; border-radius:10px; font-weight:800; font-size:0.95rem; cursor:pointer; font-family:inherit; }
+
+    .header { padding:40px 20px 12px; text-align:center; position:relative; }
+    .back-btn { position:absolute; left:16px; top:44px; background:var(--card-bg); border:1px solid var(--border); color:var(--gold); padding:8px 16px; border-radius:10px; cursor:pointer; font-size:0.85rem; font-weight:700; font-family:inherit; }
+    .back-btn:active { transform:scale(0.96); }
+    h1 { font-weight:800; font-size:1.5rem; text-transform:uppercase; letter-spacing:2px; background:linear-gradient(to bottom,#fff 30%,#888); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .sub { margin-top:4px; color:var(--blue); font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:3px; }
+
+    .main-content { padding:0 16px 100px; flex:1; max-width:720px; margin:0 auto; width:100%; }
+
+    .toolbar { display:flex; align-items:center; gap:10px; margin:16px 0 14px; flex-wrap:wrap; }
+    .filter-btn { background:transparent; border:1px solid var(--border); color:var(--muted); padding:8px 14px; border-radius:9px; cursor:pointer; font-weight:700; font-size:0.78rem; font-family:inherit; }
+    .filter-btn.active { background:rgba(255,255,255,0.06); color:var(--text); border-color:rgba(255,255,255,0.2); }
+    .btn-new { margin-left:auto; background:var(--gold); color:#000; border:none; padding:9px 16px; border-radius:9px; cursor:pointer; font-weight:800; font-size:0.8rem; font-family:inherit; }
+    .btn-new:active { transform:scale(0.96); }
+
+    .loading { text-align:center; color:var(--muted); padding:2.5rem; font-size:0.88rem; }
+
+    /* Event card */
+    .event-card { background:var(--card-bg); border:1px solid var(--border); border-radius:14px; padding:12px 14px; margin-bottom:10px; display:flex; align-items:center; gap:12px; cursor:pointer; }
+    .event-card:active { transform:scale(0.99); }
+    .event-thumb { width:48px; height:48px; border-radius:8px; flex-shrink:0; background:var(--surface2); display:flex; align-items:center; justify-content:center; font-size:1.2rem; overflow:hidden; }
+    .event-thumb img { width:100%; height:100%; object-fit:cover; }
+    .event-info { flex:1; min-width:0; }
+    .event-info-date { font-size:0.66rem; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; color:var(--gold); }
+    .event-info-theme { font-weight:700; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0.15rem 0; }
+    .event-info-venue { font-size:0.72rem; color:var(--muted); }
+    .event-info-venue .off-flag { color:var(--red); }
+    .event-badges { display:flex; flex-direction:column; gap:5px; align-items:flex-end; flex-shrink:0; }
+    .badge { font-size:0.6rem; font-weight:800; text-transform:uppercase; letter-spacing:0.04em; padding:2px 7px; border-radius:5px; white-space:nowrap; }
+    .badge-yes { background:rgba(16,185,129,0.14); color:var(--green); border:1px solid rgba(16,185,129,0.3); }
+    .badge-no { background:rgba(255,255,255,0.04); color:var(--muted); border:1px solid var(--border); }
+    .kit-btn { background:rgba(59,130,246,0.14); color:var(--blue); border:1px solid rgba(59,130,246,0.3); padding:4px 9px; border-radius:6px; font-size:0.66rem; font-weight:800; cursor:pointer; font-family:inherit; }
+    .kit-btn:active { transform:scale(0.95); }
+
+    /* Modal */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200; display:none; align-items:flex-start; justify-content:center; padding:18px; overflow-y:auto; }
+    .modal-overlay.open { display:flex; }
+    .modal { background:#141419; border:1px solid var(--border); border-radius:18px; padding:22px; width:100%; max-width:480px; margin:20px 0; }
+    .modal h3 { font-size:1.1rem; font-weight:800; margin-bottom:4px; }
+    .modal .modal-sub { font-size:0.74rem; color:var(--muted); margin-bottom:16px; }
+    .lbl { font-size:0.7rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+    .lbl .hint { font-weight:400; text-transform:none; letter-spacing:0; color:rgba(255,255,255,0.3); }
+    .input { width:100%; background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:1rem; padding:11px 13px; outline:none; font-family:inherit; appearance:none; -webkit-appearance:none; }
+    .input:focus { border-color:var(--blue); }
+    textarea.input { min-height:110px; resize:vertical; line-height:1.5; font-size:0.92rem; }
+    .field { margin-bottom:12px; }
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .move-warn { font-size:0.72rem; color:var(--gold); background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.25); border-radius:8px; padding:8px 10px; margin-bottom:12px; display:none; }
+    .section-div { border-top:1px solid var(--border); margin:18px 0 14px; padding-top:14px; }
+    .section-div .lbl { font-size:0.66rem; color:var(--blue); }
+
+    /* Drop zone */
+    .drop-zone { position:relative; border:2px dashed var(--border); border-radius:10px; background:var(--surface2); cursor:pointer; margin-bottom:12px; transition:border-color 0.2s; overflow:hidden; }
+    .drop-zone:hover, .drop-zone.dragover { border-color:var(--gold); }
+    .drop-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+    .dz-preview { width:100%; aspect-ratio:16/9; object-fit:cover; display:none; border-radius:8px; }
+    .dz-preview.visible { display:block; }
+    .dz-hint { padding:1.6rem; text-align:center; color:var(--muted); font-size:0.8rem; line-height:1.6; }
+    .dz-hint-icon { font-size:1.8rem; margin-bottom:0.3rem; }
+    .dz-hint small { display:block; color:rgba(255,255,255,0.22); margin-top:0.3rem; font-size:0.7rem; }
+
+    .btn { padding:11px 18px; border-radius:10px; border:none; font-size:0.88rem; font-weight:700; cursor:pointer; font-family:inherit; }
+    .btn:active { transform:scale(0.97); }
+    .btn:disabled { opacity:0.5; cursor:not-allowed; }
+    .btn-gold { background:var(--gold); color:#000; }
+    .btn-ghost { background:transparent; color:var(--muted); border:1px solid var(--border); }
+    .btn-danger { background:rgba(239,68,68,0.12); color:var(--red); border:1px solid rgba(239,68,68,0.3); }
+    .modal-actions { display:flex; gap:10px; margin-top:18px; align-items:center; }
+
+    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); padding:10px 22px; border-radius:10px; font-weight:700; font-size:0.9rem; z-index:500; display:none; white-space:nowrap; max-width:90vw; overflow:hidden; text-overflow:ellipsis; }
+    .toast.success { background:var(--green); color:#000; }
+    .toast.error { background:var(--red); color:#fff; }
+    @media (max-width:480px) { .input { font-size:16px; } }
+  </style>
+</head>
+<body>
+
+  <div id="authGuard">
+    <div class="spinner"></div>
+    <p id="authMsg">Verifying…</p>
+    <button id="loginBtn" class="auth-sign-in-btn" onclick="doLogin()" style="display:none;">Sign In with Google</button>
+  </div>
+
+  <div class="header">
+    <button class="back-btn" data-back-nav onclick="window.BackNav ? BackNav.go() : history.back()">&#8592; Back</button>
+    <h1>Event Publisher</h1>
+    <div class="sub">Schedule &middot; Content &middot; Facebook — one flow</div>
+  </div>
+
+  <div class="main-content">
+    <div class="toolbar">
+      <button class="filter-btn active" id="tabUpcoming" onclick="setTab(false)">Upcoming</button>
+      <button class="filter-btn" id="tabPast" onclick="setTab(true)">Past</button>
+      <button class="btn-new" onclick="openAdd()">+ New Event</button>
+    </div>
+
+    <div id="event-list"><div class="loading">Loading events…</div></div>
+  </div>
+
+  <!-- Add / Edit modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <h3 id="modalTitle">Add Event</h3>
+      <div class="modal-sub" id="modalSub"></div>
+
+      <div class="move-warn" id="moveWarn">⚠ Changing the date or venue will move this event (the old schedule entry is removed).</div>
+
+      <div class="field">
+        <div class="lbl">Date</div>
+        <input id="mDate" type="date" class="input" onchange="checkMove()">
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <div class="lbl">Venue</div>
+          <select id="mVenue" class="input" onchange="checkMove()">
+            <option value="Tight End">Tight End Bar</option>
+            <option value="Wild Corgi">Wild Corgi Pub</option>
+          </select>
+        </div>
+        <div class="field">
+          <div class="lbl">Type</div>
+          <select id="mType" class="input">
+            <option value="Regular">Regular</option>
+            <option value="Championship">Championship</option>
+            <option value="Big Stack">Big Stack</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <div class="lbl">Theme <span class="hint">(optional)</span></div>
+        <input id="mTheme" type="text" class="input" placeholder="e.g. Graphic Tee">
+      </div>
+      <div class="field">
+        <div class="lbl">Gear Description <span class="hint">(optional)</span></div>
+        <input id="mGear" type="text" class="input" placeholder="e.g. WESTERN or COWBOY inspired gear">
+        <div class="hint" style="margin-top:5px;font-size:0.7rem;">Used verbatim in the auto-announcement — leave blank to auto-infer from theme.</div>
+      </div>
+      <div class="field">
+        <div class="lbl">Announcement Note <span class="hint">(optional)</span></div>
+        <textarea id="mNote" class="input" style="min-height:64px;" placeholder="e.g. Special guests tonight — the Pocket Queenz Crew will be running the show!"></textarea>
+        <div class="hint" style="margin-top:5px;font-size:0.7rem;">One-off extra paragraph in the auto-announcement (guest runners, schedule quirks…).</div>
+      </div>
+
+      <div class="section-div">
+        <div class="lbl">Content</div>
+      </div>
+
+      <div class="field">
+        <div class="lbl">Event Title <span class="hint">(optional — overrides theme name on the site)</span></div>
+        <input id="mTitleInput" type="text" class="input" placeholder="e.g. Neon Night at the Tight End">
+      </div>
+
+      <div class="drop-zone" id="dropZone">
+        <img class="dz-preview" id="dzImg" alt="Preview">
+        <div class="dz-hint" id="dzHint">
+          <div class="dz-hint-icon">📷</div>
+          Tap to choose an image, or drag &amp; drop here
+          <small>16:9 recommended · JPG or PNG</small>
+        </div>
+        <input type="file" id="mFile" accept="image/jpeg,image/png,image/webp,image/gif" onchange="onFileChosen(this)">
+      </div>
+
+      <div class="field">
+        <div class="lbl">Description</div>
+        <textarea id="mDesc" class="input" placeholder="Paste or type the event description…"></textarea>
+      </div>
+
+      <div class="field">
+        <div class="lbl">Facebook Event URL <span class="hint">(optional — makes the event card clickable)</span></div>
+        <input id="mFbUrl" type="url" class="input" placeholder="https://www.facebook.com/events/...">
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-danger" id="mDelete" onclick="deleteFromModal()" style="display:none;">Delete</button>
+        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-gold" id="mSave" style="flex:1;" onclick="saveFromModal()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { functions, storage, httpsCallable } from '../firebase-api.js?v=6';
+    import { requireAdmin, triggerLogin } from './admin-auth.js';
+    import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+    const getScheduleFn = httpsCallable(functions, 'getSchedule');
+    const saveEntryFn   = httpsCallable(functions, 'saveScheduleEntry');
+    const deleteEntryFn = httpsCallable(functions, 'deleteScheduleEntry');
+    const saveContentFn = httpsCallable(functions, 'saveEventContent', { timeout: 120000 });
+
+    const VALID_TYPES = ['Regular', 'Championship', 'Big Stack'];
+    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const WEEKDAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const WEEKDAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    // Events are almost always Tuesday(2) or Thursday(4). Anything else is flagged.
+    const isOffNight = (dow) => dow !== 2 && dow !== 4;
+
+    let events = [];        // full merged schedule+content entries with _d Date
+    let showPast = false;
+    let editing = null;     // {originalDate, originalVenue} when editing, null when adding
+    let pendingFile = null; // File chosen in the modal, not yet uploaded
+    let existingImageUrl = null; // current image URL for the event being edited
+
+    window.doLogin = triggerLogin;
+
+    function toast(msg, type='success') {
+      const el = document.getElementById('toast');
+      el.textContent = msg; el.className = 'toast ' + type; el.style.display = 'block';
+      clearTimeout(el._t); el._t = setTimeout(() => el.style.display = 'none', 2800);
+    }
+    function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+    // "M/D/YYYY" -> Date (noon to dodge TZ)
+    function parseMdy(str){ const [m,d,y]=(str||'').split('/').map(Number); const dt=new Date(y,(m||1)-1,d||1); dt.setHours(12,0,0,0); return dt; }
+    // Date -> "YYYY-MM-DD" for <input type=date>
+    function toIso(dt){ return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`; }
+    // "YYYY-MM-DD" -> "M/D/YYYY"
+    function isoToMdy(iso){ const [y,m,d]=iso.split('-'); return `${parseInt(m)}/${parseInt(d)}/${y}`; }
+    function venueKind(v){ const l=(v||'').toLowerCase(); if(l.includes('corgi')||l.includes('wc'))return 'corgi'; if(l.includes('tight')||l.includes('te'))return 'tight'; return 'tight'; }
+    function normalizeKey(date, venue){
+      const [m, d, y] = date.split('/');
+      const v = (venue||'').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}_${v}`;
+    }
+
+    async function loadEvents() {
+      try {
+        const res = await getScheduleFn({ all: true });
+        events = (res.data?.schedule || []).map(g => {
+          const venue = g.venue || g.location || '';
+          return {
+            date: g.date,
+            venue,
+            type: VALID_TYPES.includes(g.type) ? g.type : 'Regular',
+            theme: g.theme || '',
+            gearDescription: g.gearDescription || '',
+            announcementNote: g.announcementNote || '',
+            title: g.title || '',
+            description: g.description || '',
+            image: g.image || '',
+            facebookEventUrl: g.facebookEventUrl || '',
+            _d: parseMdy(g.date)
+          };
+        }).sort((a,b) => a._d - b._d);
+        renderList();
+      } catch (err) {
+        document.getElementById('event-list').innerHTML = `<div class="loading">Error: ${esc(err.message)}</div>`;
+        toast(err.message || 'Failed to load schedule', 'error');
+      }
+    }
+
+    window.setTab = function(past) {
+      showPast = past;
+      document.getElementById('tabUpcoming').classList.toggle('active', !past);
+      document.getElementById('tabPast').classList.toggle('active', past);
+      renderList();
+    };
+
+    function renderList() {
+      const list = document.getElementById('event-list');
+      const today = new Date(); today.setHours(0,0,0,0);
+      const visible = events.filter(e => showPast ? e._d < today : e._d >= today);
+      if (showPast) visible.sort((a,b) => b._d - a._d); // most recent past first
+
+      if (!visible.length) {
+        list.innerHTML = `<div class="loading">No ${showPast ? 'past' : 'upcoming'} events found.</div>`;
+        return;
+      }
+
+      list.innerHTML = visible.map(e => {
+        const kind = venueKind(e.venue);
+        const label = e.title || e.theme || e.type;
+        const offFlag = isOffNight(e._d.getDay()) ? '<span class="off-flag">⚠ off-night · </span>' : '';
+        const hasDesc = !!e.description;
+        const hasImg = !!e.image;
+        const hasFb = !!e.facebookEventUrl;
+        const hasContent = hasDesc || hasImg;
+        const thumbHtml = e.image ? `<img src="${esc(e.image)}" alt="">` : (kind === 'corgi' ? '🐾' : '♠️');
+        const kitBtn = hasContent
+          ? `<button class="kit-btn" onclick="event.stopPropagation(); fbKit('${esc(e.date)}','${esc(e.venue)}')">FB Kit</button>`
+          : '';
+        return `
+        <div class="event-card" onclick="openEdit('${esc(e.date)}','${esc(e.venue)}')">
+          <div class="event-thumb">${thumbHtml}</div>
+          <div class="event-info">
+            <div class="event-info-date">${offFlag}${esc(e.date)} · ${esc(e.type)}</div>
+            <div class="event-info-theme">${esc(label)}</div>
+            <div class="event-info-venue">${esc(e.venue)}</div>
+          </div>
+          <div class="event-badges">
+            <span class="badge ${hasDesc ? 'badge-yes' : 'badge-no'}">${hasDesc ? '✓ Desc' : 'No Desc'}</span>
+            <span class="badge ${hasImg ? 'badge-yes' : 'badge-no'}">${hasImg ? '✓ Image' : 'No Image'}</span>
+            <span class="badge ${hasFb ? 'badge-yes' : 'badge-no'}">${hasFb ? '✓ FB' : 'No FB'}</span>
+            ${kitBtn}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    // ── Modal ──
+    function openModal() { document.getElementById('modal').classList.add('open'); }
+    window.closeModal = function() {
+      document.getElementById('modal').classList.remove('open');
+      pendingFile = null;
+      existingImageUrl = null;
+    };
+
+    function resetImageUI(imageUrl) {
+      const img = document.getElementById('dzImg');
+      const hint = document.getElementById('dzHint');
+      document.getElementById('mFile').value = '';
+      if (imageUrl) {
+        img.src = imageUrl;
+        img.classList.add('visible');
+        hint.style.display = 'none';
+      } else {
+        img.classList.remove('visible');
+        img.src = '';
+        hint.style.display = 'block';
+      }
+    }
+
+    window.openAdd = function() {
+      editing = null;
+      pendingFile = null;
+      existingImageUrl = null;
+      document.getElementById('modalTitle').textContent = 'Add Event';
+      document.getElementById('modalSub').textContent = 'New event';
+      const iso = toIso(new Date());
+      document.getElementById('mDate').value = iso;
+      document.getElementById('mVenue').value = 'Tight End';
+      document.getElementById('mType').value = 'Regular';
+      document.getElementById('mTheme').value = '';
+      document.getElementById('mGear').value = '';
+      document.getElementById('mNote').value = '';
+      document.getElementById('mTitleInput').value = '';
+      document.getElementById('mDesc').value = '';
+      document.getElementById('mFbUrl').value = '';
+      document.getElementById('mDelete').style.display = 'none';
+      document.getElementById('moveWarn').style.display = 'none';
+      resetImageUI(null);
+      openModal();
+    };
+
+    window.openEdit = function(date, venue) {
+      const e = events.find(x => x.date === date && x.venue === venue);
+      if (!e) return;
+      editing = { originalDate: date, originalVenue: venue };
+      pendingFile = null;
+      existingImageUrl = e.image || null;
+      document.getElementById('modalTitle').textContent = 'Edit Event';
+      document.getElementById('modalSub').textContent = `${date} · ${venue}`;
+      document.getElementById('mDate').value = toIso(e._d);
+      document.getElementById('mVenue').value = e.venue;
+      document.getElementById('mType').value = e.type;
+      document.getElementById('mTheme').value = e.theme;
+      document.getElementById('mGear').value = e.gearDescription;
+      document.getElementById('mNote').value = e.announcementNote;
+      document.getElementById('mTitleInput').value = e.title;
+      document.getElementById('mDesc').value = e.description;
+      document.getElementById('mFbUrl').value = e.facebookEventUrl;
+      document.getElementById('mDelete').style.display = 'inline-block';
+      document.getElementById('moveWarn').style.display = 'none';
+      resetImageUI(e.image || null);
+      openModal();
+    };
+
+    window.checkMove = function() {
+      if (!editing) return;
+      const newDate = isoToMdy(document.getElementById('mDate').value);
+      const newVenue = document.getElementById('mVenue').value;
+      const moved = newDate !== editing.originalDate || newVenue !== editing.originalVenue;
+      document.getElementById('moveWarn').style.display = moved ? 'block' : 'none';
+    };
+
+    // ── Image drop zone ──
+    window.onFileChosen = function(input) {
+      if (input.files[0]) handleFile(input.files[0]);
+    };
+    function handleFile(file) {
+      pendingFile = file;
+      const img = document.getElementById('dzImg');
+      img.src = URL.createObjectURL(file);
+      img.classList.add('visible');
+      document.getElementById('dzHint').style.display = 'none';
+    }
+    (function wireDrop() {
+      const dz = document.getElementById('dropZone');
+      dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('dragover'); });
+      dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+      dz.addEventListener('drop', e => {
+        e.preventDefault(); dz.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file) handleFile(file);
+      });
+    })();
+
+    // ── Save ──
+    window.saveFromModal = async function() {
+      const btn   = document.getElementById('mSave');
+      const iso   = document.getElementById('mDate').value;
+      const venue = document.getElementById('mVenue').value;
+      const type  = document.getElementById('mType').value;
+      const theme = document.getElementById('mTheme').value.trim();
+      const gearDescription = document.getElementById('mGear').value.trim();
+      const announcementNote = document.getElementById('mNote').value.trim();
+      const title = document.getElementById('mTitleInput').value.trim();
+      const description = document.getElementById('mDesc').value.trim();
+      const facebookEventUrl = document.getElementById('mFbUrl').value.trim();
+      if (!iso) return toast('Date is required', 'error');
+
+      // Guardrail: events are almost always Tue/Thu. Confirm any off-night date.
+      const dow = new Date(iso + 'T12:00:00').getDay();
+      if (isOffNight(dow)) {
+        if (!confirm(`This event is on a ${WEEKDAYS[dow]}.\n\nEvents are almost always on Tuesday or Thursday. Save it on ${WEEKDAYS[dow]} anyway?`)) return;
+      }
+
+      const mdyDate = isoToMdy(iso);
+      const schedulePayload = { date: mdyDate, venue, type, theme, gearDescription, announcementNote };
+      if (editing) { schedulePayload.originalDate = editing.originalDate; schedulePayload.originalVenue = editing.originalVenue; }
+
+      btn.disabled = true; btn.textContent = 'Saving…';
+      try {
+        const res = await saveEntryFn(schedulePayload);
+
+        // Image: upload only if a new file was chosen, otherwise carry the existing URL through.
+        let imageUrl = existingImageUrl || null;
+        if (pendingFile) {
+          const ext = pendingFile.type === 'image/png' ? 'png' : pendingFile.type === 'image/gif' ? 'gif' : 'jpg';
+          const key = normalizeKey(mdyDate, venue);
+          const storageRef = ref(storage, `event-images/${key}.${ext}`);
+          await uploadBytes(storageRef, pendingFile, { contentType: pendingFile.type });
+          imageUrl = await getDownloadURL(storageRef);
+        }
+
+        await saveContentFn({
+          date: mdyDate,
+          venue,
+          title,
+          description,
+          imageUrl,
+          facebookEventUrl
+        });
+
+        toast(res.data?.moved ? 'Event moved & saved' : (editing ? 'Event updated' : 'Event added'));
+        closeModal();
+        await loadEvents();
+      } catch (err) {
+        toast(err.message || 'Save failed', 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Save';
+      }
+    };
+
+    window.deleteFromModal = async function() {
+      if (!editing) return;
+      if (!confirm(`Delete ${editing.originalDate} @ ${editing.originalVenue}? This removes the schedule entry (content stays orphaned).`)) return;
+      try {
+        await deleteEntryFn({ date: editing.originalDate, venue: editing.originalVenue });
+        toast('Event deleted');
+        closeModal();
+        await loadEvents();
+      } catch (err) {
+        toast(err.message || 'Delete failed', 'error');
+      }
+    };
+
+    // Close modal on overlay click
+    document.getElementById('modal').addEventListener('click', e => {
+      if (e.target.id === 'modal') closeModal();
+    });
+
+    // ── Facebook kit ──
+    window.fbKit = async function(date, venue) {
+      const e = events.find(x => x.date === date && x.venue === venue);
+      if (!e) return;
+      const dateLabel = `${WEEKDAYS_SHORT[e._d.getDay()]} ${e._d.getMonth()+1}/${e._d.getDate()}`;
+      let caption = `${e.title || e.theme || 'Poker Night'}\n\n`;
+      if (e.description) caption += `${e.description}\n\n`;
+      caption += `📍 ${e.venue} — ${dateLabel}`;
+      if (e.facebookEventUrl) caption += `\n${e.facebookEventUrl}`;
+
+      try {
+        await navigator.clipboard.writeText(caption);
+      } catch (err) {
+        toast('Could not copy caption: ' + err.message, 'error');
+        return;
+      }
+
+      if (e.image) {
+        try {
+          const resp = await fetch(e.image);
+          const blob = await resp.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${normalizeKey(e.date, e.venue)}.jpg`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 2000);
+        } catch (err) {
+          toast('Copied caption, but image download failed: ' + err.message, 'error');
+          return;
+        }
+      }
+
+      toast('Copied ✓ — caption on clipboard' + (e.image ? ', image downloading' : ''));
+    };
+
+    async function init() {
+      const session = await requireAdmin();
+      if (!session) return;
+      loadEvents();
+    }
+    init();
+  </script>
+
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="/clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/admin/"></script>
+</body>
+</html>

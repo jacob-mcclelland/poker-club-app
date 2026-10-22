@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Game Inspector — Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/img/favicon-admin.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050508;
+      --card-bg: rgba(20,20,25,0.7);
+      --border: rgba(255,255,255,0.08);
+      --gold: #d4af37;
+      --green: #10b981;
+      --red: #ef4444;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+    #authGuard {
+      position: fixed; inset: 0; background: var(--bg); z-index: 9999;
+      display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px;
+    }
+    .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--gold); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #authMsg { color: var(--gold); font-weight: 700; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase; }
+    .header {
+      padding: 44px 20px 20px;
+      text-align: center;
+      position: relative;
+    }
+    .back-btn {
+      position: absolute; left: 16px; top: 48px;
+      background: var(--card-bg); border: 1px solid var(--border);
+      color: var(--gold); padding: 8px 16px; border-radius: 10px;
+      cursor: pointer; font-size: 0.85rem; font-weight: 700; font-family: inherit;
+      transition: all 0.2s;
+    }
+    .back-btn:active { transform: scale(0.96); }
+    h1 {
+      font-weight: 800; font-size: 1.6rem; text-transform: uppercase; letter-spacing: 2px;
+      background: linear-gradient(to bottom, #fff 30%, #888);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .sub { margin-top: 4px; color: var(--gold); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; }
+    .main-content { padding: 0 20px 80px; flex: 1; max-width: 600px; margin: 0 auto; width: 100%; }
+    .section-label {
+      font-size: 0.72rem; font-weight: 800; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 2px;
+      margin: 24px 0 12px 2px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+    .lbl { font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .input {
+      width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-size: 1rem; padding: 12px 14px;
+      outline: none; font-family: inherit; transition: border-color 0.2s;
+      appearance: none; -webkit-appearance: none;
+    }
+    .input:focus { border-color: var(--gold); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .btn {
+      padding: 13px 20px; border-radius: 10px; border: none;
+      font-size: 0.95rem; font-weight: 700; cursor: pointer;
+      transition: all 0.2s; font-family: inherit;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-gold { background: var(--gold); color: #000; }
+    .btn-full { width: 100%; }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 6px 10px; font-size: 0.8rem; border-radius: 8px; }
+    .btn-red-ghost { background: transparent; border: 1px solid rgba(239,68,68,0.3); color: var(--red); padding: 6px 10px; font-size: 0.8rem; border-radius: 8px; font-family: inherit; cursor: pointer; }
+
+    /* Roster row */
+    .roster-row {
+      display: grid;
+      grid-template-columns: 1fr 120px 76px 38px;
+      gap: 8px;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+    .roster-row.ranked { border-color: rgba(212,175,55,0.25); }
+    .player-name { font-weight: 700; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .player-name.ranked { color: var(--gold); }
+    .player-name.unranked { color: var(--muted); }
+    .rank-select { background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 6px 8px; font-size: 0.8rem; font-family: inherit; width: 100%; appearance: none; -webkit-appearance: none; outline: none; }
+    .bounty-input { background: rgba(0,0,0,0.5); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 6px 8px; font-size: 0.85rem; text-align: center; width: 100%; outline: none; font-family: inherit; }
+    .roster-col-header {
+      display: grid;
+      grid-template-columns: 1fr 120px 76px 38px;
+      gap: 8px;
+      padding: 0 12px;
+      margin-bottom: 8px;
+    }
+    .roster-col-header span { font-size: 0.68rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      padding: 10px 22px; border-radius: 10px; font-weight: 700; font-size: 0.9rem; z-index: 500;
+      display: none; white-space: nowrap;
+    }
+    .toast.success { background: var(--green); color: #000; }
+    .toast.error   { background: var(--red);   color: #fff; }
+
+    @media (max-width: 480px) {
+      .roster-row { grid-template-columns: 1fr 100px 60px 32px; gap: 6px; }
+      .roster-col-header { grid-template-columns: 1fr 100px 60px 32px; gap: 6px; }
+      .input { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="authGuard">
+    <div class="spinner"></div>
+    <p id="authMsg">Verifying…</p>
+  </div>
+
+  <div class="header">
+    <button class="back-btn" data-back-nav onclick="window.BackNav ? BackNav.go() : history.back()">&#8592; Back</button>
+    <h1>Game Inspector</h1>
+    <div class="sub">Edit Game Records</div>
+  </div>
+
+  <div class="main-content">
+
+    <!-- Load form -->
+    <div class="section-label">Select Game</div>
+    <div class="card">
+      <div class="grid-2" style="margin-bottom:12px;">
+        <div>
+          <div class="lbl">Venue</div>
+          <select id="venueSelect" class="input" onchange="loadDates()">
+            <option value="Tight End">Tight End Bar</option>
+            <option value="Wild Corgi">Wild Corgi Pub</option>
+          </select>
+        </div>
+        <div>
+          <div class="lbl">Date</div>
+          <select id="dateSelect" class="input"><option value="">Loading…</option></select>
+        </div>
+      </div>
+      <div style="margin-bottom:16px;">
+        <div class="lbl">Game Number</div>
+        <select id="gameSelect" class="input">
+          <option value="1">Game 1</option>
+          <option value="2">Game 2</option>
+        </select>
+      </div>
+      <button class="btn btn-gold btn-full" onclick="loadGame()">Load Roster</button>
+    </div>
+
+    <!-- Roster -->
+    <div id="rosterSection" style="display:none;">
+      <div class="section-label" id="rosterLabel">Roster</div>
+
+      <div class="roster-col-header">
+        <span>Player</span>
+        <span style="text-align:center;">Finish</span>
+        <span style="text-align:center;">Bounty</span>
+        <span></span>
+      </div>
+
+      <div id="rosterList"></div>
+
+      <!-- Add player -->
+      <div class="section-label">Add Player</div>
+      <div class="card">
+        <div class="lbl">Search Master Roster</div>
+        <input id="addInput" type="text" list="playersDL" class="input" placeholder="Player name…" style="margin-bottom:12px;">
+        <datalist id="playersDL"></datalist>
+        <button class="btn btn-gold btn-full" onclick="addPlayer()">+ Add to Roster</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { db, functions, httpsCallable } from '../firebase-api.js?v=6';
+    import { requireAdmin } from './admin-auth.js';
+    import {
+      collection, getDocs, query, where, doc
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // Reads stay direct; every write goes through this admin-only callable
+    // (functions/index.js adminEditGameRecord), which checks each row id
+    // belongs to the game and player being edited.
+    const editGameRecord = httpsCallable(functions, 'adminEditGameRecord');
+    const gameRow = p => ({ venue: ctx.venue, date: ctx.date, gameNum: ctx.gameNum, player: p.name });
+    // A new row's id is minted here, before the call (no write happens), so a
+    // second quick edit reuses it instead of creating a duplicate row.
+    const newRowId = col => doc(collection(db, col)).id;
+
+    const BONUS = { 1:90, 2:85, 3:80, 4:70, 5:60, 6:50, 7:40, 8:30, 9:20, 10:10 };
+    const RANK_LABEL = { 1:'1st',2:'2nd',3:'3rd',4:'4th',5:'5th',6:'6th',7:'7th',8:'8th',9:'9th',10:'10th' };
+
+    let roster = [];
+    let ctx    = null;
+
+    function toast(msg, type = 'success') {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.className = 'toast ' + type;
+      el.style.display = 'block';
+      clearTimeout(el._t);
+      el._t = setTimeout(() => el.style.display = 'none', 2800);
+    }
+
+    function esc(str) {
+      const d = document.createElement('div');
+      d.textContent = String(str);
+      return d.innerHTML;
+    }
+
+    // ── Date loader ──
+    window.loadDates = async function() {
+      const venue = document.getElementById('venueSelect').value;
+      const sel   = document.getElementById('dateSelect');
+      sel.innerHTML = '<option>Loading…</option>';
+      try {
+        const snap = await getDocs(query(collection(db, 'checkins'), where('venue', '==', venue)));
+        const dateSet = new Set();
+        snap.forEach(d => { if (d.data().date) dateSet.add(d.data().date); });
+        const parse = s => { const p = s.split('/'); return new Date(p[2], p[0]-1, p[1]); };
+        const sorted = Array.from(dateSet).sort((a,b) => parse(b) - parse(a));
+        sel.innerHTML = sorted.map(d => `<option value="${d}">${d}</option>`).join('') || '<option value="">No games found</option>';
+      } catch(e) { sel.innerHTML = '<option value="">Error loading dates</option>'; }
+    };
+
+    // ── Game loader ──
+    window.loadGame = async function() {
+      const venue   = document.getElementById('venueSelect').value;
+      const date    = document.getElementById('dateSelect').value;
+      const gameNum = parseInt(document.getElementById('gameSelect').value);
+      if (!date) return toast('Select a date first', 'error');
+
+      ctx = { venue, date, gameNum };
+      document.getElementById('rosterSection').style.display = 'block';
+      document.getElementById('rosterLabel').textContent = `Roster — ${venue} · ${date} · Game ${gameNum}`;
+      document.getElementById('rosterList').innerHTML = '<div style="color:var(--muted);padding:12px 0;">Loading…</div>';
+
+      try {
+        const q = col => getDocs(query(collection(db, col),
+          where('venue','==',venue), where('date','==',date), where('gameNum','==',gameNum)));
+        const [ciSnap, elSnap, bnSnap] = await Promise.all([q('checkins'), q('eliminations'), q('bounties')]);
+
+        const map = {};
+        const ensure = name => {
+          const key = name.toLowerCase();
+          if (!map[key]) map[key] = { name, checkinId:null, elimId:null, bountyId:null, rank:null, bounties:0 };
+          return map[key];
+        };
+        ciSnap.forEach(d => ensure(d.data().player).checkinId = d.id);
+        elSnap.forEach(d => { const r = ensure(d.data().player); r.elimId = d.id; r.rank = d.data().rank; });
+        bnSnap.forEach(d => { const r = ensure(d.data().player); r.bountyId = d.id; r.bounties = d.data().count || 0; });
+
+        roster = Object.values(map);
+        render();
+      } catch(e) { toast('Load failed: ' + e.message, 'error'); }
+    };
+
+    function render() {
+      roster.sort((a,b) => {
+        if (a.rank && b.rank) return a.rank - b.rank;
+        if (a.rank) return -1;
+        if (b.rank) return 1;
+        return a.name.localeCompare(b.name);
+      });
+
+      const rankOpts = `<option value="">—</option>` +
+        Object.keys(BONUS).map(r => `<option value="${r}">${RANK_LABEL[r]} (${BONUS[r]}pts)</option>`).join('');
+
+      const html = roster.map((p, i) => {
+        const ranked = !!p.rank;
+        const opts = rankOpts.replace(`value="${p.rank}"`, `value="${p.rank}" selected`);
+        return `
+          <div class="roster-row ${ranked ? 'ranked' : ''}">
+            <div class="player-name ${ranked ? 'ranked' : 'unranked'}">${esc(p.name)}</div>
+            <select class="rank-select" onchange="updateRank(${i}, this.value)">${opts}</select>
+            <input class="bounty-input" type="number" min="0" value="${p.bounties || ''}" placeholder="&#128128;"
+              onchange="updateBounty(${i}, this.value)">
+            <button class="btn-red-ghost" onclick="removePlayer(${i})">&#128465;</button>
+          </div>`;
+      }).join('');
+
+      document.getElementById('rosterList').innerHTML = html || '<div style="color:var(--muted);padding:12px 0;">No players found for this game.</div>';
+    }
+
+    // ── Rank update ──
+    window.updateRank = async function(i, val) {
+      const p    = roster[i];
+      const rank = val ? parseInt(val) : null;
+      p.rank     = rank;
+      // The row id is settled here, before the call, and the reply never
+      // changes it: clearing drops the id at once (a rank picked straight
+      // after gets a new row the delete cannot touch), and a new rank mints
+      // one (a second quick pick reuses it instead of adding a row).
+      const elimId = p.elimId;
+      if (!rank) p.elimId = null;
+      else if (!p.elimId) p.elimId = newRowId('eliminations');
+      try {
+        await editGameRecord({ op: 'setRank', ...gameRow(p), elimId: rank ? p.elimId : elimId, rank });
+        toast('Rank saved');
+        render();
+      } catch(e) { toast('Save failed: ' + e.message, 'error'); }
+    };
+
+    // ── Bounty update ──
+    window.updateBounty = async function(i, val) {
+      const p = roster[i];
+      p.bounties = parseInt(val) || 0;
+      // Same rule as ranks: the id is settled before the call.
+      const bountyId = p.bountyId;
+      if (p.bounties <= 0) p.bountyId = null;
+      else if (!p.bountyId) p.bountyId = newRowId('bounties');
+      try {
+        await editGameRecord({ op: 'setBounty', ...gameRow(p), bountyId: p.bounties > 0 ? p.bountyId : bountyId, count: p.bounties });
+        toast('Bounty saved');
+      } catch(e) { toast('Save failed: ' + e.message, 'error'); }
+    };
+
+    // ── Remove player ──
+    window.removePlayer = async function(i) {
+      const p = roster[i];
+      if (!confirm(`Remove ${p.name} from this game?`)) return;
+      try {
+        await editGameRecord({ op: 'removePlayer', ...gameRow(p), checkinId: p.checkinId, elimId: p.elimId, bountyId: p.bountyId });
+        roster.splice(i, 1);
+        render();
+        toast('Player removed');
+      } catch(e) { toast('Remove failed: ' + e.message, 'error'); }
+    };
+
+    // ── Add player ──
+    window.addPlayer = async function() {
+      const name = document.getElementById('addInput').value.trim();
+      if (!name) return;
+      if (roster.find(r => r.name.toLowerCase() === name.toLowerCase())) {
+        toast('Player already in roster', 'error'); return;
+      }
+      try {
+        const res = await editGameRecord({ op: 'addPlayer', ...gameRow({ name }) });
+        roster.push({ name, checkinId: res.data.checkinId, elimId: null, bountyId: null, rank: null, bounties: 0 });
+        document.getElementById('addInput').value = '';
+        render();
+        toast(name + ' added');
+      } catch(e) { toast('Add failed: ' + e.message, 'error'); }
+    };
+
+    // ── Boot ──
+    async function init() {
+      const session = await requireAdmin();
+      if (!session) return;
+
+      // Populate player datalist
+      try {
+        const snap = await getDocs(collection(db, 'players'));
+        const dl   = document.getElementById('playersDL');
+        snap.forEach(d => {
+          const opt = document.createElement('option');
+          opt.value = d.data().name;
+          dl.appendChild(opt);
+        });
+      } catch(e) { /* non-fatal */ }
+
+      loadDates();
+    }
+
+    init();
+  </script>
+
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="/clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/admin/"></script>
+</body>
+</html>

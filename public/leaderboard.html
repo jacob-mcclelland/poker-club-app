@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Season Leaderboard — All-In Poker Club</title>
+  <meta charset="UTF-8">
+  <meta name="description" content="Live season standings for All-In Poker Club Denver. See who's leading at Tight End Bar and Wild Corgi Pub.">
+  <meta property="og:title" content="All-In Poker Club — Season Leaderboard">
+  <meta property="og:description" content="Live season standings for free poker in Denver, CO. Tight End Bar Tuesdays & Wild Corgi Pub Thursdays.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://poker-club.example/img/hero-bg.jpg">
+  <meta property="og:url" content="https://poker-club.example/leaderboard.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="All-In Poker Club — Season Leaderboard">
+  <meta name="twitter:description" content="Live season standings for free poker in Denver, CO.">
+  <meta name="twitter:image" content="https://poker-club.example/img/hero-bg.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
+  <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: transparent;
+      color: #333;
+      margin: 0;
+      padding: 10px;
+    }
+
+    .widget-container {
+      background-color: #0a0a0a;
+      color: #ffffff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .widget-header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #222;
+    }
+    .widget-title {
+      color: #d4af37;
+      font-size: 1.3rem;
+      margin: 0 0 5px 0;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    }
+    .widget-subtitle {
+      color: #666;
+      font-size: 0.8rem;
+    }
+
+    /* Venue Toggle */
+    .venue-toggle {
+      flex: 1;
+      padding: 10px 20px;
+      background: #1a1a1a;
+      border: 2px solid #333;
+      border-radius: 8px;
+      color: #888;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+    .venue-toggle:hover {
+      background: #222;
+      border-color: #444;
+    }
+    .venue-toggle.active {
+      background: linear-gradient(135deg, #2a2a1a, #1a1a0a);
+      border-color: #d4af37;
+      color: #d4af37;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #222;
+      margin-bottom: 15px;
+    }
+    .tab {
+      flex: 1;
+      padding: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #555;
+      border-bottom: 3px solid transparent;
+      text-align: center;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+    .tab:hover { color: #888; }
+    .tab.active {
+      color: #ffa500;
+      border-bottom-color: #ffa500;
+    }
+
+    /* Search */
+    .search-box {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 10px;
+      border: 1px solid #333;
+      background: #111;
+      color: white;
+      font-size: 1rem;
+      margin-bottom: 15px;
+    }
+    .search-box:focus {
+      outline: none;
+      border-color: #ffa500;
+    }
+    .search-box::placeholder { color: #555; }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead th {
+      text-align: left;
+      color: #666;
+      font-size: 0.75rem;
+      padding: 10px 8px;
+      border-bottom: 1px solid #333;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+    thead th:last-child {
+      text-align: right;
+    }
+    tbody tr {
+      transition: background 0.15s;
+    }
+    tbody tr:hover {
+      background: #1a1a1a;
+    }
+    td {
+      padding: 14px 8px;
+      border-bottom: 1px solid #1a1a1a;
+      font-size: 0.95rem;
+    }
+
+    /* Rank Column */
+    .rank-cell {
+      width: 50px;
+    }
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 0.9rem;
+      background: #1a1a1a;
+      color: #666;
+    }
+
+    /* Top 3 Ranks */
+    .rank-1 .rank-badge {
+      background: linear-gradient(135deg, #FFD700, #FFA500);
+      color: #000;
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+    }
+    .rank-2 .rank-badge {
+      background: linear-gradient(135deg, #C0C0C0, #A0A0A0);
+      color: #000;
+    }
+    .rank-3 .rank-badge {
+      background: linear-gradient(135deg, #CD7F32, #B87333);
+      color: #000;
+    }
+
+    /* Player Name */
+    .player-name {
+      font-weight: 500;
+    }
+    .rank-1 .player-name { color: #FFD700; }
+    .rank-2 .player-name { color: #C0C0C0; }
+    .rank-3 .player-name { color: #CD7F32; }
+
+    /* Name + badge: the name truncates, the badge never does */
+    .name-flex { display: flex; align-items: center; min-width: 0; }
+    .name-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* Qualified indicator (game winner) */
+    .qualified-badge {
+      display: inline-block;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #28a745, #218838);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .consolation-badge {
+      background: linear-gradient(135deg, #e67e00, #b35f00) !important;
+    }
+    .qualified-row {
+      background: rgba(40, 167, 69, 0.1);
+    }
+    .qualified-row:hover {
+      background: rgba(40, 167, 69, 0.2);
+    }
+
+    /* Points Column */
+    .points-cell {
+      text-align: right;
+      font-weight: 600;
+      font-family: 'SF Mono', Monaco, monospace;
+      width: 80px;
+    }
+    .points-value { color: #ffa500; }
+    .bounty-value { color: #ff4444; }
+
+    /* Loading & Empty States */
+    .loading, .empty-state {
+      text-align: center;
+      color: #555;
+      padding: 40px 20px;
+    }
+    .loading::after {
+      content: '';
+      animation: dots 1.5s infinite;
+    }
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+
+    /* Stats Summary */
+    .stats-summary {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      flex: 1;
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #d4af37;
+      font-family: 'SF Mono', Monaco, monospace;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 5px;
+    }
+
+    /* Last Updated */
+    .last-updated {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #444;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #222;
+    }
+
+    /* Tier shading: 1-5 purple ($1000), 6-10 blue ($500), 11-20 green (qualified) */
+    .tier-1 { background: rgba(160, 32, 240, 0.15); }
+    .tier-1:hover { background: rgba(160, 32, 240, 0.25); }
+    .tier-2 { background: rgba(96, 165, 250, 0.15); }
+    .tier-2:hover { background: rgba(96, 165, 250, 0.25); }
+    .tier-3 { background: rgba(40, 167, 69, 0.15); }
+    .tier-3:hover { background: rgba(40, 167, 69, 0.25); }
+
+    /* Games Column */
+    .games-cell {
+      text-align: center;
+      color: #888;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.85rem;
+      width: 70px;
+    }
+
+    html.back-nav-on .widget-header { padding-left: 60px; }
+  </style>
+</head>
+<body>
+
+<div class="widget-container">
+  <div class="widget-header">
+    <h1 class="widget-title">♠ ALL-IN POKER CLUB ♠</h1>
+    <div class="widget-subtitle">🂡 Season Leaderboard 🂡</div>
+    <div style="text-align: center; margin-top: 10px; color: #ffa500; font-size: 0.9rem; font-weight: 600;" id="championshipDate">
+      Championship: Loading...
+    </div>
+    <div style="text-align: center; margin-top: 10px;">
+      <a id="breakdownLink" href="/stats.html" style="color: #555; font-size: 0.8rem; text-decoration: none; border: 1px solid #2a2a2a; border-radius: 6px; padding: 5px 12px; transition: all 0.2s;">
+        📊 Game Breakdown
+      </a>
+    </div>
+  </div>
+
+  <!-- Venue Toggle -->
+  <div style="display: flex; gap: 10px; margin-bottom: 15px; justify-content: center;">
+    <button class="venue-toggle active" id="venueTightEnd" onclick="switchVenue('Tight End')">Tight End</button>
+    <button class="venue-toggle" id="venueWildCorgi" onclick="switchVenue('Wild Corgi')">Wild Corgi</button>
+  </div>
+
+  <div class="stats-summary">
+    <div class="stat-card">
+      <div class="stat-value" id="totalPlayers">-</div>
+      <div class="stat-label">Players</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="totalBounties">-</div>
+      <div class="stat-label">Bounties</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('league')">🏆 Points</div>
+    <div class="tab" onclick="switchTab('bounty')">💀 Bounties</div>
+  </div>
+
+  <input type="text" id="search" class="search-box" placeholder="Search player..." onkeyup="renderTable()">
+
+  <div id="loading" class="loading">Loading rankings</div>
+
+  <table id="rankings-table" style="display:none;">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Player</th>
+        <th id="gamesHeader" style="text-align: center;">Games</th>
+        <th id="scoreHeader">Points</th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
+
+  <div id="empty-state" class="empty-state" style="display:none;">
+    No players found
+  </div>
+
+  <div class="last-updated">
+    Last updated: <span id="updateTime">-</span>
+  </div>
+</div>
+
+<script type="module">
+  import { PokerAPI, PlayerSearch } from './firebase-api.js?v=8';
+
+  // ============================================
+  // STATE
+  // ============================================
+  let leagueData = [];
+  let bountyData = [];
+  let currentTab = 'league';
+  let currentVenue = 'Tight End';
+  let championshipDate = '';
+
+  // Make functions available globally
+  window.switchVenue = switchVenue;
+  window.switchTab = switchTab;
+  window.renderTable = renderTable;
+
+  // ============================================
+  // INITIALIZATION
+  // ============================================
+  const urlParams = new URLSearchParams(window.location.search);
+  const venueParam = urlParams.get('venue');
+  if (venueParam) {
+    currentVenue = venueParam;
+    // Update button UI initially to avoid flash
+    if (venueParam === 'Wild Corgi') {
+      document.getElementById('venueTightEnd').classList.remove('active');
+      document.getElementById('venueWildCorgi').classList.add('active');
+    }
+  }
+
+  loadLeaderboard();
+
+  // ============================================
+  // DATA LOADING
+  // ============================================
+
+  async function loadLeaderboard() {
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('loading').innerText = 'Loading rankings';
+    document.getElementById('rankings-table').style.display = 'none';
+
+    try {
+      const result = await PokerAPI.getLeaderboard({ venue: currentVenue });
+
+      if (result.status === 'success') {
+        // Process standings into league and bounty data
+        leagueData = result.standings || [];
+        bountyData = leagueData
+          .filter(p => p.bounties > 0)
+          .sort((a, b) => b.bounties - a.bounties || b.gamesPlayed - a.gamesPlayed || (b.rsvpsHonored || 0) - (a.rsvpsHonored || 0) || a.name.localeCompare(b.name));
+
+        championshipDate = result.championshipDate || 'TBD';
+        const seasonName = result.seasonName || '';
+
+        // Update championship date display
+        const champText = championshipDate !== 'TBD' ? 'Championship: ' + championshipDate : '';
+        const seasonText = seasonName ? seasonName : '';
+        document.getElementById('championshipDate').innerText =
+          seasonText + (champText ? ' | ' + champText : '');
+
+        // Update stats
+        updateStats();
+
+        // Hide loading, show table
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('rankings-table').style.display = 'table';
+
+        // Update timestamp
+        document.getElementById('updateTime').innerText = new Date().toLocaleString();
+
+        renderTable();
+      } else {
+        throw new Error(result.message || 'Failed to load leaderboard');
+      }
+    } catch (err) {
+      console.error('Error loading leaderboard:', err);
+      document.getElementById('loading').innerText = 'Failed to load standings: ' + err.message;
+    }
+  }
+
+  function updateStats() {
+    // Count only players with points > 0 (have played this season)
+    const activePlayers = leagueData.filter(p => p.points > 0).length;
+    document.getElementById('totalPlayers').innerText = activePlayers;
+
+    const totalBounty = bountyData.reduce((sum, p) => sum + (p.bounties || 0), 0);
+    document.getElementById('totalBounties').innerText = totalBounty;
+  }
+
+  // ============================================
+  // VENUE SWITCHING
+  // ============================================
+
+  function switchVenue(venue) {
+    currentVenue = venue;
+
+    // Update button UI
+    document.querySelectorAll('.venue-toggle').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    if (venue === 'Tight End') {
+      document.getElementById('venueTightEnd').classList.add('active');
+    } else {
+      document.getElementById('venueWildCorgi').classList.add('active');
+    }
+
+    // Reload data for new venue
+    loadLeaderboard();
+  }
+
+  // ============================================
+  // TAB SWITCHING
+  // ============================================
+
+  function switchTab(tab) {
+    currentTab = tab;
+
+    // Update tab UI
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+
+    // Update header
+    document.getElementById('scoreHeader').innerText = tab === 'league' ? 'Points' : 'Bounties';
+
+    renderTable();
+  }
+
+  // Player search matching lives in firebase-api.js (PlayerSearch) so the
+  // scoreboard, standings, stats and check-in kiosk all behave identically.
+
+  // ============================================
+  // RENDERING
+  // ============================================
+
+  function renderTable() {
+    const tbody = document.getElementById('table-body');
+    const searchTerm = document.getElementById('search').value.toLowerCase();
+    let data = currentTab === 'league' ? leagueData : bountyData;
+
+    // For Points tab: reorder so auto-qualifiers are ranked within top 20
+    if (currentTab === 'league') {
+      data = buildChampionshipRanking(data);
+    }
+
+    // Filter by search (word-boundary match, same logic as the check-in kiosk)
+    const filtered = data.filter(p => PlayerSearch.matches(p.name, searchTerm));
+
+    // Handle empty state
+    if (filtered.length === 0) {
+      tbody.innerHTML = '';
+      document.getElementById('empty-state').style.display = 'block';
+      return;
+    }
+
+    document.getElementById('empty-state').style.display = 'none';
+
+    // Assign display-based ranks (position in this list, not full standings rank)
+    if (currentTab === 'league') {
+      // Championship list: rank = position in championship display
+      filtered.forEach((p, i) => {
+        if (i === 0) { p.dispRank = 1; }
+        else {
+          const prev = filtered[i - 1];
+          p.dispRank = (prev.points === p.points && prev.gamesPlayed === p.gamesPlayed) ? prev.dispRank : i + 1;
+        }
+      });
+      filtered.forEach(p => { p.dispTied = filtered.filter(o => o.dispRank === p.dispRank).length > 1; });
+    } else {
+      // Bounty tab
+      filtered.forEach((p, i) => {
+        if (i === 0) { p.bRank = 1; }
+        else {
+          const prev = filtered[i-1];
+          p.bRank = (prev.bounties === p.bounties && prev.gamesPlayed === p.gamesPlayed) ? prev.bRank : i + 1;
+        }
+      });
+      filtered.forEach(p => { p.bTied = filtered.filter(o => o.bRank === p.bRank).length > 1; });
+    }
+
+    // Build table rows
+    let html = '';
+    filtered.forEach((player, index) => {
+      const rank = currentTab === 'bounty' ? player.bRank : player.dispRank;
+      const tied  = currentTab === 'bounty' ? player.bTied : player.dispTied;
+      const rankDisplay = tied ? `T${rank}` : rank;
+      const rankClass = rank <= 3 ? `rank-${rank}` : '';
+
+        // Tier shading: 1-5 purple, 6-10 blue, 11-20 green
+      const tierClass = rank <= 5 ? 'tier-1' : rank <= 10 ? 'tier-2' : rank <= 20 ? 'tier-3' : '';
+
+      // Show qualified badge for auto-qualified players (game winners or consolation winner)
+      const qualifiedBadge = currentTab === 'league' && player.qualified
+        ? '<span class="qualified-badge">Qualified</span>' : '';
+
+      const scoreValue = currentTab === 'league'
+        ? `<span class="points-value">${Math.round(player.points).toLocaleString()}</span>`
+        : `<span class="bounty-value">${player.bounties} 💀</span>`;
+
+      const gamesCell = `<td class="games-cell">${player.gamesPlayed || 0}</td>`;
+
+      const statsUrl = `/stats.html?venue=${encodeURIComponent(currentVenue)}&player=${encodeURIComponent(player.name)}`;
+      html += `
+        <tr class="${rankClass} ${tierClass}">
+          <td class="rank-cell">
+            <span class="rank-badge">${rankDisplay}</span>
+          </td>
+          <td class="player-name"><div class="name-flex"><a class="name-text" href="${statsUrl}" style="color:inherit;text-decoration:none;" title="View game history">${escapeHtml(player.name)}</a>${qualifiedBadge}</div></td>
+          ${gamesCell}
+          <td class="points-cell">${scoreValue}</td>
+        </tr>
+      `;
+    });
+
+    tbody.innerHTML = html;
+  }
+
+  // Build championship ranking:
+  // Top 20 = all auto-qualifiers (game winners) + highest-points non-qualifiers to fill 20 spots
+  // Auto-qualifiers are sorted by points among themselves within the top group
+  // Everyone else is ranked by points below
+  function buildChampionshipRanking(data) {
+    const TOTAL_SPOTS = 20;
+
+    const byPts = (a, b) => b.points - a.points || b.gamesPlayed - a.gamesPlayed || (b.rsvpsHonored || 0) - (a.rsvpsHonored || 0) || a.name.localeCompare(b.name);
+    const qualified = data.filter(p => p.qualified).sort(byPts);
+    const nonQualified = data.filter(p => !p.qualified).sort(byPts);
+
+    // Remaining spots for non-qualified players
+    const spotsForNonQualified = Math.max(0, TOTAL_SPOTS - qualified.length);
+    const topNonQualified = nonQualified.slice(0, spotsForNonQualified);
+    const restNonQualified = nonQualified.slice(spotsForNonQualified);
+
+    // Championship top 20: merge qualifiers + top non-qualifiers, sort by points
+    const top20 = [...qualified, ...topNonQualified]
+      .sort((a, b) => b.points - a.points || b.gamesPlayed - a.gamesPlayed || (b.rsvpsHonored || 0) - (a.rsvpsHonored || 0) || a.name.localeCompare(b.name));
+
+    // Mark berth holders
+    top20.forEach(p => p._hasBerth = true);
+    restNonQualified.forEach(p => p._hasBerth = false);
+
+    // Final order: top 20 first, then everyone else by points
+    return [...top20, ...restNonQualified];
+  }
+
+  // ============================================
+  // HELPERS
+  // ============================================
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+</script>
+<script src="/update-check.js"></script>
+
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="./clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/"></script>
+</body>
+</html>

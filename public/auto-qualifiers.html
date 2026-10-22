@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Auto-Qualifiers — Staff</title>
+  <link rel="icon" type="image/svg+xml" href="/img/favicon-staff.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+  <link rel="apple-touch-icon" href="/img/gameday-apple-icon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#050508; --card-bg:rgba(20,20,25,0.7); --border:rgba(255,255,255,0.08); --gold:#d4af37; --blue:#3b82f6; --green:#10b981; --red:#ef4444; --text:#f8fafc; --muted:#94a3b8; }
+    * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+    body { background:var(--bg); color:var(--text); font-family:'Inter',-apple-system,sans-serif; min-height:100vh; display:flex; flex-direction:column; overflow-x:hidden; }
+    .header { padding:44px 20px 20px; text-align:center; position:relative; }
+    .back-btn { position:absolute; left:16px; top:48px; background:var(--card-bg); border:1px solid var(--border); color:var(--gold); padding:8px 16px; border-radius:10px; cursor:pointer; font-size:0.85rem; font-weight:700; font-family:inherit; transition:all 0.2s; }
+    .back-btn:active { transform:scale(0.96); }
+    h1 { font-weight:800; font-size:1.6rem; text-transform:uppercase; letter-spacing:2px; background:linear-gradient(to bottom,#fff 30%,#888); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .sub { margin-top:4px; color:var(--gold); font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:3px; }
+    .main-content { padding:0 20px 80px; flex:1; max-width:600px; margin:0 auto; width:100%; }
+    .section-label { font-size:0.72rem; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:2px; margin:24px 0 12px 2px; display:flex; align-items:center; gap:10px; }
+    .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+    .card { background:var(--card-bg); border:1px solid var(--border); border-radius:16px; padding:20px; margin-bottom:12px; }
+    .lbl { font-size:0.72rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+    .input { width:100%; background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:1rem; padding:12px 14px; outline:none; font-family:inherit; transition:border-color 0.2s; appearance:none; -webkit-appearance:none; }
+    .input:focus { border-color:var(--blue); }
+    .btn { padding:12px 20px; border-radius:10px; border:none; font-size:0.9rem; font-weight:700; cursor:pointer; transition:all 0.2s; font-family:inherit; }
+    .btn:active { transform:scale(0.97); }
+    .btn-gold { background:var(--gold); color:#000; }
+    .btn-full { width:100%; margin-top:14px; }
+    .btn:disabled { opacity:0.5; cursor:default; }
+    .venue-toggle { display:flex; gap:10px; margin-top:20px; }
+    .venue-btn { flex:1; padding:12px; border-radius:12px; border:1px solid var(--border); background:var(--card-bg); color:var(--muted); font-weight:700; font-size:0.9rem; cursor:pointer; font-family:inherit; transition:all 0.2s; }
+    .venue-btn.active { background:var(--gold); border-color:var(--gold); color:#000; }
+    .qual-row { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 16px; background:rgba(0,0,0,0.3); border-radius:10px; border:1px solid var(--border); margin-bottom:8px; }
+    .qual-name { font-weight:700; color:var(--text); }
+    .qual-note { font-size:0.78rem; color:var(--muted); margin-top:2px; }
+    .btn-remove { padding:6px 12px; font-size:0.75rem; border-radius:7px; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:var(--red); cursor:pointer; font-family:inherit; font-weight:700; flex-shrink:0; }
+    .suggestions { background:#111; border:1px solid var(--border); border-radius:12px; margin-top:6px; max-height:230px; overflow-y:auto; display:none; }
+    .suggestion-item { padding:13px 16px; border-bottom:1px solid var(--border); cursor:pointer; color:#fff; font-size:0.95rem; }
+    .suggestion-item:last-child { border-bottom:none; }
+    .suggestion-item:active { background:#1a1a1a; }
+    .suggestion-item .aka { color:var(--muted); font-size:0.8rem; }
+    .hint { font-size:0.78rem; color:var(--muted); margin-top:10px; line-height:1.5; }
+    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); padding:10px 22px; border-radius:10px; font-weight:700; font-size:0.9rem; z-index:500; display:none; white-space:nowrap; }
+    .toast.success { background:var(--green); color:#000; }
+    .toast.error { background:var(--red); color:#fff; }
+    @media (max-width:480px) { .input { font-size:16px; } }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <button class="back-btn" data-back-nav onclick="location.href='gameday.html'">&#8592; Back</button>
+    <h1>Auto-Qualifiers</h1>
+    <div class="sub">Manual Championship Berths</div>
+  </div>
+
+  <div class="main-content">
+
+    <div class="venue-toggle">
+      <button class="venue-btn active" id="venue-te" onclick="setVenue('Tight End')">Tight End</button>
+      <button class="venue-btn" id="venue-wc" onclick="setVenue('Wild Corgi')">Wild Corgi</button>
+    </div>
+
+    <div class="section-label">Season</div>
+    <div class="card">
+      <select id="seasonSelect" class="input" onchange="renderList()"></select>
+    </div>
+
+    <div class="section-label">Auto-Qualified Players</div>
+    <div id="qualList"><div style="color:var(--muted);padding:8px 0;">Loading…</div></div>
+
+    <div class="section-label">Add Auto-Qualifier</div>
+    <div class="card">
+      <div class="lbl">Player</div>
+      <input id="playerInput" type="text" class="input" placeholder="Start typing a name…" autocomplete="off">
+      <div class="suggestions" id="suggestions"></div>
+      <div style="margin-top:14px;">
+        <div class="lbl">Note (optional)</div>
+        <input id="noteInput" type="text" class="input" placeholder="e.g. Won side event, rain-out makeup…">
+      </div>
+      <button class="btn btn-gold btn-full" id="addBtn" onclick="addQualifier()">Add Auto-Qualifier</button>
+      <div class="hint">Auto-qualified players get the Q badge and a championship berth for the selected season — even with zero points. Applies everywhere the leaderboard's qualified flag is used (leaderboard, Championship Mode, timers).</div>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { PokerAPI, PlayerSearch, functions, httpsCallable } from './firebase-api.js?v=6';
+    import { requireStaff } from './staff-auth.js';
+
+    let venue = 'Tight End';
+    let data = { seasons: [], currentSeasonNumber: null, qualifiers: {} };
+    let directory = [];
+
+    function toast(msg, type='success') {
+      const el = document.getElementById('toast');
+      el.textContent = msg; el.className = 'toast ' + type; el.style.display = 'block';
+      clearTimeout(el._t); el._t = setTimeout(() => el.style.display = 'none', 2800);
+    }
+
+    function escHtml(s) {
+      return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    async function loadVenue() {
+      document.getElementById('qualList').innerHTML = '<div style="color:var(--muted);padding:8px 0;">Loading…</div>';
+      try {
+        const fn = httpsCallable(functions, 'getAutoQualifiers');
+        const res = await fn({ venue });
+        data = res.data;
+
+        const sel = document.getElementById('seasonSelect');
+        sel.innerHTML = '';
+        data.seasons.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.seasonNumber;
+          const current = s.seasonNumber === data.currentSeasonNumber ? ' (current)' : '';
+          opt.textContent = `Season ${s.seasonNumber}${current} — ${s.startDate} to ${s.endDate}`;
+          sel.appendChild(opt);
+        });
+        if (data.currentSeasonNumber !== null) sel.value = String(data.currentSeasonNumber);
+        renderList();
+      } catch (e) {
+        document.getElementById('qualList').innerHTML = `<div style="color:var(--red)">${escHtml(e.message)}</div>`;
+      }
+    }
+
+    window.renderList = function() {
+      const box = document.getElementById('qualList');
+      const seasonNum = document.getElementById('seasonSelect').value;
+      if (!seasonNum) { box.innerHTML = '<div style="color:var(--muted)">No seasons found for this venue.</div>'; return; }
+      const list = data.qualifiers[seasonNum] || [];
+      if (!list.length) {
+        box.innerHTML = '<div style="color:var(--muted);padding:8px 0;">No auto-qualifiers for this season yet.</div>';
+        return;
+      }
+      box.innerHTML = list.map(e => {
+        const name = typeof e === 'string' ? e : e.name;
+        const note = (typeof e === 'object' && e.note) ? `<div class="qual-note">${escHtml(e.note)}</div>` : '';
+        return `<div class="qual-row">
+          <div><div class="qual-name">${escHtml(name)}</div>${note}</div>
+          <button class="btn-remove" onclick="removeQualifier('${escHtml(name).replace(/'/g, "\\'")}')">Remove</button>
+        </div>`;
+      }).join('');
+    };
+
+    window.setVenue = function(v) {
+      venue = v;
+      document.getElementById('venue-te').classList.toggle('active', v === 'Tight End');
+      document.getElementById('venue-wc').classList.toggle('active', v === 'Wild Corgi');
+      loadVenue();
+    };
+
+    window.addQualifier = async function() {
+      const name = document.getElementById('playerInput').value.trim();
+      const note = document.getElementById('noteInput').value.trim();
+      const seasonNum = document.getElementById('seasonSelect').value;
+      if (!name) return toast('Enter a player name', 'error');
+      if (!seasonNum) return toast('No season selected', 'error');
+
+      const btn = document.getElementById('addBtn');
+      btn.disabled = true;
+      try {
+        const fn = httpsCallable(functions, 'addAutoQualifier');
+        await fn({ venue, seasonNumber: Number(seasonNum), player: name, note });
+        toast(`${name} auto-qualified`);
+        document.getElementById('playerInput').value = '';
+        document.getElementById('noteInput').value = '';
+        hideSuggestions();
+        await loadVenue();
+        document.getElementById('seasonSelect').value = seasonNum;
+        renderList();
+      } catch (e) { toast(e.message, 'error'); }
+      btn.disabled = false;
+    };
+
+    window.removeQualifier = async function(name) {
+      const seasonNum = document.getElementById('seasonSelect').value;
+      if (!confirm(`Remove ${name} from season ${seasonNum} auto-qualifiers?`)) return;
+      try {
+        const fn = httpsCallable(functions, 'removeAutoQualifier');
+        await fn({ venue, seasonNumber: Number(seasonNum), player: name });
+        toast(`${name} removed`);
+        await loadVenue();
+        document.getElementById('seasonSelect').value = seasonNum;
+        renderList();
+      } catch (e) { toast(e.message, 'error'); }
+    };
+
+    // ── Player autocomplete (canonical PlayerSearch over the master roster) ──
+    const input = document.getElementById('playerInput');
+    const sugBox = document.getElementById('suggestions');
+
+    function hideSuggestions() { sugBox.style.display = 'none'; sugBox.innerHTML = ''; }
+
+    input.addEventListener('input', () => {
+      const q = input.value.trim();
+      if (q.length < 2 || !directory.length) { hideSuggestions(); return; }
+      const results = PlayerSearch.search(directory, q, { limit: 6 });
+      if (!results.length) { hideSuggestions(); return; }
+      sugBox.innerHTML = results.map(r => {
+        const aka = r.aka ? ` <span class="aka">(aka ${escHtml(r.aka)})</span>` : '';
+        return `<div class="suggestion-item" data-name="${escHtml(r.name)}">${escHtml(r.name)}${aka}</div>`;
+      }).join('');
+      sugBox.style.display = 'block';
+    });
+
+    sugBox.addEventListener('click', (ev) => {
+      const item = ev.target.closest('.suggestion-item');
+      if (!item) return;
+      input.value = item.dataset.name;
+      hideSuggestions();
+    });
+
+    document.addEventListener('click', (ev) => {
+      if (!ev.target.closest('#playerInput') && !ev.target.closest('#suggestions')) hideSuggestions();
+    });
+
+    async function init() {
+      await requireStaff();
+      loadVenue();
+      try {
+        const res = await PokerAPI.getPlayerList();
+        directory = res.directory || [];
+      } catch (e) { /* autocomplete degrades to free typing */ }
+    }
+
+    init();
+  </script>
+
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="/clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/gameday.html"></script>
+</body>
+</html>

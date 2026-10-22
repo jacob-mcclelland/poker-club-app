@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <title>Clock Control</title>
+  <style>
+    /* Staff phone controller for the shared venue clock.
+       Design: docs/timer-prd/07-synced-clock.md, Part 3. */
+    :root {
+      --bg: #000; --panel: #111418; --line: #262b33; --text: #f4f6f8; --muted: #8a93a0;
+      --gold: #d4af37; --green: #33dd77; --amber: #ffcc00; --red: #ff5544; --blue: #3aa0ff;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--text); }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: max(10px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+      min-height: 100vh;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button { font: inherit; color: inherit; cursor: pointer; }
+    header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    header h1 { font-size: 1rem; margin: 0; font-weight: 800; letter-spacing: .02em; flex: 1; }
+    header h1 small { color: var(--muted); font-weight: 600; }
+    .pill { font-size: .75rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+    .pill.live { color: var(--green); border-color: rgba(51,221,119,.4); }
+    .pill.warn { color: var(--amber); border-color: rgba(255,204,0,.4); }
+    .pill.bad { color: var(--red); border-color: rgba(255,85,68,.4); }
+
+    .seg { display: flex; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 3px; gap: 3px; }
+    .seg button { flex: 1; border: 0; background: transparent; padding: 9px 8px; border-radius: 9px; font-weight: 700; color: var(--muted); }
+    .seg button.on { background: #222833; color: var(--text); }
+    .seg button .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--green); margin-left: 6px; vertical-align: middle; visibility: hidden; }
+    .seg button .dot.show { visibility: visible; }
+    /* The game being controlled must be unmistakable: presses go to it. */
+    .seg.games button.on { background: rgba(212,175,55,.18); color: var(--gold); box-shadow: inset 0 0 0 2px var(--gold); }
+    .tabs { margin-bottom: 12px; }
+
+    .layout { display: grid; gap: 12px; }
+    .face { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; text-align: center; }
+    .face .level { color: var(--muted); font-weight: 700; font-size: 1rem; min-height: 1.3em; }
+    .face .time { font-size: min(24vw, 30vh); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -.02em; margin: 4px 0; }
+    .face .time.final { color: var(--red); }
+    .face .time.paused { color: var(--muted); }
+    .face .blinds { font-size: min(8vw, 9vh); font-weight: 800; color: var(--gold); }
+    .face .blinds.break { color: var(--blue); }
+    .face .sub { color: var(--muted); font-size: .85rem; min-height: 1.1em; }
+    .face .state { margin-top: 6px; font-weight: 800; letter-spacing: .08em; font-size: .9rem; min-height: 1.2em; color: var(--amber); }
+    .last { color: var(--muted); font-size: .8rem; text-align: center; margin: 6px 0 0; min-height: 1.2em; }
+
+    .controls { display: grid; gap: 10px; align-content: start; }
+    .btn { border: 1px solid var(--line); background: #1a1f27; border-radius: 14px; padding: 16px 10px; font-weight: 800; font-size: 1.05rem; }
+    .btn:active { transform: scale(.98); }
+    .btn:disabled { opacity: .35; }
+    .btn.play { font-size: 1.6rem; padding: 22px 10px; background: #12351f; border-color: #1f6b3d; }
+    .btn.play.pause { background: #3a2a10; border-color: #7a5a1a; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .btn.reset { background: transparent; color: var(--red); border-color: rgba(255,85,68,.35); font-size: .9rem; padding: 10px; }
+    .hint { color: var(--muted); font-size: .8rem; text-align: center; margin: 4px 0 0; }
+    .notice { color: var(--amber); font-size: .85rem; text-align: center; min-height: 1.2em; margin: 4px 0 0; }
+    .seg-label { font-size: .8rem; color: var(--muted); margin: 6px 0 4px; }
+
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; margin-bottom: 12px; }
+    .card h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 0 0 10px; }
+    .hotn-now { font-size: 1.4rem; font-weight: 800; margin-bottom: 10px; }
+    .hotn-now small { color: var(--muted); font-size: .85rem; font-weight: 600; display: block; }
+    label { display: block; font-size: .8rem; color: var(--muted); margin: 8px 0 4px; }
+    input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--line); background: #0b0d10; color: var(--text); font: inherit; font-size: 1rem; }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .grid3 .btn { font-size: .9rem; padding: 12px 6px; }
+
+    @media (orientation: landscape) and (min-width: 560px) {
+      .layout { grid-template-columns: 1.2fr 1fr; align-items: start; }
+      .face .time { font-size: min(13vw, 34vh); }
+      .face .blinds { font-size: min(5vw, 10vh); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a id="backLink" data-back-nav hidden href="/gameday.html" style="flex:0 0 auto;white-space:nowrap;color:var(--gold);text-decoration:none;font-size:.76rem;font-weight:700;padding:8px 0">← Game Day</a>
+    <h1>Clock Control <small id="venueName"></small></h1>
+    <span class="pill" id="statusPill">Connecting</span>
+  </header>
+
+  <div class="seg tabs" role="tablist">
+    <button class="on" data-tab="clock">Clock</button>
+    <button data-tab="tv" id="tvTabBtn">TV extras</button>
+    <button data-tab="share">Share &amp; new</button>
+  </div>
+
+  <section id="tab-clock">
+    <div class="layout">
+      <div>
+        <div class="seg games" style="margin-bottom:10px">
+          <button data-game="1">Game 1<span class="dot"></span></button>
+          <button data-game="2">Game 2<span class="dot"></span></button>
+        </div>
+        <div class="face">
+          <div class="level" id="level"></div>
+          <div class="time" id="time">--:--</div>
+          <div class="blinds" id="blinds"></div>
+          <div class="sub" id="sub"></div>
+          <div class="state" id="state"></div>
+        </div>
+        <p class="last" id="lastChange"></p>
+      </div>
+      <div class="controls">
+        <button class="btn play" id="playBtn" disabled>Play</button>
+        <div class="row">
+          <button class="btn" data-act="subtractMinute" disabled>&minus;1 min</button>
+          <button class="btn" data-act="addMinute" disabled>+1 min</button>
+        </div>
+        <div class="row">
+          <button class="btn" data-act="prev" disabled>&#9664; Prev level</button>
+          <button class="btn" data-act="next" disabled>Next level &#9654;</button>
+        </div>
+        <button class="btn reset" id="resetBtn" disabled>Reset this game</button>
+        <p class="notice" id="notice"></p>
+        <p class="hint" id="hint">The TV follows these buttons while its menu shows <b>Shared</b>.</p>
+        <div>
+          <div class="seg-label">Player phones with sound on play</div>
+          <div class="seg">
+            <button data-sound="voice" disabled>Voice calls</button>
+            <button data-sound="chime" disabled>Chimes</button>
+          </div>
+          <p class="notice" id="soundNotice"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-tv" hidden>
+    <div class="card">
+      <h2>Hand of the Night</h2>
+      <div class="hotn-now" id="hotnNow">--</div>
+      <label for="hotnTheme">Theme</label>
+      <input id="hotnTheme" autocomplete="off">
+      <label for="hotnHand">Hand (type /s /h /c /d for suits, e.g. A/s K/s)</label>
+      <input id="hotnHand" autocomplete="off">
+      <label for="hotnBonus">Bonus</label>
+      <input id="hotnBonus" autocomplete="off" inputmode="numeric">
+      <div class="row" style="margin-top:12px">
+        <button class="btn" id="hotnSave">Save</button>
+        <button class="btn reset" id="hotnClear">Clear</button>
+      </div>
+      <p class="notice" id="hotnNotice"></p>
+    </div>
+    <div class="card">
+      <h2>TV layout</h2>
+      <div class="grid3">
+        <button class="btn" data-layout="timerOnly1">Timer 1</button>
+        <button class="btn" data-layout="timerOnly2">Timer 2</button>
+        <button class="btn" data-layout="scoresOnly">Scores Only</button>
+        <button class="btn" data-layout="full1">Full 1</button>
+        <button class="btn" data-layout="full2">Full 2</button>
+        <button class="btn" data-layout="dual">Dual Timer</button>
+      </div>
+      <button class="btn" id="refreshTv" style="width:100%;margin-top:10px">Refresh TV data</button>
+      <p class="notice" id="tvNotice"></p>
+    </div>
+  </section>
+
+  <section id="tab-share" hidden>
+    <div class="card">
+      <h2>Players watch this clock at</h2>
+      <div class="hotn-now" id="shareUrl" style="font-size:1rem;word-break:break-all"></div>
+      <div class="row">
+        <button class="btn" id="shareBtn">Share link</button>
+        <button class="btn" id="copyBtn">Copy link</button>
+      </div>
+      <p class="notice" id="shareNotice"></p>
+    </div>
+    <div class="card">
+      <h2>New clock (home game, side game)</h2>
+      <label for="newName">Name</label>
+      <input id="newName" autocomplete="off" maxlength="40" placeholder="Jake's house">
+      <button class="btn" id="createBtn" style="width:100%;margin-top:12px">Create clock</button>
+      <p class="notice" id="newNotice"></p>
+      <div id="recentWrap" hidden>
+        <h2 style="margin-top:14px">Your recent clocks</h2>
+        <div id="recent" style="display:grid;gap:8px"></div>
+      </div>
+    </div>
+  </section>
+
+<script type="module">
+  // Staff controller for a shared clock (timerClocks/{id}): a venue clock
+  // ('tight', 'corgi') or a named clock (a home game). The controller can run
+  // a clock on its own: if no structure has been published yet, its first
+  // press publishes the standard one (clock-structures.js). The TV page is
+  // optional; it is just another screen with buttons.
+  // Every press starts from where the clock really is (clockAt), applies the
+  // change, and writes the whole game; the TV and player phones follow.
+  // staff-auth.js and this page must import firebase-api.js with the same ?v=
+  // or Firebase initializes twice (CLAUDE.md).
+  import { requireStaff } from '../staff-auth.js';
+  import * as fb from '../firebase-api.js?v=6';
+  import { clockAt, applyAction, initialGame, normalizeGame, isNewer } from '../clock-engine.js?v=2';
+  import { serverNow, measureServerOffset, isOffsetCalibrated, createClockSync } from '../clock-sync.js?v=4';
+  import { VENUES, clockIdFromUrl, isVenueClock, clockName, newClockId, formatClock, levelLabel, blindsLine, escapeHtml } from '../clock-view.js?v=3';
+  import { STRUCTURES, DEFAULT_STRUCTURE_ID } from '../clock-structures.js?v=1';
+  import { mainGameFor } from '../clock-pick.js?v=2';
+
+  const clockId = clockIdFromUrl();
+  const isVenue = isVenueClock(clockId);
+  const V = VENUES[clockId] || null;           // venue details (Hand of the Night), venue clocks only
+  const GAME_KEYS = ['1', '2'];
+  const STALE_MS = 12 * 3600 * 1000;   // older than this is a previous night
+  const $ = (id) => document.getElementById(id);
+  function showName(data) {
+    const name = clockName(clockId, data);
+    $('venueName').textContent = '· ' + name;
+    document.title = `Clock Control - ${name}`;
+  }
+  showName(null);
+  if (!isVenue) {
+    // No TV, Hand of the Night or layouts for a named clock.
+    $('tvTabBtn').hidden = true;
+    $('hint').textContent = 'Everyone with the link sees this clock.';
+  }
+
+  // Throws for a signed-out or non-staff visitor; its overlay explains what to do.
+  await requireStaff();
+
+  // The clock's blind structure: the one stored on the clock, else the
+  // standard one, which this page publishes with its first press.
+  const DEFAULT_STRUCTURE = STRUCTURES[DEFAULT_STRUCTURE_ID];
+  let levels = DEFAULT_STRUCTURE.levels;
+  let structurePublished = false;
+  const games = { '1': null, '2': null };
+  let ready = false;          // true once a server (not cached) snapshot arrived
+  let status = 'connecting';
+  let offlineSince = Date.now();
+  let current = '1';
+  let soundStyle = 'voice';   // what player phones play for this clock (no field yet = voice)
+  // Opens on the main game, decided once when the page loads (the owner, 2026-10-21):
+  // Game 2 from 9:00 PM Denver if its clock started tonight, otherwise Game 1,
+  // the same rule as the app's clock bubble (clock-pick.js). Never remembered:
+  // remembering the last game sent a press to Game 2 without anyone noticing
+  // (2026-10-15). Tapping a tab before the first snapshot wins.
+  let mainChosen = false;
+
+  // Buttons wait for the first server-time check: a press stamped with a
+  // phone clock that is minutes off would freeze everyone's countdown
+  // (same issue the TV handles with calibrateClock). If the check fails
+  // (no internet), the phone's own clock is the best there is.
+  let timeChecked = isOffsetCalibrated();
+  measureServerOffset().finally(() => { timeChecked = true; render(); });
+  setInterval(measureServerOffset, 10 * 60 * 1000);
+  window.addEventListener('online', () => measureServerOffset());
+
+  const ref = fb.doc(fb.db, 'timerClocks', clockId);
+  const sync = createClockSync({
+    fb, venue: clockId, device: 'phone',
+    onStatus: (s) => {
+      if (s !== 'live' && status === 'live') offlineSince = Date.now();
+      status = s;
+      renderStatus();
+    },
+    onData: (data, meta) => {
+      const stored = data && data.structure && Array.isArray(data.structure.levels) && data.structure.levels.length
+        ? data.structure.levels : null;
+      structurePublished = !!stored;
+      levels = stored || DEFAULT_STRUCTURE.levels;
+      soundStyle = data && data.sound === 'chime' ? 'chime' : 'voice';
+      if (data) showName(data);
+      const now = serverNow();
+      for (const k of GAME_KEYS) {
+        const remote = normalizeGame(data && data.games && data.games[k], levels);
+        const fresh = remote && now - remote.changedAt <= STALE_MS ? remote : null;
+        if (fresh && (!games[k] || isNewer(fresh, games[k]))) games[k] = fresh;
+        if (!fresh && games[k] && now - games[k].changedAt > STALE_MS) games[k] = null;
+      }
+      if (meta && !meta.fromCache) ready = true;
+      if (ready && !mainChosen) { mainChosen = true; current = mainGameFor(data, levels, now); }
+      render();
+    }
+  });
+  sync.start();
+
+  // A game with nothing tonight starts from the top, never from last week,
+  // even if this page has been open since then.
+  function gameOrFresh(k, now) {
+    const g = games[k];
+    if (g && now - g.changedAt <= STALE_MS) return g;
+    return { ...initialGame(levels, now), changedAt: 0 };
+  }
+
+  function press(action) {
+    if (!ready || !levels || !timeChecked) return;
+    const now = serverNow();
+    const k = current;
+    const before = games[k];
+    const from = gameOrFresh(k, now);
+    const was = clockAt(from, levels, now);
+    const next = applyAction(from, levels, action, now);
+    games[k] = next;
+    render();
+    $('notice').textContent = '';
+    // First press on a clock with no structure yet publishes the standard one.
+    const structure = structurePublished ? undefined : { id: DEFAULT_STRUCTURE.id, levels: DEFAULT_STRUCTURE.levels };
+    // Press log: where the game stood just before this press (clock-sync.js logPress).
+    const log = {
+      action, game: k, levelIndex: was.levelIndex, remainingMs: Math.round(was.remainingMs),
+      phase: was.phase, status: next.status, changedAt: next.changedAt, via: 'button'
+    };
+    sync.writeGames({ [k]: next }, structure, [log]).then((outcome) => {
+      if (outcome === 'ok') return;
+      // Not saved: show the clock everyone else still sees, not this press.
+      // Match by version, not object: the pending snapshot may already have
+      // replaced `next` with an equal copy (review finding 2026-10-15).
+      if (games[k] && games[k].changedAt === next.changedAt) { games[k] = before; render(); }
+      $('notice').textContent = outcome === 'denied'
+        ? 'This account is not allowed to change the clock.'
+        : 'That press did not save. Check the connection and try again.';
+    });
+  }
+
+  $('playBtn').addEventListener('click', () => press('toggle'));
+  document.querySelectorAll('[data-act]').forEach((b) => b.addEventListener('click', () => press(b.dataset.act)));
+  $('resetBtn').addEventListener('click', () => {
+    if (confirm(`Reset Game ${current} to the start for everyone (TV and phones)?`)) press('reset');
+  });
+  document.querySelectorAll('[data-game]').forEach((b) => b.addEventListener('click', () => {
+    current = b.dataset.game;
+    mainChosen = true;
+    render();
+  }));
+  document.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-tab]').forEach((x) => x.classList.toggle('on', x === b));
+    $('tab-clock').hidden = b.dataset.tab !== 'clock';
+    $('tab-tv').hidden = b.dataset.tab !== 'tv';
+    $('tab-share').hidden = b.dataset.tab !== 'share';
+  }));
+
+  // ---- Last change ----------------------------------------------------------
+  // One line under the clock: the newest press-log record for the game on
+  // screen (timerClocks/{id}/presses, written by clock-sync.js logPress).
+  // Listens to every record from the last 12 hours, so a busy Game 1 can't
+  // push Game 2's last change out of a short window (review 2026-10-16); a
+  // per-game query would need a composite index. Staff-only read; if it is
+  // refused or fails, the line just stays empty.
+  let recentPresses = [];
+  fb.onSnapshot(
+    fb.query(fb.collection(ref, 'presses'), fb.where('at', '>=', new Date(Date.now() - STALE_MS)),
+      fb.orderBy('at', 'desc'), fb.limit(500)),
+    (snap) => { recentPresses = snap.docs.map((d) => d.data({ serverTimestamps: 'estimate' })); },
+    (err) => { console.warn('[clock-control] press log unavailable:', err); recentPresses = []; }
+  );
+  const PRESS_VERBS = {
+    start: 'Started', pause: 'Paused', addMinute: 'Added 1 min', subtractMinute: 'Took off 1 min',
+    next: 'Next level', prev: 'Previous level', reset: 'Reset',
+    shared: 'TV clock shared', resend: 'TV clock re-sent', calibrate: 'TV time corrected'
+  };
+  function pressText(p) {
+    const verb = p.action === 'toggle' ? (p.status === 'running' ? 'Started' : 'Paused') : (PRESS_VERBS[p.action] || p.action);
+    const by = p.by || {};
+    const who = (by.name || '').trim().split(/\s+/)[0] || (by.email || '').split('@')[0] || 'unknown';
+    const where = p.device === 'tv' ? 'TV' : (p.device || '?');
+    const at = p.at && p.at.toDate ? p.at.toDate() : null;
+    let when = '';
+    if (at) {
+      when = at.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      if (Date.now() - at.getTime() > STALE_MS) when = at.toLocaleDateString([], { weekday: 'short', month: 'numeric', day: 'numeric' }) + ' ' + when;
+    }
+    return `Last change: ${verb} by ${who} (${where})${when ? ' at ' + when : ''}`;
+  }
+  function renderLastChange() {
+    const p = recentPresses.find((r) => r.game === current);
+    const text = p ? pressText(p) : '';
+    if ($('lastChange').textContent !== text) $('lastChange').textContent = text;
+  }
+
+  function renderStatus() {
+    const pill = $('statusPill');
+    const offlineLong = Date.now() - offlineSince > 5000;
+    const map = {
+      live: ['Live', 'live'],
+      sending: ['Sending...', 'warn'],
+      connecting: [offlineLong ? 'Offline' : 'Connecting', offlineLong ? 'bad' : 'warn'],
+      denied: ['No permission', 'bad'],
+      error: ['Error', 'bad']
+    };
+    const [text, cls] = map[status] || ['...', 'warn'];
+    pill.textContent = text;
+    pill.className = 'pill ' + cls;
+  }
+
+  function render() {
+    const now = serverNow();
+    renderLastChange();
+    document.querySelectorAll('[data-game]').forEach((b) => {
+      b.classList.toggle('on', b.dataset.game === current);
+      const g = levels && games[b.dataset.game];
+      const running = g && clockAt(g, levels, now).phase === 'running';
+      b.querySelector('.dot').classList.toggle('show', !!running);
+    });
+
+    const enabled = ready && !!levels && timeChecked;
+    document.querySelectorAll('#tab-clock .btn').forEach((b) => { b.disabled = !enabled; });
+    document.querySelectorAll('[data-sound]').forEach((b) => {
+      b.classList.toggle('on', ready && b.dataset.sound === soundStyle);
+      b.disabled = !ready;
+    });
+
+    if (!ready) {
+      $('level').textContent = '';
+      $('time').textContent = '--:--';
+      $('time').className = 'time paused';
+      $('blinds').textContent = '';
+      $('sub').textContent = '';
+      $('state').textContent = 'Connecting...';
+      return;
+    }
+
+    const g = gameOrFresh(current, now);
+    const v = clockAt(g, levels, now);
+    const line = blindsLine(v.level);
+    $('level').textContent = levelLabel(v.level);
+    $('time').textContent = formatClock(v.remainingMs);
+    $('time').className = 'time' + (v.phase === 'running' ? (v.remainingMs <= 60000 ? ' final' : '') : ' paused');
+    $('blinds').textContent = line.kind === 'pregame' ? '' : line.main;
+    $('blinds').className = 'blinds' + (line.kind === 'break' ? ' break' : '');
+    $('sub').textContent = line.sub || '';
+    let state = '';
+    if (v.phase === 'paused') state = g.startedTonight ? 'PAUSED' : 'NOT STARTED';
+    else if (v.phase === 'holding') state = 'BREAK OVER: PRESS PLAY';
+    else if (v.phase === 'finished') state = 'FINAL LEVEL ENDED';
+    $('state').textContent = state;
+    const play = $('playBtn');
+    play.textContent = v.phase === 'running' ? 'Pause' : 'Play';
+    play.classList.toggle('pause', v.phase === 'running');
+  }
+  setInterval(() => { render(); renderStatus(); }, 250);
+  render();
+
+  // ---- Player phone sounds --------------------------------------------------
+  // One choice for the whole clock: every player phone with sound on plays
+  // the director's recorded calls or soft chimes (the owner, 2026-10-15). Firestore
+  // shows the write here at once and takes it back if the rules refuse it.
+  document.querySelectorAll('[data-sound]').forEach((b) => b.addEventListener('click', () => {
+    const pick = b.dataset.sound;
+    if (!ready || pick === soundStyle) return;
+    $('soundNotice').textContent = 'Saving...';
+    fb.setDoc(ref, { sound: pick, updatedAt: fb.serverTimestamp(), updatedBy: { device: 'phone' } }, { merge: true })
+      .then(() => { $('soundNotice').textContent = pick === 'voice' ? 'Phones play your voice calls.' : 'Phones play chimes.'; })
+      .catch((err) => {
+        $('soundNotice').textContent = err && err.code === 'permission-denied'
+          ? 'This account is not allowed to change the clock.'
+          : 'Not saved: ' + (err.code || err.message);
+      });
+  }));
+
+  // ---- TV extras ----------------------------------------------------------
+  function convertSuits(hand) {
+    return String(hand || '')
+      .replace(/\/s/gi, '♠').replace(/\/h/gi, '♥')
+      .replace(/\/c/gi, '♣').replace(/\/d/gi, '♦');
+  }
+
+  // Hand of the Night belongs to a venue; named clocks have no TV extras.
+  let hotnFilled = false;
+  if (isVenue) fb.onSnapshot(fb.doc(fb.db, 'config', 'handOfNight'), (snap) => {
+    const v = snap.exists() ? snap.data()[V.apiVenue] : null;
+    const hand = (v && v.hand) || '--';
+    const bonus = (v && v.bonus) || '---';
+    $('hotnNow').innerHTML = `${escapeHtml(convertSuits(hand))} <small>Bonus ${escapeHtml(bonus)}${v && v.theme ? ' · ' + escapeHtml(v.theme) : ''}</small>`;
+    if (!hotnFilled) {
+      $('hotnTheme').value = (v && v.theme) || '';
+      $('hotnHand').value = v && v.hand && v.hand !== '--' ? v.hand : '';
+      $('hotnBonus').value = v && v.bonus && v.bonus !== '---' ? v.bonus : '';
+      hotnFilled = true;
+    }
+  }, (err) => { $('hotnNotice').textContent = 'Could not load Hand of the Night: ' + (err.code || err.message); });
+
+  $('hotnSave').addEventListener('click', async () => {
+    const theme = $('hotnTheme').value.trim();
+    const hand = $('hotnHand').value.trim() || '--';
+    const bonus = $('hotnBonus').value.trim() || '---';
+    $('hotnNotice').textContent = 'Saving...';
+    try {
+      await fb.PokerAPI.saveHandOfNight({ venue: V.apiVenue, hand, bonus, theme });
+      $('hotnNotice').textContent = 'Saved. The TV updates in a moment.';
+    } catch (err) {
+      $('hotnNotice').textContent = 'Save failed: ' + (err.message || err.code || 'unknown error');
+    }
+  });
+
+  $('hotnClear').addEventListener('click', async () => {
+    if (!confirm('Clear Hand of the Night on the TV?')) return;
+    $('hotnNotice').textContent = 'Clearing...';
+    try {
+      await fb.PokerAPI.clearHandOfNight({ venue: V.apiVenue });
+      $('hotnHand').value = '';
+      $('hotnBonus').value = '';
+      $('hotnNotice').textContent = 'Cleared.';
+    } catch (err) {
+      $('hotnNotice').textContent = 'Clear failed: ' + (err.message || err.code || 'unknown error');
+    }
+  });
+
+  // The TV applies a layout or refresh when these counters go up
+  // (timer.html handleTvCommands); the counters only ever increase.
+  function sendTv(fields, label) {
+    $('tvNotice').textContent = 'Sending...';
+    fb.setDoc(ref, { tv: fields, updatedAt: fb.serverTimestamp(), updatedBy: { device: 'phone' } }, { merge: true })
+      .then(() => { $('tvNotice').textContent = `${label} sent to the TV.`; })
+      .catch((err) => {
+        $('tvNotice').textContent = err && err.code === 'permission-denied'
+          ? 'This account is not allowed to control the TV.'
+          : 'Not sent: ' + (err.code || err.message);
+      });
+  }
+  document.querySelectorAll('[data-layout]').forEach((b) => b.addEventListener('click', () => {
+    sendTv({ layout: b.dataset.layout, layoutSeq: fb.increment(1) }, `${b.textContent} layout`);
+  }));
+  $('refreshTv').addEventListener('click', () => sendTv({ refreshSeq: fb.increment(1) }, 'Refresh'));
+
+  // ---- Share & new ----------------------------------------------------------
+  const watchUrl = isVenue
+    ? `${location.origin}/clock?venue=${clockId}`
+    : `${location.origin}/clock?clock=${clockId}`;
+  $('shareUrl').textContent = watchUrl;
+  $('shareBtn').hidden = !navigator.share;
+  $('shareBtn').addEventListener('click', () => {
+    navigator.share({ title: clockName(clockId, null), text: 'Tournament clock', url: watchUrl }).catch(() => {});
+  });
+  $('copyBtn').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(watchUrl);
+      $('shareNotice').textContent = 'Link copied.';
+    } catch (e) {
+      $('shareNotice').textContent = 'Copy failed. Press and hold the link above to copy it.';
+    }
+  });
+
+  // Named clocks this phone created or opened, newest first (just a shortcut
+  // list on this phone; the clocks themselves live in the database).
+  const RECENT_KEY = 'clockControlRecent';
+  function loadRecent() {
+    try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]').filter((c) => c && c.id && c.name); } catch (e) { return []; }
+  }
+  function rememberClock(id, name) {
+    const list = [{ id, name }, ...loadRecent().filter((c) => c.id !== id)].slice(0, 8);
+    try { localStorage.setItem(RECENT_KEY, JSON.stringify(list)); } catch (e) { /* not remembered */ }
+  }
+  function renderRecent() {
+    const list = loadRecent();
+    $('recentWrap').hidden = !list.length;
+    $('recent').innerHTML = list.map((c) =>
+      `<a class="btn" style="text-decoration:none;text-align:center;color:inherit" href="clock-control.html?clock=${encodeURIComponent(c.id)}">${escapeHtml(c.name)}</a>`
+    ).join('');
+  }
+  if (!isVenue) {
+    fb.getDoc(ref).then((snap) => { if (snap.exists()) rememberClock(clockId, clockName(clockId, snap.data())); renderRecent(); }).catch(() => {});
+  }
+  renderRecent();
+
+  $('createBtn').addEventListener('click', async () => {
+    const name = $('newName').value.trim().slice(0, 40);
+    if (!name) { $('newNotice').textContent = 'Give the clock a name first.'; return; }
+    $('newNotice').textContent = 'Creating...';
+    try {
+      // Never overwrite an existing clock: try a fresh id until one is free
+      // (review finding 2026-10-15).
+      let id = null;
+      for (let attempt = 0; attempt < 5 && !id; attempt++) {
+        const candidate = newClockId(name);
+        if (!(await fb.getDoc(fb.doc(fb.db, 'timerClocks', candidate))).exists()) id = candidate;
+      }
+      if (!id) { $('newNotice').textContent = 'Could not find a free id for that name. Try again.'; return; }
+      const now = serverNow();
+      await fb.setDoc(fb.doc(fb.db, 'timerClocks', id), {
+        venue: id,
+        name,
+        structure: { id: DEFAULT_STRUCTURE.id, levels: DEFAULT_STRUCTURE.levels },
+        games: { '1': { ...initialGame(DEFAULT_STRUCTURE.levels, now), noHold: false } },
+        updatedAt: fb.serverTimestamp(),
+        updatedBy: { device: 'phone' }
+      });
+      rememberClock(id, name);
+      location.href = `clock-control.html?clock=${encodeURIComponent(id)}&created=1`;
+    } catch (err) {
+      $('newNotice').textContent = err && err.code === 'permission-denied'
+        ? 'This account is not allowed to create clocks.'
+        : 'Could not create the clock: ' + (err.code || err.message);
+    }
+  });
+
+  // Just created: open on the Share tab so the link is right there.
+  if (new URLSearchParams(location.search).get('created') === '1') {
+    document.querySelector('[data-tab="share"]').click();
+    $('shareNotice').textContent = 'Clock created. Send this link to the players.';
+  }
+  if (new URLSearchParams(location.search).get('new') === '1') {
+    document.querySelector('[data-tab="share"]').click();
+    $('newName').focus();
+  }
+</script>
+<script>
+  (function () {
+    if (window.navigator.standalone !== true) return;
+    const backLink = document.getElementById('backLink');
+    backLink.hidden = false;
+    try {
+      const referrer = new URL(document.referrer);
+      if (referrer.origin === location.origin && (referrer.pathname === '/clock' || referrer.pathname === '/clock.html')) {
+        backLink.textContent = '← Clock';
+        backLink.addEventListener('click', function (event) {
+          event.preventDefault();
+          history.length > 1 ? history.back() : (location.href = document.referrer);
+        });
+      }
+    } catch (_) {}
+  })();
+</script>
+<script src="/back-nav.js?v=1" data-home="/gameday.html"></script>
+</body>
+</html>

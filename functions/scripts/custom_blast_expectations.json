@@ -1,0 +1,19 @@
+{
+  "brief": "BRIEF_18_poker_comms_blast_check.md",
+  "note": "Frozen cases, invented drafts only. Each case freezes the status, the (field, rule id) list compared as a sorted list, and the exit code with no --ack. Every cue is on line 1.",
+  "cases": [
+    {"id": "C1", "subject": "Friday game update", "body": "Doors open at seven. See you at the tables.", "status": "clear_for_human_review", "cues": [], "exit": 0},
+    {"id": "C2", "subject": "TBD schedule", "body": "See you at the tables.", "status": "placeholder_found", "cues": [["subject", "caps_placeholder"]], "exit": 1},
+    {"id": "C3", "subject": "Game update", "body": "Please RSVP by [add date].", "status": "placeholder_found", "cues": [["body", "square_editorial"]], "exit": 1},
+    {"id": "C4", "subject": "Game update", "body": "Hello {{first_name}}, your seat is ready.", "status": "placeholder_found", "cues": [["body", "brace_token"]], "exit": 1},
+    {"id": "C5", "subject": "Game update", "body": "Insert PLACEHOLDER here before sending.", "status": "placeholder_found", "cues": [["body", "caps_placeholder"], ["body", "insert_here"]], "exit": 1},
+    {"id": "C6", "subject": "Game update", "body": "Visit https://club.example for details.", "status": "sensitive_review", "cues": [["body", "link"]], "exit": 1},
+    {"id": "C7", "subject": "Game update", "body": "A member owes $120 in dues.", "status": "sensitive_review", "cues": [["body", "individual_detail"], ["body", "payment_term"]], "exit": 1},
+    {"id": "C8", "subject": "Game update", "body": "We will explain what a placeholder means in the editor.", "status": "sensitive_review", "cues": [["body", "word_placeholder"]], "exit": 1},
+    {"id": "C9", "subject": "Game update", "body": "This message is for the full league. Thanks for playing.", "status": "clear_for_human_review", "cues": [], "exit": 0},
+    {"id": "C10", "subject": "Game update", "body": "Placeholder text follows.", "status": "sensitive_review", "cues": [["body", "word_placeholder"]], "exit": 1},
+    {"id": "R1", "subject": "Game update", "body": "Hey ${firstName}! Doors open at seven.", "status": "placeholder_found", "cues": [["body", "brace_token"]], "exit": 1},
+    {"id": "R2", "subject": "Schedule", "body": "Fri, Oct 9 at TBD.", "status": "placeholder_found", "cues": [["body", "caps_placeholder"]], "exit": 1},
+    {"id": "R3", "subject": "Championship", "body": "Congratulations, you have qualified for the Championship. Please RSVP at https://club.example/rsvp", "status": "sensitive_review", "cues": [["body", "link"], ["body", "sensitive_topic"]], "exit": 1}
+  ]
+}

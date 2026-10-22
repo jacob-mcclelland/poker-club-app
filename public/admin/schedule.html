@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Schedule Admin — Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/img/favicon-admin.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#050508; --card-bg:rgba(20,20,25,0.7); --border:rgba(255,255,255,0.08); --gold:#d4af37; --blue:#3b82f6; --green:#10b981; --red:#ef4444; --purple:#a855f7; --text:#f8fafc; --muted:#94a3b8; --corgi:#3b82f6; --tight:#d4af37; }
+    * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+    body { background:var(--bg); color:var(--text); font-family:'Inter',-apple-system,sans-serif; min-height:100vh; display:flex; flex-direction:column; overflow-x:hidden; }
+    #authGuard { position:fixed; inset:0; background:var(--bg); z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:16px; }
+    .spinner { width:40px; height:40px; border:3px solid rgba(255,255,255,0.1); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    #authMsg { color:var(--gold); font-weight:700; font-size:0.9rem; letter-spacing:1px; text-transform:uppercase; }
+    .auth-sign-in-btn { background:var(--gold); color:#000; border:none; padding:12px 28px; border-radius:10px; font-weight:800; font-size:0.95rem; cursor:pointer; font-family:inherit; }
+
+    .header { padding:40px 20px 12px; text-align:center; position:relative; }
+    .back-btn { position:absolute; left:16px; top:44px; background:var(--card-bg); border:1px solid var(--border); color:var(--gold); padding:8px 16px; border-radius:10px; cursor:pointer; font-size:0.85rem; font-weight:700; font-family:inherit; }
+    .back-btn:active { transform:scale(0.96); }
+    h1 { font-weight:800; font-size:1.5rem; text-transform:uppercase; letter-spacing:2px; background:linear-gradient(to bottom,#fff 30%,#888); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .sub { margin-top:4px; color:var(--blue); font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:3px; }
+
+    .main-content { padding:0 16px 80px; flex:1; max-width:920px; margin:0 auto; width:100%; }
+
+    /* Calendar toolbar */
+    .cal-bar { display:flex; align-items:center; gap:10px; margin:14px 0 12px; flex-wrap:wrap; }
+    .nav-btn { background:var(--card-bg); border:1px solid var(--border); color:var(--text); width:38px; height:38px; border-radius:10px; cursor:pointer; font-size:1.1rem; font-weight:700; }
+    .nav-btn:active { transform:scale(0.94); }
+    .month-label { font-weight:800; font-size:1.15rem; min-width:200px; text-align:center; flex:1; }
+    .today-btn { background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3); color:var(--blue); padding:8px 14px; border-radius:9px; cursor:pointer; font-weight:700; font-size:0.78rem; font-family:inherit; }
+    .filters { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; align-items:center; }
+    .filter-btn { background:transparent; border:1px solid var(--border); color:var(--muted); padding:6px 12px; border-radius:8px; cursor:pointer; font-weight:700; font-size:0.74rem; font-family:inherit; }
+    .filter-btn.active { background:rgba(255,255,255,0.06); color:var(--text); border-color:rgba(255,255,255,0.2); }
+    .legend { margin-left:auto; display:flex; gap:14px; align-items:center; font-size:0.72rem; color:var(--muted); }
+    .legend span { display:inline-flex; align-items:center; gap:6px; }
+    .dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+    .dot.tight { background:var(--tight); }
+    .dot.corgi { background:var(--corgi); }
+
+    /* Calendar grid */
+    .cal { background:var(--card-bg); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+    .cal-dow { display:grid; grid-template-columns:repeat(7,1fr); background:rgba(0,0,0,0.3); }
+    .cal-dow div { padding:8px 6px; text-align:center; font-size:0.66rem; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--muted); }
+    .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); }
+    .cell { min-height:92px; border-top:1px solid var(--border); border-left:1px solid var(--border); padding:5px; position:relative; cursor:pointer; transition:background 0.15s; display:flex; flex-direction:column; gap:3px; }
+    .cell:nth-child(7n+1) { border-left:none; }
+    .cell:hover { background:rgba(255,255,255,0.03); }
+    .cell.other-month { opacity:0.32; }
+    .cell.today .daynum { background:var(--gold); color:#000; }
+    .daynum { font-size:0.74rem; font-weight:700; color:var(--muted); width:22px; height:22px; display:flex; align-items:center; justify-content:center; border-radius:50%; align-self:flex-end; }
+    .pill { font-size:0.66rem; font-weight:700; padding:3px 6px; border-radius:6px; line-height:1.15; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; border-left:3px solid; }
+    .pill.tight { background:rgba(212,175,55,0.12); border-color:var(--tight); color:#f0dca0; }
+    .pill.corgi { background:rgba(59,130,246,0.12); border-color:var(--corgi); color:#bcd4ff; }
+    .pill .pill-type { opacity:0.7; font-weight:800; font-size:0.6rem; text-transform:uppercase; }
+    @media (max-width:640px) {
+      .cell { min-height:64px; padding:3px; }
+      .pill { font-size:0.58rem; padding:2px 4px; }
+      .legend { display:none; }
+      .month-label { min-width:auto; font-size:1rem; }
+    }
+
+    /* Modal */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200; display:none; align-items:center; justify-content:center; padding:18px; }
+    .modal-overlay.open { display:flex; }
+    .modal { background:#141419; border:1px solid var(--border); border-radius:18px; padding:22px; width:100%; max-width:420px; }
+    .modal h3 { font-size:1.1rem; font-weight:800; margin-bottom:4px; }
+    .modal .modal-sub { font-size:0.74rem; color:var(--muted); margin-bottom:16px; }
+    .lbl { font-size:0.7rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+    .input { width:100%; background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:1rem; padding:11px 13px; outline:none; font-family:inherit; appearance:none; -webkit-appearance:none; }
+    .input:focus { border-color:var(--blue); }
+    .field { margin-bottom:12px; }
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .move-warn { font-size:0.72rem; color:var(--gold); background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.25); border-radius:8px; padding:8px 10px; margin-bottom:12px; display:none; }
+    .btn { padding:11px 18px; border-radius:10px; border:none; font-size:0.88rem; font-weight:700; cursor:pointer; font-family:inherit; }
+    .btn:active { transform:scale(0.97); }
+    .btn:disabled { opacity:0.5; cursor:not-allowed; }
+    .btn-gold { background:var(--gold); color:#000; }
+    .btn-ghost { background:transparent; color:var(--muted); border:1px solid var(--border); }
+    .btn-danger { background:rgba(239,68,68,0.12); color:var(--red); border:1px solid rgba(239,68,68,0.3); }
+    .modal-actions { display:flex; gap:10px; margin-top:18px; align-items:center; }
+
+    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); padding:10px 22px; border-radius:10px; font-weight:700; font-size:0.9rem; z-index:500; display:none; white-space:nowrap; }
+    .toast.success { background:var(--green); color:#000; }
+    .toast.error { background:var(--red); color:#fff; }
+    @media (max-width:480px) { .input { font-size:16px; } }
+  </style>
+</head>
+<body>
+
+  <div id="authGuard">
+    <div class="spinner"></div>
+    <p id="authMsg">Verifying…</p>
+    <button id="loginBtn" class="auth-sign-in-btn" onclick="doLogin()" style="display:none;">Sign In with Google</button>
+  </div>
+
+  <div class="header">
+    <button class="back-btn" data-back-nav onclick="window.BackNav ? BackNav.go() : history.back()">&#8592; Back</button>
+    <h1>Schedule Admin</h1>
+    <div class="sub">Tap a day to add &middot; Tap an event to edit</div>
+  </div>
+
+  <div class="main-content">
+    <div class="cal-bar">
+      <button class="nav-btn" onclick="changeMonth(-1)">&#8249;</button>
+      <div class="month-label" id="monthLabel">—</div>
+      <button class="nav-btn" onclick="changeMonth(1)">&#8250;</button>
+      <button class="today-btn" onclick="goToday()">Today</button>
+    </div>
+    <div class="filters">
+      <button class="filter-btn active" data-venue="all" onclick="setFilter('all')">All Venues</button>
+      <button class="filter-btn" data-venue="Tight End" onclick="setFilter('Tight End')">Tight End</button>
+      <button class="filter-btn" data-venue="Wild Corgi" onclick="setFilter('Wild Corgi')">Wild Corgi</button>
+      <div class="legend">
+        <span><i class="dot tight"></i> Tight End</span>
+        <span><i class="dot corgi"></i> Wild Corgi</span>
+      </div>
+    </div>
+
+    <div class="cal">
+      <div class="cal-dow">
+        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+  </div>
+
+  <!-- Add / Edit modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <h3 id="modalTitle">Add Event</h3>
+      <div class="modal-sub" id="modalSub"></div>
+
+      <div class="move-warn" id="moveWarn">⚠ Changing the date or venue will move this event (the old entry is removed).</div>
+
+      <div class="field">
+        <div class="lbl">Date</div>
+        <input id="mDate" type="date" class="input" onchange="checkMove()">
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <div class="lbl">Venue</div>
+          <select id="mVenue" class="input" onchange="checkMove()">
+            <option value="Tight End">Tight End Bar</option>
+            <option value="Wild Corgi">Wild Corgi Pub</option>
+          </select>
+        </div>
+        <div class="field">
+          <div class="lbl">Type</div>
+          <select id="mType" class="input">
+            <option value="Regular">Regular</option>
+            <option value="Championship">Championship</option>
+            <option value="Big Stack">Big Stack</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <div class="lbl">Theme <span style="font-weight:400;text-transform:none;letter-spacing:0;color:rgba(255,255,255,0.3)">(optional)</span></div>
+        <input id="mTheme" type="text" class="input" placeholder="e.g. Graphic Tee">
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-danger" id="mDelete" onclick="deleteFromModal()" style="display:none;">Delete</button>
+        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-gold" id="mSave" style="flex:1;" onclick="saveFromModal()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { functions, httpsCallable } from '../firebase-api.js?v=6';
+    import { requireAdmin, triggerLogin } from './admin-auth.js';
+
+    const getScheduleFn = httpsCallable(functions, 'getSchedule');
+    const saveEntryFn   = httpsCallable(functions, 'saveScheduleEntry');
+    const deleteEntryFn = httpsCallable(functions, 'deleteScheduleEntry');
+
+    const VALID_TYPES = ['Regular', 'Championship', 'Big Stack'];
+    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const WEEKDAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    // Events are almost always Tuesday(2) or Thursday(4). Anything else is flagged.
+    const isOffNight = (dow) => dow !== 2 && dow !== 4;
+
+    let events = [];                 // [{date, venue, type, theme, _d}]
+    let view = new Date();           // currently displayed month
+    let venueFilter = 'all';
+    let editing = null;              // {originalDate, originalVenue} when editing, null when adding
+
+    window.doLogin = triggerLogin;
+
+    function toast(msg, type='success') {
+      const el = document.getElementById('toast');
+      el.textContent = msg; el.className = 'toast ' + type; el.style.display = 'block';
+      clearTimeout(el._t); el._t = setTimeout(() => el.style.display = 'none', 2800);
+    }
+    function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+    // "M/D/YYYY" -> Date (noon to dodge TZ)
+    function parseMdy(str){ const [m,d,y]=(str||'').split('/').map(Number); const dt=new Date(y,(m||1)-1,d||1); dt.setHours(12,0,0,0); return dt; }
+    // Date -> "M/D/YYYY"
+    function toMdy(dt){ return `${dt.getMonth()+1}/${dt.getDate()}/${dt.getFullYear()}`; }
+    // Date -> "YYYY-MM-DD" for <input type=date>
+    function toIso(dt){ return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`; }
+    // "YYYY-MM-DD" -> "M/D/YYYY"
+    function isoToMdy(iso){ const [y,m,d]=iso.split('-'); return `${parseInt(m)}/${parseInt(d)}/${y}`; }
+    function venueKind(v){ const l=(v||'').toLowerCase(); if(l.includes('corgi')||l.includes('wc'))return 'corgi'; if(l.includes('tight')||l.includes('te'))return 'tight'; return 'tight'; }
+    function sameDay(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+
+    async function loadEvents() {
+      try {
+        const res = await getScheduleFn({ all: true });
+        events = (res.data?.schedule || []).map(g => {
+          const venue = g.venue || g.location || '';
+          return {
+            date: g.date,
+            venue,
+            type: VALID_TYPES.includes(g.type) ? g.type : 'Regular',
+            theme: g.theme || g.title || '',
+            _d: parseMdy(g.date)
+          };
+        });
+        renderCalendar();
+      } catch (err) {
+        toast(err.message || 'Failed to load schedule', 'error');
+      }
+    }
+
+    function renderCalendar() {
+      document.getElementById('monthLabel').textContent = `${MONTHS[view.getMonth()]} ${view.getFullYear()}`;
+      const grid = document.getElementById('calGrid');
+      const today = new Date();
+
+      const first = new Date(view.getFullYear(), view.getMonth(), 1);
+      const start = new Date(first);
+      start.setDate(1 - first.getDay()); // back up to Sunday
+
+      let html = '';
+      for (let i = 0; i < 42; i++) {
+        const cellDate = new Date(start);
+        cellDate.setDate(start.getDate() + i);
+        const otherMonth = cellDate.getMonth() !== view.getMonth();
+        const isToday = sameDay(cellDate, today);
+
+        const dayEvents = events.filter(e =>
+          sameDay(e._d, cellDate) && (venueFilter === 'all' || e.venue === venueFilter)
+        );
+
+        const pills = dayEvents.map(e => {
+          const kind = venueKind(e.venue);
+          const label = e.theme || e.type;
+          const typeTag = e.type !== 'Regular' ? `<span class="pill-type">${esc(e.type)} · </span>` : '';
+          const offFlag = isOffNight(e._d.getDay()) ? '⚠ ' : '';
+          const offTitle = offFlag ? ` title="Off-night event (${WEEKDAYS[e._d.getDay()]}) — events are normally Tue/Thu"` : '';
+          return `<div class="pill ${kind}"${offTitle} onclick="event.stopPropagation(); openEdit('${esc(e.date)}','${esc(e.venue)}')">${offFlag}${typeTag}${esc(label)}</div>`;
+        }).join('');
+
+        const iso = toIso(cellDate);
+        html += `<div class="cell${otherMonth ? ' other-month' : ''}${isToday ? ' today' : ''}" onclick="openAdd('${iso}')">
+          <div class="daynum">${cellDate.getDate()}</div>
+          ${pills}
+        </div>`;
+      }
+      grid.innerHTML = html;
+    }
+
+    window.changeMonth = function(delta) {
+      view = new Date(view.getFullYear(), view.getMonth() + delta, 1);
+      renderCalendar();
+    };
+    window.goToday = function() { view = new Date(); renderCalendar(); };
+    window.setFilter = function(v) {
+      venueFilter = v;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.venue === v));
+      renderCalendar();
+    };
+
+    // ── Modal ──
+    function openModal() { document.getElementById('modal').classList.add('open'); }
+    window.closeModal = function() { document.getElementById('modal').classList.remove('open'); };
+
+    window.openAdd = function(iso) {
+      editing = null;
+      document.getElementById('modalTitle').textContent = 'Add Event';
+      document.getElementById('modalSub').textContent = 'New event on the selected day';
+      document.getElementById('mDate').value = iso;
+      document.getElementById('mVenue').value = venueFilter !== 'all' ? venueFilter : 'Tight End';
+      document.getElementById('mType').value = 'Regular';
+      document.getElementById('mTheme').value = '';
+      document.getElementById('mDelete').style.display = 'none';
+      document.getElementById('moveWarn').style.display = 'none';
+      openModal();
+    };
+
+    window.openEdit = function(date, venue) {
+      const e = events.find(x => x.date === date && x.venue === venue);
+      if (!e) return;
+      editing = { originalDate: date, originalVenue: venue };
+      document.getElementById('modalTitle').textContent = 'Edit Event';
+      document.getElementById('modalSub').textContent = `${date} · ${venue}`;
+      document.getElementById('mDate').value = toIso(e._d);
+      document.getElementById('mVenue').value = e.venue;
+      document.getElementById('mType').value = e.type;
+      document.getElementById('mTheme').value = e.theme;
+      document.getElementById('mDelete').style.display = 'inline-block';
+      document.getElementById('moveWarn').style.display = 'none';
+      openModal();
+    };
+
+    window.checkMove = function() {
+      if (!editing) return;
+      const newDate = isoToMdy(document.getElementById('mDate').value);
+      const newVenue = document.getElementById('mVenue').value;
+      const moved = newDate !== editing.originalDate || newVenue !== editing.originalVenue;
+      document.getElementById('moveWarn').style.display = moved ? 'block' : 'none';
+    };
+
+    window.saveFromModal = async function() {
+      const btn   = document.getElementById('mSave');
+      const iso   = document.getElementById('mDate').value;
+      const venue = document.getElementById('mVenue').value;
+      const type  = document.getElementById('mType').value;
+      const theme = document.getElementById('mTheme').value.trim();
+      if (!iso) return toast('Date is required', 'error');
+
+      // Guardrail: events are almost always Tue/Thu. Confirm any off-night date.
+      const dow = new Date(iso + 'T12:00:00').getDay();
+      if (isOffNight(dow)) {
+        if (!confirm(`This event is on a ${WEEKDAYS[dow]}.\n\nEvents are almost always on Tuesday or Thursday. Save it on ${WEEKDAYS[dow]} anyway?`)) return;
+      }
+
+      const payload = { date: isoToMdy(iso), venue, type, theme };
+      if (editing) { payload.originalDate = editing.originalDate; payload.originalVenue = editing.originalVenue; }
+
+      btn.disabled = true; btn.textContent = 'Saving…';
+      try {
+        const res = await saveEntryFn(payload);
+        toast(res.data?.moved ? 'Event moved' : (editing ? 'Event updated' : 'Event added'));
+        closeModal();
+        await loadEvents();
+      } catch (err) {
+        toast(err.message || 'Save failed', 'error');
+      } finally {
+        btn.disabled = false; btn.textContent = 'Save';
+      }
+    };
+
+    window.deleteFromModal = async function() {
+      if (!editing) return;
+      if (!confirm(`Delete ${editing.originalDate} @ ${editing.originalVenue}?`)) return;
+      try {
+        await deleteEntryFn({ date: editing.originalDate, venue: editing.originalVenue });
+        toast('Event deleted');
+        closeModal();
+        await loadEvents();
+      } catch (err) {
+        toast(err.message || 'Delete failed', 'error');
+      }
+    };
+
+    // Close modal on overlay click
+    document.getElementById('modal').addEventListener('click', e => {
+      if (e.target.id === 'modal') closeModal();
+    });
+
+    async function init() {
+      const session = await requireAdmin();
+      if (!session) return;
+      view = new Date();
+      loadEvents();
+    }
+    init();
+  </script>
+
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="/clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/admin/"></script>
+</body>
+</html>

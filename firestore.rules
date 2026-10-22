@@ -1,0 +1,315 @@
+// Firestore security rules — All-In Poker Club
+//
+// Deployed 2026-09-05, replacing a single wildcard that allowed read and write
+// on every document to anyone until 2030.
+//
+// Derived from every direct browser read/write in public/ (see
+// docs/FIRESTORE_RULES_PROPOSAL.md for the access matrix). Cloud Functions use
+// the Admin SDK and bypass these rules entirely, so every callable keeps
+// working regardless of what is written here — `requireRole` in
+// functions/index.js remains the gate for those.
+//
+// Two exceptions the proposal documented were closed on 2026-10-19:
+//   1. shotRounds / shotOptions took writes from anyone, signed out. shots.html
+//      and bar.html now sign each device in to an anonymous account
+//      (public/shot-orders.js), and the rules below require an account and
+//      check the fields those pages write.
+//   2. Admins could write game rows directly for admin/game-inspector.html.
+//      The page now calls the adminEditGameRecord callable, so no browser
+//      writes game rows.
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Anonymous accounts exist for the event contest app (contest-demo),
+    // which signs visitors in silently. They must not count as signed in for
+    // anything in the poker app, so its surface stays exactly what it was
+    // when Google was the only provider (2026-10-08).
+    function signedIn() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider != 'anonymous';
+    }
+
+    function hasProfile() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/userProfiles/$(request.auth.uid));
+    }
+
+    function profile() {
+      return get(/databases/$(database)/documents/userProfiles/$(request.auth.uid)).data;
+    }
+
+    // Uses map.get(key, default), NOT profile().role — reading a field that is
+    // absent from a document is an ERROR in rules, not a null. Real profiles
+    // predate the role/isAdmin/isStaff trio (admin/players.html writes all
+    // three, hand-made ones may carry only one), so a bare property read would
+    // throw and deny an admin whose doc happens to lack the other fields.
+    function isAdmin() {
+      return hasProfile()
+        && (profile().get('role', '') == 'admin' || profile().get('isAdmin', false) == true);
+    }
+
+    // Fields a player may set on their OWN profile. role / isAdmin / isStaff are
+    // deliberately absent: that is the privilege-escalation surface this whole
+    // ruleset exists to close.
+    function ownProfileFields() {
+      return ['uid', 'email', 'linkedName', 'preferredEmail', 'preferences',
+              'createdAt', 'updatedAt', 'lastSeen', 'displayName', 'photoURL'];
+    }
+
+    // ── Game data ────────────────────────────────────────────────────────────
+    // Public read: the player app, the kiosk and scripts/season_health.py all
+    // read these signed out. Writes go through callables only, admins included
+    // (admin/game-inspector.html uses adminEditGameRecord).
+    match /players/{id}      { allow read: if true; allow write: if false; }
+    match /checkins/{id}     { allow read: if true; allow write: if false; }
+    match /eliminations/{id} { allow read: if true; allow write: if false; }
+    match /bounties/{id}     { allow read: if true; allow write: if false; }
+    match /rsvps/{id}        { allow read: if true; allow write: if false; }
+
+    // ── Season / schedule / content: public read, callables write ────────────
+    match /seasons/{id}         { allow read: if true; allow write: if false; }
+    match /schedule/{id}        { allow read: if true; allow write: if false; }
+    match /eventContent/{id}    { allow read: if true; allow write: if false; }
+    match /announcements/{id}   { allow read: if true; allow write: if false; }
+    match /champ_overrides/{id} { allow read: if true; allow write: if false; }
+
+    // config/* is public read (high hands, champions, hand of night all render
+    // on signed-out pages). admin/seasons.html writes config/champions directly.
+    match /config/{id} { allow read: if true; allow write: if isAdmin(); }
+
+    // ── Synced venue clock (docs/timer-prd/07-synced-clock.md) ──────────────
+    // One document per venue. Public read: player phones show the clock signed
+    // out. Writes come from the venue TV and the staff phone controller, both
+    // signed in as staff. Same staff test as staff-auth.js requireStaff().
+    function isStaff() {
+      return hasProfile()
+        && (profile().get('role', '') in ['staff', 'admin']
+            || profile().get('isStaff', false) == true
+            || profile().get('isAdmin', false) == true);
+    }
+
+    // Ids: 'tight' and 'corgi' for the venues, or a generated id for a named
+    // clock (a home game) that staff create from the phone controller,
+    // e.g. 'sams-house-k3x9'. Same pattern as clock-view.js CLOCK_ID_PATTERN.
+    match /timerClocks/{clockId} {
+      allow read: if true;
+      allow create, update: if isStaff()
+        && clockId.matches('^[a-z0-9-]{3,40}$')
+        && request.resource.data.keys().hasOnly(['venue', 'name', 'games', 'structure', 'tv', 'sound', 'updatedAt', 'updatedBy'])
+        && (!('name' in request.resource.data) || (request.resource.data.name is string && request.resource.data.name.size() <= 40))
+        && (!('sound' in request.resource.data) || request.resource.data.sound in ['voice', 'chime']);
+      allow delete: if isAdmin();
+    }
+
+    // Press log: one record per change to a shared clock (clock-sync.js
+    // logPress), so a surprise pause can be traced to a device and an account
+    // (2026-10-16). Staff add and read records; only an admin may change or
+    // remove one. `by` must be the writer's own account and `at` the server's
+    // clock, so nobody can log a press in someone else's name or time.
+    match /timerClocks/{clockId}/presses/{pressId} {
+      allow read: if isStaff();
+      allow create: if isStaff()
+        && request.resource.data.keys().hasOnly(['action', 'game', 'levelIndex', 'remainingMs', 'phase', 'status', 'changedAt', 'via', 'device', 'by', 'at'])
+        && request.resource.data.keys().hasAll(['action', 'game', 'levelIndex', 'remainingMs', 'phase', 'status', 'changedAt', 'via', 'device', 'by', 'at'])
+        && request.resource.data.action in ['toggle', 'start', 'pause', 'addMinute', 'subtractMinute', 'next', 'prev', 'reset', 'shared', 'resend', 'calibrate']
+        && request.resource.data.game in ['1', '2']
+        && request.resource.data.levelIndex is int
+        && request.resource.data.remainingMs is number
+        && request.resource.data.phase in ['running', 'paused', 'holding', 'finished']
+        && request.resource.data.status in ['running', 'paused']
+        && request.resource.data.changedAt is number
+        && request.resource.data.via in ['button', 'key', 'auto']
+        && request.resource.data.device in ['phone', 'tv']
+        && request.resource.data.by.keys().hasOnly(['uid', 'email', 'name'])
+        && request.resource.data.by.keys().hasAll(['uid', 'email', 'name'])
+        && request.resource.data.by.uid == request.auth.uid
+        && request.resource.data.by.email == request.auth.token.get('email', '')
+        && request.resource.data.by.name is string && request.resource.data.by.name.size() <= 100
+        && request.resource.data.at == request.time;
+      allow update, delete: if isAdmin();
+    }
+
+    // ── Accounts and roles ───────────────────────────────────────────────────
+    // A signed-in user may create and update their own document but may only
+    // touch the fields in ownProfileFields(). Admins may edit anyone
+    // (admin/players.html is the role editor).
+    match /userProfiles/{uid} {
+      // get: your own doc, or any doc if you are an admin. list: admins only —
+      // admin/players.html enumerates profiles, and these documents carry every
+      // member's email address, so a signed-in player must not be able to dump
+      // the collection.
+      allow get: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow list: if isAdmin();
+      allow create: if isAdmin()
+        || (signedIn() && request.auth.uid == uid
+            && request.resource.data.keys().hasOnly(ownProfileFields()));
+      allow update: if isAdmin()
+        || (signedIn() && request.auth.uid == uid
+            && request.resource.data.diff(resource.data).affectedKeys()
+                 .hasOnly(ownProfileFields()));
+      allow delete: if isAdmin();
+    }
+
+    // ── Shot rounds (shots.html orders, bar.html pours) ──────────────────────
+    // Public read (tonight.html and admin/shot-log.html read them too). Writes
+    // need an account, anonymous included: both pages run signed out on game
+    // night and sign in through shot-orders.js. This is the only place an
+    // anonymous account may write; signedIn() still excludes it everywhere
+    // else. Each write may touch only the fields the two pages write, and a
+    // changed time must be the server's (every page write is serverTimestamp()).
+    function shotRoundFields() {
+      return ['venue', 'eventType', 'gameNum', 'gameLabel', 'sessionDate', 'table',
+              'submitter', 'players', 'clientId', 'status', 'timestamp',
+              'submittedAt', 'updatedAt', 'poured', 'pouredAt', 'paid', 'paidAt'];
+    }
+    function shortText(d, key) {
+      return d[key] is string && d[key].size() <= 100;
+    }
+    function shotRoundOk(changed) {
+      let d = request.resource.data;
+      return changed.hasOnly(shotRoundFields())
+        && (!changed.hasAny(['venue']) || shortText(d, 'venue'))
+        && (!changed.hasAny(['eventType']) || shortText(d, 'eventType'))
+        && (!changed.hasAny(['gameLabel']) || shortText(d, 'gameLabel'))
+        && (!changed.hasAny(['sessionDate']) || shortText(d, 'sessionDate'))
+        && (!changed.hasAny(['table']) || shortText(d, 'table'))
+        && (!changed.hasAny(['clientId']) || shortText(d, 'clientId'))
+        && (!changed.hasAny(['gameNum']) || d.gameNum is int)
+        && (!changed.hasAny(['submitter']) || (d.submitter is map
+              && d.submitter.keys().hasOnly(['name'])
+              && (!('name' in d.submitter) || shortText(d.submitter, 'name'))))
+        && (!changed.hasAny(['players']) || (d.players is list && d.players.size() <= 40))
+        && (!changed.hasAny(['status']) || d.status in ['draft', 'pending', 'closed'])
+        && (!changed.hasAny(['poured']) || d.poured is bool)
+        && (!changed.hasAny(['paid']) || d.paid is bool)
+        && (!changed.hasAny(['timestamp']) || d.timestamp == request.time)
+        && (!changed.hasAny(['submittedAt']) || d.submittedAt == request.time)
+        && (!changed.hasAny(['updatedAt']) || d.updatedAt == request.time)
+        && (!changed.hasAny(['pouredAt']) || d.pouredAt == request.time)
+        && (!changed.hasAny(['paidAt']) || d.paidAt == request.time);
+    }
+    // A card only moves forward: once poured or paid it stays so, a closed card
+    // stays closed, and a legacy 'filled' card may only become 'closed' (bar.html
+    // marking it paid). Otherwise a card could be un-poured and then deleted.
+    function shotRoundForwardOnly() {
+      let before = resource.data;
+      let after = request.resource.data;
+      return (before.get('poured', false) != true || after.get('poured', false) == true)
+        && (before.get('paid', false) != true || after.get('paid', false) == true)
+        && (before.get('status', '') != 'closed' || after.get('status', '') == 'closed')
+        && (before.get('status', '') != 'filled' || after.get('status', '') in ['filled', 'closed']);
+    }
+    match /shotRounds/{id} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && shotRoundOk(request.resource.data.keys().toSet());
+      allow update: if request.auth != null
+        && shotRoundOk(request.resource.data.diff(resource.data).affectedKeys())
+        && shotRoundForwardOnly();
+      // A card can be deleted until the bar starts pouring it (shots.html Undo
+      // and "Delete this card"); after that only an admin may.
+      allow delete: if isAdmin()
+        || (request.auth != null
+            && resource.data.get('poured', false) != true
+            && !(resource.data.get('status', '') in ['closed', 'filled']));
+    }
+
+    // Dropdown options with a use count. Pages only ever create an option at
+    // count 0 or 1, add 1 per order, and name it once (40 characters at most).
+    match /shotOptions/{id} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && id.matches('^[a-z0-9_]{1,60}$')
+        && request.resource.data.keys().hasOnly(['name', 'count'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 40
+        && request.resource.data.count in [0, 1];
+      allow update: if request.auth != null
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'count'])
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['name'])
+            || (request.resource.data.name is string
+                && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 40))
+        && request.resource.data.get('count', 0) is int
+        && request.resource.data.get('count', 0) - resource.data.get('count', 0) in [0, 1];
+      allow delete: if isAdmin();
+    }
+
+    // ── Email queue for the firestore-send-email extension ───────────────────
+    // The extension reads via the Admin SDK; only admins enqueue (comms.html).
+    match /mail/{id} { allow read, create: if isAdmin(); allow update, delete: if false; }
+
+    // ── Server-only: no client access at all ─────────────────────────────────
+    match /emailList/{id}        { allow read, write: if false; }
+    match /playerContacts/{id}   { allow read, write: if false; }
+    match /clientErrors/{id}     { allow read, write: if false; }
+
+    // ── Host assistant (docs/host-assistant-spec.md, 2026-10-19) ─────────────
+    // nightOverrides is public read: tonight.html shows "3 games tonight" and
+    // shots.html honors a closed-ordering override signed out. Everything the
+    // assistant writes goes through the hostAssistant callables (Admin SDK).
+    match /nightOverrides/{id}      { allow read: if true; allow write: if false; }
+    match /assistantProposals/{id}  { allow read, write: if false; }
+    match /assistantAudits/{id}     { allow read, write: if false; }
+    match /assistantCalls/{id}      { allow read, write: if false; }
+    match /ops_issues/{id}          { allow read, write: if false; }
+    // Player correction requests (player-requests.js): filed through
+    // callables (rate limited, server validated), read back by id through
+    // getMyRequests, reviewed by staff on tonight.html. Clients never touch
+    // these collections directly.
+    match /playerRequests/{id}      { allow read, write: if false; }
+    match /playerRequestDrafts/{id} { allow read, write: if false; }
+    match /playerRequestLimits/{id} { allow read, write: if false; }
+    match /submissionAudits/{id} { allow read, write: if false; }
+    match /qualifiers/{id}       { allow read, write: if false; }
+    match /scoringEvents/{id}    { allow read, write: if false; }
+
+    // ── Event contest app (a separate app, site contest-demo) ────────
+    // Costume contests, pumpkin carving, photo walls. Every write goes through
+    // the contest* callables (Admin SDK); browsers only read. Visitors are
+    // anonymous accounts, so these rules use request.auth directly, not
+    // signedIn().
+    //
+    // Contest co-hosts are invited by email from the contest admin page
+    // (contestAdmins/{lowercased email}, written only by the contestAdmin
+    // function). They get contest admin reads and nothing in the poker app.
+    function isContestAdmin() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && request.auth.token.get('email_verified', false) == true
+        && request.auth.token.get('email', '') != ''
+        && exists(/databases/$(database)/documents/contestAdmins/$(request.auth.token.email.lower()));
+    }
+    function runsContests() {
+      return isAdmin() || isContestAdmin();
+    }
+
+    match /contestAdmins/{id} { allow read, write: if false; }
+    match /contestConfig/{id} { allow read: if true; allow write: if false; }
+    match /contestEvents/{eventId} {
+      allow read: if true;
+      allow write: if false;
+
+      // Public queries must filter hidden == false; admins see everything.
+      match /entries/{entryId} {
+        allow read: if resource.data.hidden == false || runsContests();
+        allow write: if false;
+      }
+      match /photos/{photoId} {
+        allow read: if resource.data.hidden == false || runsContests();
+        allow write: if false;
+      }
+      // One ballot per voter, keyed by uid. A voter may read only their own.
+      match /votes/{uid} {
+        allow get: if (request.auth != null && request.auth.uid == uid) || runsContests();
+        allow list: if runsContests();
+        allow write: if false;
+      }
+    }
+
+    // Anything not named above is closed.
+    match /{document=**} { allow read, write: if false; }
+  }
+}

@@ -1,0 +1,77 @@
+{
+ "player-0004": {
+  "email": "jordan.wexmoor@example.com",
+  "emailAddedAt": "2026-02-01T18:00:00.000Z",
+  "source": "landing_page"
+ },
+ "player-0014": {
+  "email": "shay.fenwhistle@example.com",
+  "emailAddedAt": "2026-02-01T18:00:00.000Z",
+  "source": "landing_page"
+ },
+ "player-0024": {
+  "email": "kendall.sablewood@example.com",
+  "emailAddedAt": "2026-02-01T18:00:00.000Z",
+  "source": "landing_page"
+ },
+ "player-0034": {
+  "email": "riley.corrimore@example.com",
+  "emailAddedAt": "2026-02-01T18:00:00.000Z",
+  "source": "landing_page"
+ },
+ "player-0044": {
+  "email": "cameron.vossington@example.com",
+  "emailAddedAt": "2026-02-01T18:00:00.000Z",
+  "source": "landing_page"
+ },
+ "player-0054": {
+  "email": "oakley.gallowpike@example.com",
+  "emailAddedAt": "2026-02-01T18:00:00.000Z",
+  "source": "landing_page"
+ },
+ "player-0064": {
+  "email": "frankie.pellbrook@example.com",
+  "emailAddedAt": "2026-02-01T18:00:00.000Z",
+  "source": "landing_page"
+ },
+ "player-0074": {
+  "email": "remy.yarrowdale@example.com",
+  "emailAddedAt": "2026-02-01T18:00:00.000Z",
+  "source": "landing_page"
+ },
+ "player-0084": {
+  "email": "shay.dellacourt@example.com",
+  "emailAddedAt": "2026-02-01T18:00:00.000Z",
+  "source": "landing_page"
+ },
+ "player-0094": {
+  "email": "bailey.zephyrine@example.com",
+  "emailAddedAt": "2026-02-01T18:00:00.000Z",
+  "source": "landing_page"
+ },
+ "player-0104": {
+  "email": "quinn.yarrowdale@example.com",
+  "emailAddedAt": "2026-02-01T18:00:00.000Z",
+  "source": "landing_page"
+ },
+ "player-0114": {
+  "email": "remy.tamberline@example.com",
+  "emailAddedAt": "2026-02-01T18:00:00.000Z",
+  "source": "landing_page"
+ },
+ "player-0124": {
+  "email": "noel.zephyrine@example.com",
+  "emailAddedAt": "2026-02-01T18:00:00.000Z",
+  "source": "landing_page"
+ },
+ "player-0134": {
+  "email": "eli.sablewood@example.com",
+  "emailAddedAt": "2026-02-01T18:00:00.000Z",
+  "source": "landing_page"
+ },
+ "player-0144": {
+  "email": "alex.rastervale@example.com",
+  "emailAddedAt": "2026-02-01T18:00:00.000Z",
+  "source": "landing_page"
+ }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "poker-club-app",
+  "private": true,
+  "scripts": {
+    "test": "node scripts/clock-engine-test.js && node scripts/championship-seating-test.js && node scripts/shots-reopen-test.js && node scripts/sw-check.js && node scripts/shot-order-clean-test.js && node scripts/clock-pick-test.js && node scripts/game-inspector-edit-test.js && node scripts/sample-invoice-test.js && node demo/check-no-real-data.js",
+    "test:py": "cd functions/scripts && python -W error -m unittest test_audit_gameday_theme test_check_custom_blast test_check_event_copy test_check_player_names test_check_schedule_copy",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-poker-test \"node scripts/rules-emulator-test.js && node scripts/callables-emulator-test.js\"",
+    "seed": "node demo/seed.js --out demo/fixtures",
+    "invoices": "node demo/sample-invoice.js",
+    "screenshots": "node demo/screenshots/run.js && node demo/screenshots/check-text.js",
+    "test:seed": "firebase emulators:exec --only firestore,auth --project demo-poker \"node demo/seed.js --load\"",
+    "check:data": "node demo/check-no-real-data.js"
+  },
+  "dependencies": {
+    "acorn": "^8.16.0",
+    "puppeteer": "^24.40.0"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.5"
+  }
+}

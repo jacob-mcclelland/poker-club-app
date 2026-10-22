@@ -1,0 +1,2744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>All-In Poker Club | Free Poker in Denver, CO</title>
+  <meta name="description" content="Free poker every Tuesday &amp; Thursday in Denver, CO. No buy-in, no experience needed. All skill levels welcome.">
+  <link rel="canonical" href="https://poker-club.example/home">
+  <meta property="og:title" content="All-In Poker Club — Free Poker in Denver">
+  <meta property="og:description" content="Free poker every Tuesday &amp; Thursday in Denver. All skill levels welcome!">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://poker-club.example/img/hero-bg.jpg">
+  <meta property="og:url" content="https://poker-club.example/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="All-In Poker Club — Free Poker in Denver">
+  <meta name="twitter:description" content="Free poker every Tuesday &amp; Thursday in Denver. All skill levels welcome!">
+  <meta name="twitter:image" content="https://poker-club.example/img/hero-bg.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
+  <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="All-In Poker">
+  <script>
+    try { if (localStorage.getItem('allin_largeText') === '1') document.documentElement.classList.add('large-text'); } catch(e) {}
+  </script>
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+    body {
+      background: #0a0a0a;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #1a0a00, #0a0a1a);
+      border-bottom: 1px solid #2a2a2a;
+      padding: 14px 80px 10px; /* Increased side padding to reserve space for buttons */
+      text-align: center;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .header h1 {
+      color: #d4af37;
+      font-size: 1.3rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      text-shadow: 0 0 20px rgba(212,175,55,0.4);
+      margin-bottom: 2px;
+      z-index: 5;
+      position: relative;
+    }
+    .header .sub { color: #555; font-size: 0.75rem; }
+
+    @media (max-width: 420px) {
+      .header h1 { font-size: 1.05rem; letter-spacing: 1px; }
+      .header { padding-left: 70px; padding-right: 70px; }
+    }
+    @media (max-width: 360px) {
+      .header h1 { font-size: 0.9rem; letter-spacing: 0px; }
+      .header { padding-left: 60px; padding-right: 60px; padding-top: 18px; }
+    }
+
+    /* ── Tab bar ── */
+    .tab-bar {
+      display: flex;
+      background: #111;
+      border-bottom: 1px solid #222;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 12px 4px 10px;
+      background: none;
+      border: none;
+      color: #555;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+      letter-spacing: 0.5px;
+    }
+    .tab-btn .tab-icon { display: block; font-size: 1.2rem; margin-bottom: 2px; }
+    .tab-btn.active { color: #d4af37; border-bottom-color: #d4af37; }
+
+    /* ── Tab content ── */
+    .tab-content { display: none; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 24px; height: 0; }
+    .tab-content.active { display: flex; flex-direction: column; }
+
+    /* ── Spinner ── */
+    .spinner { text-align: center; padding: 40px; color: #444; font-size: 0.9rem; }
+
+    /* ── Modals ── */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8); z-index: 1000;
+      display: none; justify-content: center; align-items: center;
+      padding: 20px; overscroll-behavior: contain;
+    }
+    .modal-content {
+      background: #111; border: 1px solid #333; border-radius: 12px;
+      width: 100%; max-width: 400px; padding: 20px;
+    }
+    .modal-title { color: #d4af37; font-size: 1.2rem; font-weight: 700; margin-bottom: 12px; }
+    .modal-close { float: right; background: none; border: none; color: #555; font-size: 1.2rem; cursor: pointer; margin-top:-5px; }
+    .btn { display: inline-block; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    .btn-outline { background: none; border: 1px solid #d4af37; color: #d4af37; }
+    .btn-outline:hover { background: rgba(212,175,55,0.1); }
+    .btn-sm { padding: 8px 14px; font-size: 0.85rem; }
+    .auth-btn {
+      background: #fff; color: #333; border: none; border-radius: 8px;
+      padding: 12px; width: 100%; font-size: 1rem; font-weight: bold;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      cursor: pointer; margin-top: 10px;
+    }
+    .checkbox-wrap { margin-top: 10px; background: #0a0a0a; padding: 12px; border-radius: 8px; border: 1px solid #333; }
+    .checkbox-wrap label { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; margin-bottom: 10px; cursor: pointer; }
+    .checkbox-wrap label:last-child { margin-bottom: 0; }
+    .checkbox-wrap input[type="checkbox"] { accent-color: #d4af37; width: 18px; height: 18px; }
+
+    /* ══════════════════════════════════
+       CALENDAR TAB
+    ══════════════════════════════════ */
+    .calendar-section { padding: 0; }
+
+    .month-header {
+      background: #111;
+      padding: 8px 16px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      border-bottom: 1px solid #1a1a1a;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .event-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid #1a1a1a;
+      transition: background 0.1s;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .event-card:active { background: rgba(255,255,255,0.03); }
+
+    /* ── Event Detail Modal ── */
+    .event-modal-img {
+      width: 100%; aspect-ratio: 16/9; object-fit: cover;
+      border-radius: 8px; margin-bottom: 12px;
+    }
+    .event-modal-date { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #d4af37; margin-bottom: 4px; }
+    .event-modal-name { font-size: 1.15rem; font-weight: 700; margin-bottom: 4px; }
+    .event-modal-venue { font-size: 0.85rem; color: #888; margin-bottom: 8px; }
+    .event-modal-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+    .event-modal-desc { font-size: 0.88rem; color: #bbb; line-height: 1.65; margin-bottom: 14px; white-space: pre-line; }
+    .event-modal-winners { margin-bottom: 12px; }
+    .event-modal-winner { font-size: 0.85rem; color: #d4af37; margin-bottom: 3px; }
+    .event-modal-winner::before { content: '🏆 '; }
+    .event-modal-fb {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 12px; border-radius: 8px; border: none;
+      background: #1877F2; color: #fff; font-size: 0.92rem; font-weight: 700;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .event-modal-fb:hover { background: #166ae0; }
+    .event-card.today { background: rgba(212,175,55,0.06); border-left: 3px solid #d4af37; }
+    .event-card.past { opacity: 0.7; }
+
+    .event-date-block {
+      text-align: center;
+      min-width: 44px;
+      flex-shrink: 0;
+    }
+    .event-day-num {
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1;
+      color: #fff;
+    }
+    .event-card.today .event-day-num { color: #d4af37; }
+    .event-day-name {
+      font-size: 0.65rem;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .event-info { flex: 1; min-width: 0; }
+    .event-venue {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #ddd;
+    }
+    .event-type-row { display: flex; gap: 6px; align-items: center; margin-top: 3px; flex-wrap: wrap; }
+    .badge {
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-regular { background: #1a3a1a; color: #5dbb5d; }
+    .badge-championship { background: #3a1a3a; color: #cc77ff; }
+    .badge-te { background: #1a2a3a; color: #55aaff; }
+    .badge-wc { background: #1a3a2a; color: #44dd88; }
+
+    .event-theme {
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 3px;
+      font-style: italic;
+    }
+    .event-winner {
+      font-size: 0.8rem;
+      color: #d4af37;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .event-winner::before { content: '🏆'; font-size: 0.75rem; }
+
+    /* ══════════════════════════════════
+       RECENT NOTIFICATIONS STRIP
+    ══════════════════════════════════ */
+    .recent-noti-strip {
+      padding: 0 16px 16px;
+    }
+    .recent-noti-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #444;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .recent-noti-label::before,
+    .recent-noti-label::after { content: ''; flex: 1; height: 1px; background: #1e1e1e; }
+    .noti-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #111;
+      border: 1px solid #1e1e1e;
+      border-left: 3px solid #333;
+      border-radius: 8px;
+      padding: 10px 10px 10px 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .noti-card:active { background: #161616; }
+    .noti-card.type-info  { border-left-color: #3b82f6; }
+    .noti-card.type-alert { border-left-color: #ef4444; }
+    .noti-card.type-promo { border-left-color: #d4af37; }
+    .noti-card.type-event { border-left-color: #a855f7; }
+    .noti-card-icon { font-size: 1rem; flex-shrink: 0; }
+    .noti-card-body { flex: 1; min-width: 0; }
+    .noti-card-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #ddd;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .noti-card-age {
+      font-size: 0.7rem;
+      color: #444;
+      margin-top: 2px;
+    }
+    .noti-card-dismiss {
+      flex-shrink: 0;
+      background: none;
+      border: none;
+      color: #333;
+      font-size: 1.1rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 4px 2px;
+      border-radius: 4px;
+      transition: color 0.15s;
+    }
+    .noti-card-dismiss:active { color: #888; }
+
+    /* ══════════════════════════════════
+       RSVP TAB
+    ══════════════════════════════════ */
+    .rsvp-section { padding: 16px; }
+
+    .venue-toggle {
+      display: flex;
+      background: #111;
+      border-radius: 10px;
+      padding: 3px;
+      margin-bottom: 16px;
+      border: 1px solid #222;
+    }
+    .venue-btn {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 8px;
+      background: none;
+      color: #555;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .venue-btn.active { background: #1a1a2a; color: #d4af37; }
+
+    .game-card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .game-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .game-date-label { font-weight: 700; color: #d4af37; font-size: 0.95rem; }
+    .game-subtitle { color: #555; font-size: 0.75rem; margin-top: 2px; }
+
+    .player-input-wrap { margin-bottom: 12px; }
+    .player-input-wrap label { display: block; font-size: 0.75rem; color: #666; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+    .player-input {
+      width: 100%;
+      background: #0a0a0a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.95rem;
+      padding: 10px 12px;
+      outline: none;
+    }
+    .player-input:focus { border-color: #d4af37; }
+    .player-suggestions {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      max-height: 160px;
+      overflow-y: auto;
+    }
+    .suggestion-item {
+      padding: 9px 12px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      border-bottom: 1px solid #222;
+    }
+    .suggestion-item:last-child { border-bottom: none; }
+    .suggestion-item:active { background: #252525; }
+
+    /* Clear (×) button on prefilled inputs */
+    .input-wrap-rel { position: relative; }
+    .input-clear-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #555;
+      font-size: 1.3rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 2px 6px;
+      display: none;
+      border-radius: 4px;
+      transition: color 0.15s;
+      z-index: 2;
+    }
+    .input-clear-btn:active { color: #d4af37; }
+
+    .rsvp-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+    .rsvp-btn {
+      flex: 1;
+      min-width: 80px;
+      padding: 10px 8px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.3px;
+    }
+    .rsvp-btn-g1 { background: rgba(204,102,0,0.2); color: #ff9900; border: 1px solid rgba(204,102,0,0.3); }
+    .rsvp-btn-g2 { background: rgba(136,0,204,0.2); color: #cc66ff; border: 1px solid rgba(136,0,204,0.3); }
+    .rsvp-btn-both { background: rgba(212,175,55,0.2); color: #d4af37; border: 1px solid rgba(212,175,55,0.3); }
+    .rsvp-btn-decline { background: rgba(180,0,0,0.15); color: #ff5555; border: 1px solid rgba(180,0,0,0.25); }
+    .rsvp-btn:active { filter: brightness(1.2); transform: scale(0.97); }
+    .rsvp-btn:disabled { opacity: 0.4; cursor: default; }
+
+    .rsvp-status {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      text-align: center;
+    }
+    .rsvp-status.success { background: rgba(0,180,0,0.15); color: #44dd44; }
+    .rsvp-status.error { background: rgba(180,0,0,0.15); color: #ff5555; }
+
+    .no-games { text-align: center; padding: 40px 20px; color: #444; }
+
+    .rsvp-name-bar {
+      background: #111;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+    .rsvp-name-bar .player-input-wrap { margin-bottom: 0; }
+    .add-player-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      background: none;
+      border: none;
+      color: #555;
+      font-size: 0.78rem;
+      cursor: pointer;
+      padding: 0;
+      letter-spacing: 0.3px;
+    }
+    .add-player-toggle:active { color: #888; }
+    .add-player-panel {
+      background: #0d0d0d;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .add-player-panel label { display: block; font-size: 0.75rem; color: #555; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* ══════════════════════════════════
+       STANDINGS TAB
+    ══════════════════════════════════ */
+    .standings-section { display: flex; flex-direction: column; height: 100%; }
+
+    .standings-controls {
+      background: #111;
+      border-bottom: 1px solid #222;
+      flex-shrink: 0;
+    }
+    .standings-toggle-row {
+      display: flex;
+    }
+    .st-btn {
+      flex: 1;
+      padding: 10px 4px;
+      border: none;
+      background: none;
+      color: #555;
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .st-btn.active { color: #d4af37; border-bottom-color: #d4af37; }
+    .standings-type-row {
+      display: flex;
+      border-top: 1px solid #1a1a1a;
+    }
+    .st-type-btn {
+      flex: 1;
+      padding: 8px 4px;
+      border: none;
+      background: none;
+      color: #555;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.3px;
+    }
+    .st-type-btn.active { color: #fff; background: #1a1a2a; }
+
+    .standings-breakdown-row {
+      display: flex;
+      justify-content: center;
+      padding: 7px 12px;
+      border-top: 1px solid #1a1a1a;
+      background: #0d0d0d;
+    }
+    .breakdown-link {
+      color: #555;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-decoration: none;
+      letter-spacing: 0.3px;
+      transition: color 0.15s;
+    }
+    .breakdown-link:hover { color: #888; }
+
+    .standings-search-wrap {
+      padding: 10px 12px;
+      border-bottom: 1px solid #1a1a1a;
+      background: #0d0d0d;
+    }
+    .standings-search {
+      width: 100%;
+      background: #111;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.9rem;
+      padding: 9px 12px;
+      outline: none;
+    }
+    .standings-search:focus { border-color: #d4af37; }
+    .standings-search::placeholder { color: #444; }
+
+    /* ── High Hand Panel ── */
+    .hh-panel {
+      background: linear-gradient(135deg, #1a1a1a, #0d0d0d);
+      border-bottom: 1px solid #d4af37;
+      padding: 14px 16px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hh-panel::before {
+      content: ''; position: absolute; top:0; left:0; right:0; height:1px;
+      background: linear-gradient(90deg, transparent, #d4af37, transparent);
+    }
+    .hh-title {
+      font-size: 0.7rem; font-weight: 800; color: #d4af37;
+      text-transform: uppercase; letter-spacing: 2.5px; margin-bottom: 10px;
+      text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+    }
+    .hh-grid { display: flex; gap: 10px; }
+    .hh-row {
+      flex: 1; background: rgba(255,255,255,0.03); border-radius: 8px;
+      padding: 10px 8px; border: 1px solid rgba(255,255,255,0.05);
+    }
+    .hh-venue { font-size: 0.6rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .hh-player { font-size: 0.95rem; font-weight: 700; color: #fff; margin-bottom: 2px; }
+    .hh-hand { font-size: 0.72rem; color: #aaa; font-style: italic; }
+    .hh-pot { font-size: 1.1rem; font-weight: 800; color: #00ff88; margin-top: 6px; }
+    .hh-pot::before { content: '$'; font-size: 0.8rem; margin-right: 2px; }
+    .hh-empty { color: #444; font-size: 0.8rem; font-style: italic; padding: 10px; }
+
+    .standings-scroll { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+    /* Player card (search result) */
+    .player-card {
+      margin: 12px;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .player-card-name {
+      padding: 12px 14px 8px;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #d4af37;
+      border-bottom: 1px solid #1a1a1a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    /* Add / remove action on a player card header */
+    .pc-action {
+      flex-shrink: 0;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      border-radius: 7px;
+    }
+    .pc-add {
+      background: #1a1a2a;
+      color: #d4af37;
+      border: 1px solid #d4af37;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 5px 10px;
+      letter-spacing: 0.3px;
+    }
+    .pc-add:active { background: #d4af37; color: #111; }
+    .pc-added {
+      flex-shrink: 0;
+      color: #44aa55;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .pc-remove {
+      background: #1a1a1a;
+      color: #888;
+      font-size: 1.1rem;
+      line-height: 1;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pc-remove:active { background: #3a1a1a; color: #ff6666; }
+    /* Compare bar above pinned cards */
+    .compare-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px 4px;
+      color: #d4af37;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.3px;
+    }
+    .compare-clear-all {
+      background: none;
+      border: 1px solid #2a2a2a;
+      color: #777;
+      font-family: inherit;
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .compare-hint {
+      text-align: center;
+      color: #555;
+      font-size: 0.75rem;
+      padding: 6px 16px 12px;
+    }
+    .player-card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .pc-cell {
+      padding: 10px 14px;
+      border-bottom: 1px solid #1a1a1a;
+      border-right: 1px solid #1a1a1a;
+    }
+    .pc-cell:nth-child(2n) { border-right: none; }
+    .pc-cell:nth-last-child(-n+2) { border-bottom: none; }
+    .pc-label { font-size: 0.65rem; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .pc-rank { font-size: 1.1rem; font-weight: 700; color: #fff; }
+    .pc-pts { font-size: 0.75rem; color: #888; margin-top: 2px; }
+    .pc-rank.top5 { color: #aa66ff; }
+    .pc-rank.top10 { color: #4488ff; }
+    .pc-rank.top20 { color: #44aa55; }
+    .pc-unranked { color: #444; font-size: 0.85rem; font-style: italic; }
+
+    /* ─── Week-one champion showcase ─── */
+    .cs-showcase {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 10px;
+      padding: 20px 16px 28px;
+    }
+    .cs-eyebrow {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #d4af37;
+    }
+    /* contain, not cover: these are three-person podium shots and a cover-crop
+       cuts people out of frame on a narrow phone. */
+    .cs-photo {
+      width: 100%;
+      max-height: 60vh;
+      object-fit: contain;
+      border-radius: 12px;
+      border: 1px solid #222;
+      background: #0a0a0a;
+    }
+    .cs-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+    }
+    .cs-sub { font-size: 0.78rem; color: #555; }
+
+    .standings-list { }
+    .standings-entry {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-bottom: 1px solid #1a1a1a;
+      font-size: 0.9rem;
+    }
+    .standings-entry.tier-1 { border-left: 3px solid #aa66ff; }
+    .standings-entry.tier-2 { border-left: 3px solid #4488ff; }
+    .standings-entry.tier-3 { border-left: 3px solid #44aa55; }
+    .s-rank { min-width: 28px; color: #555; font-size: 0.8rem; text-align: right; flex-shrink: 0; }
+    .s-name { flex: 1; min-width: 0; color: #eee; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .s-pts { color: #d4af37; font-weight: 700; font-size: 0.95rem; flex-shrink: 0; }
+    .s-badge { flex-shrink: 0; font-size: 0.6rem; background: rgba(68,221,68,0.15); color: #44dd44; border: 1px solid rgba(68,221,68,0.3); padding: 1px 5px; border-radius: 6px; margin: 0 6px 0 4px; }
+    
+    .modal-content {
+      background: #111; border: 1px solid #333; border-radius: 12px;
+      padding: 24px; min-width: 300px; max-width: 90%;
+      text-align: center; position: relative;
+    }
+    .modal-close {
+      position: absolute; top: 12px; right: 12px;
+      background: none; border: none; color: #888;
+      font-size: 1.5rem; cursor: pointer; padding: 4px;
+      line-height: 1; transition: color 0.15s;
+    }
+    .modal-close:hover { color: #fff; }
+    .modal-title { font-size: 1.35rem; font-weight: 700; color: #d4af37; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+    
+    /* ── PWA Banner ── */
+    #pwaInstallBanner {
+      display: none;
+      background: linear-gradient(to right, #0a0a0a, #1a1500, #0a0a0a);
+      color: #bbb;
+      text-align: center;
+      padding: 8px 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(212,175,55,0.3);
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    #pwaInstallBanner:hover { background: #1a1500; }
+    #pwaInstallBanner span { color: #d4af37; text-decoration: none; font-weight: 700; margin-left: 4px; border-bottom: 1px dotted #d4af37; }
+    #pwaInstallBanner .close-pwa { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: #666; font-size: 1.2rem; border: none; background: none; padding: 2px 6px; cursor: pointer; }
+    
+    .standings-footer { text-align: center; padding: 12px; color: #444; font-size: 0.75rem; }
+
+    /* ===== LARGE TEXT (Easy Read) MODE: toggled via html.large-text ===== */
+    html.large-text { font-size: 137.5%; }
+    html.large-text body { line-height: 1.45; }
+
+    /* ── Global chrome ── */
+    html.large-text .tab-btn { min-height: 52px; letter-spacing: 0.2px; }
+    html.large-text .header h1 { font-size: 1.1rem; letter-spacing: 1px; }
+    html.large-text .header button[aria-label="Account Profile"] svg,
+    html.large-text .header button[aria-label="Admin Portal"] svg,
+    html.large-text .header button[aria-label="Invite Friends"] svg,
+    html.large-text .header button[aria-label="Staff Portal"] svg {
+      width: 30px; height: 30px;
+    }
+    /* Larger tap targets for the admin/staff doors: extend inward over the title, which they take priority over */
+    #adminDoorBtn, #staffDoorBtn { z-index: 6; } /* above .header h1 (z-index 5), whose box covers the buttons on phones */
+    #adminDoorBtn::after, #staffDoorBtn::after {
+      content: '';
+      position: absolute;
+      top: -12px;
+      bottom: -12px;
+    }
+    #adminDoorBtn::after { left: -4px; right: -40px; }
+    #staffDoorBtn::after { left: -40px; right: -4px; }
+    html.large-text #notiBtn { width: 60px !important; height: 60px !important; }
+
+    /* ── Calendar tab ── */
+    html.large-text .event-date-block { min-width: 2.75em; }
+    html.large-text .noti-card-title {
+      white-space: normal;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ── RSVP tab ── */
+    html.large-text .rsvp-btns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    html.large-text .rsvp-btn { min-width: 0; padding: 14px 10px; }
+    html.large-text #add-player-panel .rsvp-btn {
+      flex: unset !important;
+      width: 100%;
+    }
+    html.large-text #add-player-panel > div[style*="display:flex"] {
+      flex-direction: column !important;
+    }
+    html.large-text #rsvp-name { padding-right: 44px !important; }
+    html.large-text .player-suggestions { max-height: 220px; }
+
+    /* ── Standings tab ── */
+    html.large-text .st-btn,
+    html.large-text .st-type-btn {
+      white-space: normal;
+      line-height: 1.25;
+      padding: 10px 6px;
+      min-height: 44px;
+    }
+    html.large-text .hh-grid { flex-direction: column; }
+    html.large-text .player-card-grid { grid-template-columns: 1fr; }
+    html.large-text .player-card-name { flex-wrap: wrap; }
+    html.large-text .player-card-name > span,
+    html.large-text .player-card-name { min-width: 0; overflow-wrap: anywhere; }
+    html.large-text .s-rank { min-width: 2em; }
+    html.large-text .s-name { min-width: 0; overflow-wrap: anywhere; white-space: normal; overflow: visible; }
+    html.large-text .standings-search { padding-right: 44px !important; }
+
+    /* ── Modals / profile ── */
+    html.large-text .checkbox-wrap input[type="checkbox"] { width: 24px; height: 24px; }
+    html.large-text .checkbox-wrap label { gap: 12px; }
+    html.large-text .modal-close { font-size: 2rem; }
+    html.large-text .input-clear-btn { font-size: 1.7rem; }
+    html.large-text .noti-card-dismiss { font-size: 1.4rem; }
+    html.large-text .pc-remove { width: 36px; height: 36px; font-size: 1.4rem; }
+  </style>
+</head>
+<body>
+  <div id="pwaInstallBanner">
+    <div onclick="handleInstallClick()" style="flex:1;">
+      📱 For the best experience, <span>Install App</span>
+    </div>
+    <button class="close-pwa" aria-label="Close" onclick="dismissInstallBanner(event)">&times;</button>
+  </div>
+
+  <div class="header" style="position: relative;">
+    <!-- Account Profile (Left) -->
+    <button onclick="openProfileModal()" aria-label="Account Profile" style="position: absolute; left: 16px; top: 16px; background: none; border: none; color: rgb(212, 175, 55); font-size: 1.4rem; cursor: pointer; padding: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmousedown="this.style.background=&#39;rgba(212,175,55,0.2)&#39;" onmouseup="this.style.background=&#39;none&#39;" onmouseleave="this.style.background=&#39;none&#39;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    </button>
+    
+    <!-- Admin Portal (Inside Left, hidden by default) -->
+    <button id="adminDoorBtn" onclick="window.location.href=&#39;/admin/&#39;" aria-label="Admin Portal" style="display: none; position: absolute; left: 56px; top: 16px; background: none; border: none; color: #cc77ff; font-size: 1.4rem; cursor: pointer; padding: 4px; border-radius: 50%; align-items: center; justify-content: center; transition: background 0.2s;" onmousedown="this.style.background=&#39;rgba(204,119,255,0.2)&#39;" onmouseup="this.style.background=&#39;none&#39;" onmouseleave="this.style.background=&#39;none&#39;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+      </svg>
+    </button>
+    
+    <!-- Invite Friends (Right) -->
+    <button onclick="shareApp()" aria-label="Invite Friends" style="position: absolute; right: 16px; top: 16px; background: none; border: none; color: #d4af37; font-size: 1.4rem; cursor: pointer; padding: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmousedown="this.style.background=&#39;rgba(212,175,55,0.2)&#39;" onmouseup="this.style.background=&#39;none&#39;" onmouseleave="this.style.background=&#39;none&#39;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="18" cy="5" r="3"></circle>
+        <circle cx="6" cy="12" r="3"></circle>
+        <circle cx="18" cy="19" r="3"></circle>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+      </svg>
+    </button>
+
+    <!-- Staff Portal (Inside Right, hidden by default) -->
+    <button id="staffDoorBtn" onclick="window.location.href=&#39;/gameday.html&#39;" aria-label="Staff Portal" style="display: none; position: absolute; right: 56px; top: 16px; background: none; border: none; color: #00aaff; font-size: 1.4rem; cursor: pointer; padding: 4px; border-radius: 50%; align-items: center; justify-content: center; transition: background 0.2s;" onmousedown="this.style.background=&#39;rgba(0,170,255,0.2)&#39;" onmouseup="this.style.background=&#39;none&#39;" onmouseleave="this.style.background=&#39;none&#39;">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+      </svg>
+    </button>
+
+    <h1 style="cursor: pointer;" onclick="window.location.href='/home'">♠ All-In Poker Club ♠</h1>
+    <div class="sub">Denver, CO · NLTH Poker League</div>
+    
+  </div>
+
+  <!-- Notification Bell FAB — fixed bottom-right, persists across all tabs -->
+  <button id="notiBtn" onclick="handleNotificationClick()" aria-label="Announcements" style="position: fixed; bottom: 20px; right: 16px; z-index: 200; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 50%; width: 48px; height: 48px; color: #888; font-size: 1.4rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 12px rgba(0,0,0,0.5); transition: all 0.2s;">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+    </svg>
+    <div id="notiDot" style="display: none; position: absolute; top: 6px; right: 6px; width: 9px; height: 9px; background: #ff4444; border-radius: 50%; border: 2px solid #1a1a1a;"></div>
+  </button>
+
+  <div class="tab-bar">
+    <button class="tab-btn" onclick="switchTab(&#39;calendar&#39;)">
+      <span class="tab-icon">🗓</span>Schedule
+    </button>
+    <button class="tab-btn active" onclick="switchTab(&#39;rsvp&#39;)">
+      <span class="tab-icon">✋</span>RSVP
+    </button>
+    <button class="tab-btn" onclick="switchTab(&#39;standings&#39;)">
+      <span class="tab-icon">🏆</span>Standings
+    </button>
+  </div>
+
+  <!-- CALENDAR TAB -->
+  <div id="tab-calendar" class="tab-content">
+    <div id="calendarContent" class="calendar-section">
+      <div class="spinner">Loading schedule…</div>
+    </div>
+  </div>
+
+  <!-- RSVP TAB -->
+  <div id="tab-rsvp" class="tab-content active">
+    <div class="rsvp-section">
+
+      <!-- Single name input shared across all game cards -->
+      <div class="rsvp-name-bar">
+        <div class="player-input-wrap">
+          <label>Your Name</label>
+          <div class="input-wrap-rel">
+            <input class="player-input" id="rsvp-name" type="text" placeholder="Start typing your name…" oninput="onRsvpNameInput()" onblur="setTimeout(hideRsvpSugg, 200)" autocomplete="off" style="padding-right:36px;">
+            <button class="input-clear-btn" id="rsvp-name-clear" onclick="clearRsvpName()" tabindex="-1" aria-label="Clear name">×</button>
+            <div class="player-suggestions" id="rsvp-sugg" style="display:none;"></div>
+          </div>
+        </div>
+        <button class="add-player-toggle" onclick="toggleAddPlayer()">➕ Not on the list? Add yourself</button>
+      </div>
+
+      <!-- Add new player panel (hidden by default) -->
+      <div id="add-player-panel" class="add-player-panel" style="display:none;">
+        <label>New Player Name</label>
+        <input class="player-input" id="new-player-name" type="text" placeholder="First and last name…" autocomplete="off">
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button class="rsvp-btn rsvp-btn-g1" style="flex:unset;padding:9px 18px;" onclick="submitAddPlayer()">Add Player</button>
+          <button class="rsvp-btn" style="flex:unset;padding:9px 14px;background:#1a1a1a;color:#555;border:1px solid #2a2a2a;" onclick="toggleAddPlayer()">Cancel</button>
+        </div>
+        <div id="add-player-status" class="rsvp-status" style="display:none;"></div>
+      </div>
+
+      <!-- RSVP Content -->
+      <div style="margin-top: 20px; margin-bottom: 12px; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; color: #555; letter-spacing: 1.5px; display: flex; align-items: center; gap: 8px;">
+        <span style="flex: 1; height: 1px; background: #222;"></span>
+        Next Sessions
+        <span style="flex: 1; height: 1px; background: #222;"></span>
+      </div>
+      <div id="rsvpContent"><div class="spinner">Loading games…</div></div>
+    </div>
+
+    <!-- Recent Notifications Strip -->
+    <div class="recent-noti-strip" id="recentNotiStrip" style="display:none;">
+      <div class="recent-noti-label">Recent Announcements</div>
+      <div id="recentNotiCards"></div>
+    </div>
+  </div>
+
+  <!-- STANDINGS TAB -->
+  <div id="tab-standings" class="tab-content">
+    <div class="standings-section">
+      <div class="standings-controls">
+        <div class="standings-toggle-row">
+          <button class="st-btn active" id="stTE" onclick="setStVenue(&#39;Tight End&#39;)">🎯 Tight End</button>
+          <button class="st-btn" id="stWC" onclick="setStVenue(&#39;Wild Corgi&#39;)">🐶 Wild Corgi</button>
+        </div>
+        <div class="standings-type-row">
+          <button class="st-type-btn active" id="stBounty" onclick="setStType(&#39;bounty&#39;)">🎯 Bounty</button>
+          <button class="st-type-btn" id="stChamp" onclick="setStType(&#39;championship&#39;)">🏆 Championship</button>
+        </div>
+        <div class="standings-breakdown-row">
+          <a class="breakdown-link" id="breakdownLink" href="/stats.html?venue=Tight%20End">📊 Game-by-Game Breakdown →</a>
+        </div>
+        <div class="standings-search-wrap">
+          <div class="input-wrap-rel">
+            <input class="standings-search" id="standingsSearch" type="text" placeholder="🔍 Search your name to see all rankings…" oninput="onStandingsSearch()" autocomplete="off" style="padding-right:36px;">
+            <button class="input-clear-btn" id="standings-clear" onclick="clearStandingsSearch()" tabindex="-1" aria-label="Clear search">×</button>
+          </div>
+        </div>
+      </div>
+      <div class="standings-scroll">
+        <!-- High Hand panel lives INSIDE the scroll area so the pinned controls
+             stay compact and the standings list is always reachable — in
+             large-text mode the panel would otherwise crush the list to nothing. -->
+        <div id="highHandSection" class="hh-panel">
+          <div class="hh-title">♠ High Hand Jackpot ♠</div>
+          <div id="hhContent" class="hh-grid">
+            <div class="hh-empty">Loading jackpots...</div>
+          </div>
+        </div>
+        <div id="standingsContent"><div class="spinner">Loading standings…</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Event Detail Modal -->
+  <div id="eventDetailModal" class="modal-overlay" onclick="if(event.target===this)closeEventDetail()" style="overflow-y:auto; -webkit-overflow-scrolling:touch;">
+    <div class="modal-content" style="max-height:none; margin:20px auto; position:relative;">
+      <button class="modal-close" onclick="closeEventDetail()">×</button>
+      <div id="eventDetailBody"></div>
+    </div>
+  </div>
+
+  <!-- iOS Install Modal -->
+  <div id="iosInstallModal" class="modal-overlay" onclick="if(event.target===this)closeIosModal()" style="overflow-y:auto; -webkit-overflow-scrolling:touch;">
+    <div class="modal-content" style="max-height:none; margin:20px auto; position:relative; padding:30px 20px;">
+      <button class="modal-close" onclick="closeIosModal()">×</button>
+      <div style="font-size:1.2rem; font-weight:bold; margin-bottom:15px; color:#d4af37; text-transform:uppercase; letter-spacing:1px;">Install App on iOS</div>
+      <div style="font-size:0.95rem; color:#ccc; line-height:1.6; text-align:left;">
+        <p style="margin-bottom:15px;">To install the All-In Poker app on your iPhone or iPad:</p>
+        <ol style="padding-left:20px; margin-bottom:20px;">
+          <li style="margin-bottom:10px;">Tap the <b>Share</b> icon <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin:0 2px;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> at the bottom of Safari.</li>
+          <li>Scroll down and tap <b>Add to Home Screen</b> <span style="display:inline-block; border:1px solid #666; padding:0 4px; border-radius:4px; font-weight:bold; font-size:1.1rem; line-height:1; vertical-align:middle; color:#fff;">+</span></li>
+        </ol>
+        <button class="rsvp-btn" style="width:100%; background:linear-gradient(135deg, #00ff88, #00cc66); color:#000;" onclick="closeIosModal()">Got It!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth / Profile Modal -->
+  <div id="profileModal" class="modal-overlay">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeProfileModal()">×</button>
+      
+      <div id="profileLoggedOut">
+        <div class="modal-title">Sign In</div>
+        <p style="font-size:0.9rem; color:#aaa; margin-bottom:15px;">Securely link your identity to easily check in and track stats.</p>
+        <button class="auth-btn" onclick="signInWithGoogle()">
+          <svg style="margin-right:8px" width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"></path><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"></path><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"></path><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"></path><path fill="none" d="M1 1h22v22H1z"></path></svg>
+          Sign In with Google
+        </button>
+        <div class="checkbox-wrap" style="margin-top:20px; padding-top:16px; border-top:1px solid #333;">
+          <label><input type="checkbox" id="prefLargeTextGuest" onchange="toggleLargeText(this.checked)"> Larger Text (easier reading)</label>
+        </div>
+        <p style="font-size:0.75rem; color:#777; margin-top:6px;">Saves on this device. Sign in to keep it on all your devices.</p>
+        <button id="prefInstallAppBtnGuest" class="btn btn-outline btn-sm" style="margin-top:14px;" onclick="handleInstallClick()">Download / Install App</button>
+      </div>
+
+      <div id="profileClaimName" style="display:none;">
+        <div class="modal-title">Link Your Identity</div>
+        <p style="font-size:0.9rem; color:#aaa; margin-bottom:15px;">Search for your name to link your Google account to your league identity.</p>
+        <div class="player-input-wrap" style="position:relative;">
+          <input type="text" id="claimNameInput" class="player-input" placeholder="Start typing your name..." autocomplete="off" oninput="onClaimNameInput()">
+          <div id="claimNameSugg" class="player-suggestions" style="display:none; position:absolute; width:100%; z-index:1100; max-height:200px;"></div>
+        </div>
+        <button class="rsvp-btn" style="background:linear-gradient(135deg, #00ff88, #00cc66); color:#000; font-weight:bold; width:100%; margin-top:20px; border:none; padding:12px; border-radius:8px; cursor:pointer;" onclick="claimProfileName()">Link My Profile</button>
+      </div>
+
+        <div id="profileLoggedIn" style="display:none;">
+          <div class="modal-title">Your Profile</div>
+          <div style="background:#222; padding:12px; border-radius:8px; margin-bottom:15px;">
+            <div style="font-size:0.75rem; color:#888; text-transform:uppercase;">Linked Alliance Name</div>
+            <div style="font-size:1.1rem; color:#d4af37; font-weight:bold; margin-top:2px;" id="profileLinkedNameDisp">Loading...</div>
+            <button style="background:none; border:none; color:#55aaff; font-size:0.85rem; cursor:pointer; margin-top:10px; padding:0;" onclick="requestNameChange()">↳ Request Alias Change from Admin</button>
+          </div>
+
+          <div style="font-size:0.95rem; font-weight:bold; color:#eee; margin-top:20px;">Club Contact Email</div>
+          <div class="player-input-wrap" style="margin-top:8px;">
+            <input type="email" id="preferredEmail" class="player-input" placeholder="you@example.com" autocomplete="email" style="font-size:1rem;">
+          </div>
+          <div style="font-size:0.78rem; color:#888; margin-top:8px; line-height:1.45;">Used for league emails. Your sign-in email is kept separately for authentication.</div>
+          <button class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="savePreferredEmail()">Save Email</button>
+          
+          <div style="font-size:0.95rem; font-weight:bold; color:#eee; margin-top:20px;">Email Notifications</div>
+          <div class="checkbox-wrap">
+            <label><input type="checkbox" id="prefNewsletter" onchange="savePreferences()"> Weekly Newsletter Updates</label>
+            <label><input type="checkbox" id="prefReminders" onchange="savePreferences()"> Game Day Action Reminders</label>
+            <label><input type="checkbox" id="prefAnnouncements" onchange="savePreferences()"> Personalized Announcements</label>
+          </div>
+
+        <div style="font-size:0.95rem; font-weight:bold; color:#eee; margin-top:20px;">Device Preferences</div>
+        <div class="checkbox-wrap">
+          <label><input type="checkbox" id="prefPush" onchange="savePreferences()"> Receive Push Notifications</label>
+          <label><input type="checkbox" id="prefLargeText" onchange="toggleLargeText(this.checked)"> Larger Text (easier reading)</label>
+        </div>
+        <button id="prefInstallAppBtn" class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="handleInstallClick()">Download / Install App</button>
+
+        <button class="auth-btn" style="background:#2a1111; color:#ff5555; margin-top:25px; border:1px solid #552222;" onclick="logOut()">Log Out</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { PokerAPI, PlayerSearch, PokerSession, functions, db, auth, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, GoogleAuthProvider, setDoc, doc, collection, httpsCallable } from './firebase-api.js?v=13';
+    import { getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { seasonHasStarted, championName, championSeasonLabel, buildShowcaseHtml,
+             preloadChampionPhoto, championPhotoReady } from './champions-showcase.js?v=3';
+
+    // ── State ──
+    let allEvents = [];         // merged schedule events
+    let winnersMap = {};        // "YYYY-MM-DD_venuekey" → player name
+    let playerList = [];
+    let upcomingGames = [];
+    let standingsCache = {};
+    let rsvpLoaded = false;
+    let standingsLoaded = { 'Tight End': false, 'Wild Corgi': false };
+    // Week-one champion showcase: per-venue "has anyone played yet", plus the
+    // config/champions names. Auto-qualifiers seeded with 0 games don't count.
+    let seasonStarted = { 'Tight End': true, 'Wild Corgi': true };
+    let hallOfFame = {};
+    let standingsLoading = {};   // venue -> true while a getLeaderboard fetch is in flight
+    let standingsError = {};     // venue -> true if the last fetch failed
+    let compareCards = [];      // pinned player names shown as comparison cards
+    let currentPreviewName = null; // best match currently shown as a search preview
+    let compareHydratedUid = null; // uid we've already hydrated compare cards for
+
+    window.closeIosModal = function() {
+      document.getElementById('iosInstallModal').style.display = 'none';
+    }
+
+    // ── Auth State ──
+    let currentUser = null;
+    let currentProfile = null; // { linkedName, preferences }
+
+    // Flag: open the profile modal once auth state resolves (set when returning from Google redirect)
+    let openModalAfterAuth = false;
+    getRedirectResult(auth).then((result) => {
+      if (result?.user) openModalAfterAuth = true;
+    }).catch((err) => {
+      console.error('Google sign-in redirect error:', err.message);
+    });
+
+    // expose to global for onclick
+    window.switchTab = switchTab;
+    window.setStVenue = setStVenue;
+    window.setStType = setStType;
+    window.onStandingsSearch = onStandingsSearch;
+    window.submitRsvp = submitRsvp;
+    window.onRsvpNameInput = onRsvpNameInput;
+    window.selectRsvpPlayer = selectRsvpPlayer;
+    window.hideRsvpSugg = hideRsvpSugg;
+    window.toggleAddPlayer = toggleAddPlayer;
+    window.submitAddPlayer = submitAddPlayer;
+    window.openProfileModal = openProfileModal;
+    window.closeProfileModal = closeProfileModal;
+    window.signInWithGoogle = signInWithGoogle;
+    window.logOut = logOut;
+    window.onClaimNameInput = onClaimNameInput;
+    window.selectClaimName = selectClaimName;
+      window.claimProfileName = claimProfileName;
+      window.requestNameChange = requestNameChange;
+      window.savePreferences = savePreferences;
+      window.toggleLargeText = toggleLargeText;
+      window.savePreferredEmail = savePreferredEmail;
+      window.shareApp = shareApp;
+    window.openEventDetail = openEventDetail;
+    window.closeEventDetail = closeEventDetail;
+    window.clearRsvpName = clearRsvpName;
+    window.clearStandingsSearch = clearStandingsSearch;
+
+    // ══════════════════════════════════
+    // AUTHENTICATION & PROFILE
+    // ══════════════════════════════════
+
+    function updateProfileIcon(loggedIn) {
+      const btn = document.querySelector('[aria-label="Account Profile"]');
+      if (btn) btn.style.color = loggedIn ? '#00ff88' : '#d4af37';
+    }
+
+    function updateClearBtn(inputId, btnId) {
+      const btn = document.getElementById(btnId);
+      if (btn) btn.style.display = document.getElementById(inputId)?.value ? 'block' : 'none';
+    }
+
+    function clearRsvpName() {
+      document.getElementById('rsvp-name').value = '';
+      document.getElementById('rsvp-sugg').style.display = 'none';
+      document.getElementById('rsvp-name-clear').style.display = 'none';
+      document.getElementById('rsvp-name').focus();
+    }
+
+    function clearStandingsSearch() {
+      document.getElementById('standingsSearch').value = '';
+      document.getElementById('standings-clear').style.display = 'none';
+      document.getElementById('standingsSearch').focus();
+      renderStandingsView();
+    }
+
+    function applyAuthAutofill() {
+      if (!currentProfile?.linkedName) return;
+      const rsvpInput = document.getElementById('rsvp-name');
+      if (rsvpInput && !rsvpInput.value) {
+        rsvpInput.value = currentProfile.linkedName;
+        updateClearBtn('rsvp-name', 'rsvp-name-clear');
+      }
+      // The Standings tab no longer pre-fills the search box — the user's own
+      // card is auto-pinned to the compare list via hydrateCompareFromProfile().
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        try {
+          const snap = await getDoc(doc(db, 'userProfiles', user.uid));
+          currentProfile = snap.exists() ? snap.data() : null;
+          
+          if (currentProfile) {
+            document.getElementById('adminDoorBtn').style.display = currentProfile.isAdmin ? 'flex' : 'none';
+            document.getElementById('staffDoorBtn').style.display = (currentProfile.isStaff || currentProfile.isAdmin) ? 'flex' : 'none';
+          }
+        } catch(e) {
+          currentProfile = null;
+        }
+        updateProfileIcon(true);
+        applyAuthAutofill();
+        hydrateCompareFromProfile();
+        if (currentProfile?.preferences?.push) {
+          syncPushPreference().catch(() => {});
+        }
+        // Large-text device preference: hydrate from Firestore, but a local
+        // 'on' wins over a Firestore 'off' (device preference, not account-wide).
+        const localLargeText = (() => { try { return localStorage.getItem('allin_largeText') === '1'; } catch(e) { return false; } })();
+        const remoteLargeText = currentProfile?.preferences?.largeText;
+        if ((remoteLargeText === true && !localLargeText) || (remoteLargeText === false && localLargeText)) {
+          toggleLargeText(true).catch(() => {});
+        }
+        // Re-render modal if it's already open
+        const modal = document.getElementById('profileModal');
+        if (modal && modal.style.display === 'flex') renderProfileState();
+        // If we just came back from Google redirect, open the modal
+        if (openModalAfterAuth) {
+          openModalAfterAuth = false;
+          openProfileModal();
+        }
+      } else {
+        currentUser = null;
+        currentProfile = null;
+        compareHydratedUid = null;
+        document.getElementById('adminDoorBtn').style.display = 'none';
+        document.getElementById('staffDoorBtn').style.display = 'none';
+        updateProfileIcon(false);
+        const modal = document.getElementById('profileModal');
+        if (modal && modal.style.display === 'flex') renderProfileState();
+      }
+    });
+
+    function openProfileModal() {
+      document.getElementById('profileModal').style.display = 'flex';
+      renderProfileState();
+    }
+    function closeProfileModal() {
+      document.getElementById('profileModal').style.display = 'none';
+      document.getElementById('claimNameSugg').style.display = 'none';
+    }
+
+    function renderProfileState() {
+      document.getElementById('profileLoggedOut').style.display = 'none';
+      document.getElementById('profileClaimName').style.display = 'none';
+      document.getElementById('profileLoggedIn').style.display = 'none';
+
+      if (!currentUser) {
+        document.getElementById('profileLoggedOut').style.display = 'block';
+      } else if (!currentProfile || !currentProfile.linkedName) {
+        document.getElementById('profileClaimName').style.display = 'block';
+        document.getElementById('claimNameInput').value = '';
+        } else {
+          document.getElementById('profileLoggedIn').style.display = 'block';
+          document.getElementById('profileLinkedNameDisp').innerText = currentProfile.linkedName;
+          document.getElementById('preferredEmail').value = currentProfile.preferredEmail || currentProfile.email || '';
+          document.getElementById('prefNewsletter').checked = currentProfile.preferences?.newsletter || false;
+          document.getElementById('prefReminders').checked = currentProfile.preferences?.reminders || false;
+          document.getElementById('prefAnnouncements').checked = currentProfile.preferences?.announcements || false;
+          document.getElementById('prefPush').checked = currentProfile.preferences?.push || false;
+      }
+      document.getElementById('prefLargeText').checked = document.documentElement.classList.contains('large-text');
+      const guestLT = document.getElementById('prefLargeTextGuest');
+      if (guestLT) guestLT.checked = document.documentElement.classList.contains('large-text');
+
+      // Hide the install button once the app is already running as an installed PWA.
+      const alreadyInstalled = isPWA();
+      const installBtn = document.getElementById('prefInstallAppBtn');
+      const installBtnGuest = document.getElementById('prefInstallAppBtnGuest');
+      if (installBtn) installBtn.style.display = alreadyInstalled ? 'none' : 'block';
+      if (installBtnGuest) installBtnGuest.style.display = alreadyInstalled ? 'none' : 'block';
+    }
+
+    async function syncPushPreference({ interactive = false } = {}) {
+      if (!currentUser || !currentProfile) return;
+
+      if (!currentProfile.preferences?.push) {
+        await PokerAPI.disablePushNotifications().catch(() => {});
+        return;
+      }
+
+      try {
+        if (interactive) {
+          await PokerAPI.enablePushNotifications();
+        } else {
+          await PokerAPI.syncPushRegistration();
+        }
+      } catch (error) {
+        currentProfile.preferences.push = false;
+        const pushBox = document.getElementById('prefPush');
+        if (pushBox) pushBox.checked = false;
+        await setDoc(doc(db, 'userProfiles', currentUser.uid), {
+          preferences: currentProfile.preferences
+        }, { merge: true });
+        if (interactive) {
+          alert(error.message || 'Push notifications could not be enabled.');
+        }
+      }
+    }
+
+    async function signInWithGoogle() {
+      const provider = new GoogleAuthProvider();
+      try {
+        // Popup is more reliable than redirect in modern browsers.
+        // Falls back to redirect if popup is blocked (e.g. strict iOS Safari).
+        await signInWithPopup(auth, provider);
+        // onAuthStateChanged will fire and handle everything from here.
+      } catch (err) {
+        if (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user') {
+          // Popup was blocked — fall back to redirect flow
+          signInWithRedirect(auth, provider);
+        } else {
+          alert('Sign-in error: ' + (err.message || err.code));
+        }
+      }
+    }
+    async function logOut() {
+      await signOut(auth);
+      closeProfileModal();
+      alert('Successfully logged out.');
+    }
+
+    // -- Claim Name Logic --
+    function onClaimNameInput() {
+      const val = document.getElementById('claimNameInput').value.toLowerCase();
+      const sugg = document.getElementById('claimNameSugg');
+      if (!val) { sugg.style.display = 'none'; return; }
+      
+      const matches = PlayerSearch.rank(playerList, val, 5);
+      if (matches.length > 0) {
+        sugg.innerHTML = matches.map(m => `<div class="suggestion-item" onclick="selectClaimName('${escHtml(m)}')">${escHtml(m)}</div>`).join('');
+        sugg.style.display = 'block';
+      } else {
+        sugg.style.display = 'none';
+      }
+    }
+    function selectClaimName(name) {
+      document.getElementById('claimNameInput').value = name;
+      document.getElementById('claimNameSugg').style.display = 'none';
+    }
+      async function claimProfileName() {
+        const name = document.getElementById('claimNameInput').value.trim();
+        if (!name) return alert('Please select your name.');
+        if (!playerList.includes(name)) return alert('Name not found in roster. Please select from the dropdown.');
+        
+        const payload = {
+          uid: currentUser.uid,
+          email: currentUser.email,
+          linkedName: name,
+          preferredEmail: currentUser.email,
+          preferences: { newsletter: true, reminders: true, announcements: true, push: false }
+        };
+        
+        await setDoc(doc(db, 'userProfiles', currentUser.uid), payload, { merge: true });
+        const emailResult = await PokerAPI.updatePlayerEmail({
+          player: name,
+          email: currentUser.email,
+          onlyIfMissing: true,
+          source: 'account_link'
+        });
+        payload.preferredEmail = emailResult.email || payload.preferredEmail;
+        await setDoc(doc(db, 'userProfiles', currentUser.uid), { preferredEmail: payload.preferredEmail }, { merge: true });
+        currentProfile = payload;
+        applyAuthAutofill();
+        compareHydratedUid = null;   // force re-hydrate now that a name is linked (auto-seed own card)
+        hydrateCompareFromProfile();
+        renderProfileState();
+      }
+
+    function requestNameChange() {
+      alert("Please see the Tournament Director at the venue to request an Alias Change. This prevents unauthorized identity swapping.");
+    }
+
+      async function savePreferences() {
+        if (!currentUser || !currentProfile) return;
+        currentProfile.preferences = {
+          ...(currentProfile.preferences || {}),   // keep pinnedCards + any other prefs
+          newsletter: document.getElementById('prefNewsletter').checked,
+          reminders: document.getElementById('prefReminders').checked,
+          announcements: document.getElementById('prefAnnouncements').checked,
+          push: document.getElementById('prefPush').checked
+        };
+        await setDoc(doc(db, 'userProfiles', currentUser.uid), { preferences: currentProfile.preferences }, { merge: true });
+        await syncPushPreference({ interactive: currentProfile.preferences.push });
+      }
+
+      async function toggleLargeText(on) {
+        document.documentElement.classList.toggle('large-text', on);
+        try { localStorage.setItem('allin_largeText', on ? '1' : '0'); } catch(e) {}
+
+        if (currentUser && currentProfile?.linkedName) {
+          currentProfile.preferences = {
+            ...(currentProfile.preferences || {}),
+            largeText: on
+          };
+          await setDoc(doc(db, 'userProfiles', currentUser.uid), { preferences: currentProfile.preferences }, { merge: true });
+        }
+      }
+
+      async function savePreferredEmail() {
+        if (!currentUser || !currentProfile?.linkedName) return;
+        const input = document.getElementById('preferredEmail');
+        const preferredEmail = input.value.trim().toLowerCase();
+
+        if (!preferredEmail) return alert('Enter an email address first.');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(preferredEmail)) {
+          return alert('Please enter a valid email address.');
+        }
+
+        let result;
+        try {
+          result = await PokerAPI.updatePlayerEmail({
+            player: currentProfile.linkedName,
+            email: preferredEmail,
+            source: 'profile_edit'
+          });
+        } catch (e) {
+          // permission-denied: the server would not let this account change the
+          // club's contact email for that name (see updatePlayerEmail).
+          return alert(e && e.code === 'functions/permission-denied'
+            ? 'Your contact email was not changed. Please see the Tournament Director.'
+            : 'Could not save your contact email. Please try again.');
+        }
+        currentProfile.preferredEmail = result.email || preferredEmail;
+        await setDoc(doc(db, 'userProfiles', currentUser.uid), { preferredEmail: currentProfile.preferredEmail }, { merge: true });
+        input.value = currentProfile.preferredEmail;
+        alert('Contact email saved.');
+      }
+
+    // ══════════════════════════════════
+    // TAB SWITCHING
+    // ══════════════════════════════════
+    function switchTab(name) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      const el = document.getElementById('tab-' + name);
+      el.classList.add('active');
+      el.scrollTop = 0;
+      document.querySelectorAll('.tab-btn')[['calendar','rsvp','standings'].indexOf(name)].classList.add('active');
+
+      if (name === 'calendar' && allEvents.length === 0) loadCalendar();
+      if (name === 'rsvp' && !rsvpLoaded) { loadRsvpTab(); rsvpLoaded = true; }
+      if (name === 'standings') {
+        // Pre-load both venues so switching is instant
+        if (!standingsLoaded['Tight End']) loadStandings('Tight End');
+        if (!standingsLoaded['Wild Corgi']) loadStandings('Wild Corgi');
+        loadHighHands();
+        renderStandingsView(); // reflect compare cards immediately, even before data lands
+      }
+    }
+
+    // Shared Schedule Cache
+    let schedulePromise = null;
+    function fetchScheduleData() {
+      if (!schedulePromise) {
+        schedulePromise = Promise.all([
+          PokerAPI.getSchedule({ historical: false }).then(r => r.schedule || []),
+          PokerAPI.getSchedule({ historical: true }).then(r => r.schedule || [])
+        ]);
+      }
+      return schedulePromise;
+    }
+
+    // ══════════════════════════════════
+    // CALENDAR
+    // ══════════════════════════════════
+    let showAllHistory = false;
+    let fullScheduleRaw = { future: [], pastRaw: [] };
+
+    window.loadEarlierGames = function() {
+      showAllHistory = true;
+      processAndRenderCalendar();
+    };
+
+    async function loadCalendar() {
+      try {
+        const [future, pastRaw] = await fetchScheduleData();
+        fullScheduleRaw = { future: future || [], pastRaw: pastRaw || [] };
+        
+        await loadWinners();
+        processAndRenderCalendar();
+      } catch (err) {
+        document.getElementById('calendarContent').innerHTML =
+          `<div class="spinner" style="color:#555;">Could not load schedule.<br><small>${err.message}</small></div>`;
+      }
+    }
+
+    function processAndRenderCalendar() {
+      const { future, pastRaw } = fullScheduleRaw;
+
+      // Limit past to last ~14 days if not showing all
+      let past = pastRaw;
+      if (!showAllHistory) {
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - 14);
+        past = pastRaw.filter(e => new Date(e.date) >= cutoff);
+      }
+
+      // Merge and deduplicate by date+location
+      const seen = new Set();
+      allEvents = [];
+      [...past, ...future].forEach(e => {
+        const key = e.date + '_' + (e.location || '');
+        if (!seen.has(key)) { seen.add(key); allEvents.push(e); }
+      });
+      allEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      renderCalendar();
+    }
+
+    async function loadWinners() {
+      try {
+        const fn = httpsCallable(functions, 'getWinners');
+        const res = await fn({});
+        const w = res.data.winners || {};
+        Object.assign(winnersMap, w);
+      } catch (e) { /* silently skip if unavailable */ }
+    }
+
+    function normalizeToYMD(dateStr) {
+      const d = new Date(dateStr);
+      return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    }
+
+    function renderCalendar() {
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const todayStr = normalizeToYMD(today);
+
+      let html = '';
+      let lastMonth = '';
+      let todayAnchor = null;
+
+      // Inject Load Historical button at the absolute top of the calendar
+      if (!showAllHistory && fullScheduleRaw.pastRaw.length > 0) {
+        html += `<button onclick="loadEarlierGames()" style="width:100%; padding:14px; margin-bottom: 20px; font-size:1rem; border-radius:12px; background:#1a1a1a; border:2px dashed #333; color:#d4af37; cursor:pointer;" onmouseover="this.style.background='#222'" onmouseout="this.style.background='#1a1a1a'">⏳ Load Older Games</button>`;
+      }
+
+      allEvents.forEach((ev, idx) => {
+        const dt = new Date(ev.date);
+        dt.setHours(12,0,0,0); // avoid DST issues
+        const ymd = normalizeToYMD(ev.date);
+        const isPast = dt < today;
+        const isToday = ymd === todayStr;
+
+        const monthLabel = dt.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        if (monthLabel !== lastMonth) {
+          html += `<div class="month-header">${monthLabel}</div>`;
+          lastMonth = monthLabel;
+        }
+
+        const dayNum = dt.getDate();
+        const dayName = dt.toLocaleDateString('en-US', { weekday: 'short' });
+        const venue = ev.location || 'TBD';
+        const type = ev.type || 'Regular';
+        const theme = ev.theme || '';
+
+        // Winner: check both game 1 and game 2
+        const w1 = winnersMap[ymd + '_1'];
+        const w2 = winnersMap[ymd + '_2'];
+
+        const typeBadge = type.toLowerCase().includes('championship')
+          ? `<span class="badge badge-championship">Championship</span>`
+          : `<span class="badge badge-regular">Regular</span>`;
+        const venueBadge = venue.toLowerCase().includes('tight')
+          ? `<span class="badge badge-te">Tight End</span>`
+          : venue.toLowerCase().includes('corgi')
+            ? `<span class="badge badge-wc">Wild Corgi</span>`
+            : ``;
+
+        const cardId = isToday ? 'today-anchor' : '';
+        const hasDetail = ev.image || ev.description || ev.title || ev.facebookEventUrl;
+        const clickAttr = hasDetail ? ` onclick="openEventDetail(${idx})"` : '';
+        html += `
+          <div class="event-card ${isPast ? 'past' : ''} ${isToday ? 'today' : ''}" id="${cardId}"${clickAttr}>
+            <div class="event-date-block">
+              <div class="event-day-num">${dayNum}</div>
+              <div class="event-day-name">${dayName}</div>
+            </div>
+            <div class="event-info">
+              <div class="event-venue">${escHtml(venue)}</div>
+              <div class="event-type-row">${typeBadge}${venueBadge}</div>
+              ${theme ? `<div class="event-theme">${escHtml(theme)}</div>` : ''}
+              ${w1 ? `<div class="event-winner">${escHtml(w1)} <span style="color:#888;font-size:0.7rem;">(${type.toLowerCase().includes('championship') ? 'Bounty' : 'Game 1'})</span></div>` : ''}
+              ${w2 ? `<div class="event-winner">${escHtml(w2)} <span style="color:#888;font-size:0.7rem;">(${type.toLowerCase().includes('championship') ? 'Championship' : 'Game 2'})</span></div>` : ''}
+            </div>
+          </div>`;
+      });
+
+      if (!allEvents.length) {
+        html = '<div class="spinner" style="color:#444;">No events found.</div>';
+      }
+
+      document.getElementById('calendarContent').innerHTML = html;
+
+      // Scroll to today
+      const anchor = document.getElementById('today-anchor');
+      if (anchor) {
+        setTimeout(() => anchor.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+      }
+    }
+
+    // ── Event Detail Modal ──
+    function openEventDetail(idx) {
+      const ev = allEvents[idx];
+      if (!ev) return;
+      const dt = new Date(ev.date); dt.setHours(12,0,0,0);
+      const ymd = normalizeToYMD(ev.date);
+      const dateStr = dt.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+      const venue = ev.location || 'TBD';
+      const type = ev.type || 'Regular';
+      const theme = ev.title || ev.theme || '';
+      const desc = ev.description || '';
+      const img = ev.image || '';
+      const fbUrl = ev.facebookEventUrl || '';
+      const isChamp = type.toLowerCase().includes('championship');
+      const w1 = winnersMap[ymd + '_1'];
+      const w2 = winnersMap[ymd + '_2'];
+
+      const typeBadge = isChamp
+        ? `<span class="badge badge-championship">Championship</span>`
+        : `<span class="badge badge-regular">Regular</span>`;
+      const venueBadge = venue.toLowerCase().includes('tight')
+        ? `<span class="badge badge-te">Tight End</span>`
+        : venue.toLowerCase().includes('corgi')
+          ? `<span class="badge badge-wc">Wild Corgi</span>` : '';
+
+      let html = '';
+      if (img) html += `<img class="event-modal-img" src="${img}" alt="${escHtml(theme)}">`;
+      html += `<div class="event-modal-date">${dateStr}</div>`;
+      if (theme) html += `<div class="event-modal-name">${escHtml(theme)}</div>`;
+      html += `<div class="event-modal-venue">${escHtml(venue)}</div>`;
+      html += `<div class="event-modal-badges">${typeBadge}${venueBadge}</div>`;
+      if (desc) html += `<div class="event-modal-desc">${escHtml(desc)}</div>`;
+      if (w1 || w2) {
+        html += `<div class="event-modal-winners">`;
+        if (w1) html += `<div class="event-modal-winner">${escHtml(w1)} <span style="color:#888;font-size:0.75rem;">(${isChamp ? 'Bounty' : 'Game 1'})</span></div>`;
+        if (w2) html += `<div class="event-modal-winner">${escHtml(w2)} <span style="color:#888;font-size:0.75rem;">(${isChamp ? 'Championship' : 'Game 2'})</span></div>`;
+        html += `</div>`;
+      }
+      if (fbUrl) {
+        html += `<a href="${fbUrl}" target="_blank" rel="noopener noreferrer" class="event-modal-fb">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          View Facebook Event
+        </a>`;
+      }
+
+      document.getElementById('eventDetailBody').innerHTML = html;
+      document.getElementById('eventDetailModal').style.display = 'flex';
+    }
+    function closeEventDetail() {
+      document.getElementById('eventDetailModal').style.display = 'none';
+    }
+
+    // ══════════════════════════════════
+    // RSVP
+    // ══════════════════════════════════
+    async function loadRsvpTab() {
+      // Fetch player list and schedule concurrently
+      try {
+        const [plData, schData] = await Promise.all([
+          PokerAPI.getPlayerList().then(r => r.players || []),
+          fetchScheduleData()
+        ]);
+        playerList = plData;
+        // Merge into allEvents if not already loaded
+        if (!allEvents.length) {
+          const future = schData[0]; // Index 0 is future schedule
+          future.forEach(e => {
+            const key = e.date + '_' + (e.location || '');
+            if (!allEvents.find(x => x.date + '_' + (x.location||'') === key)) allEvents.push(e);
+          });
+          allEvents.sort((a, b) => new Date(a.date) - new Date(b.date));
+        }
+      } catch(e) {}
+
+      // Apply auth autofill now that the RSVP input exists in the DOM
+      applyAuthAutofill();
+      renderRsvpGames();
+    }
+
+    // ── Self check-in phase ──
+    // Which game the venue is taking phone check-ins for right now:
+    //   before  … < 5:00pm   game1  5:00–7:45pm
+    //   pause   7:45–8:30pm  game2  8:30–11:00pm   after … >= 11:00pm
+    // Every check-in decision derives from this so there is one clock, not five.
+    //
+    // 7:45 is deliberate and must stay in lockstep with getWindowState() in
+    // checkin.html — the kiosk holds Game 1 open through 7:45 too. An earlier
+    // 7:40 cutoff here meant a player's phone said "closed" while the kiosk in
+    // front of them still accepted. If you're inside the geofence by 7:45,
+    // you're in.
+    function getCheckinPhase(now = new Date()) {
+      const t = now.getHours() * 60 + now.getMinutes();
+      if (t < 17 * 60) return 'before';
+      if (t <= 19 * 60 + 45) return 'game1';
+      if (t < 20 * 60 + 30) return 'pause';
+      if (t < 23 * 60) return 'game2';
+      return 'after';
+    }
+
+    // The game a check-in lands in for a given phase. During the pause the
+    // answer is still Game 1 — Game 1 is closed but Game 2 hasn't opened yet.
+    function phaseGameNum(phase) { return phase === 'game2' ? '2' : '1'; }
+
+    // "game_0_1" → true once that card has checked into that game this session.
+    // Keeps the confirmation on screen across a phase re-render.
+    let selfCheckinDone = {};
+
+    // Rendered fresh on every phase flip, so a phone left open on Game 1 gets
+    // the Game 2 button at 8:30 instead of a stuck success message.
+    function renderSelfCheckinBlock(id, game, type, isChampWeek, phase) {
+      const gameNum = phaseGameNum(phase);
+      const done1 = !!selfCheckinDone[id + '_1'];
+      const done2 = !!selfCheckinDone[id + '_2'];
+      const doneNow = gameNum === '2' ? done2 : done1;
+      // Championship nights let you pick either game at any time, so the button
+      // only retires once both are done.
+      const allDone = isChampWeek ? (done1 && done2) : doneNow;
+
+      // Championship nights list each game separately so a player who is in
+      // one game can see they still need the other.
+      let panelHtml = '';
+      if (isChampWeek) {
+        if (done1) panelHtml += `<div style="color:#00ff88; font-weight:bold;">✓ You're checked into ${escHtml(getRsvpConfirmationLabel('1', type))}.</div>`;
+        if (done2) panelHtml += `<div style="color:#00ff88; font-weight:bold;">✓ You're checked into ${escHtml(getRsvpConfirmationLabel('2', type))}.</div>`;
+        if ((done1 || done2) && !allDone) panelHtml += `<div style="color:#888; font-size:0.8rem; margin-top:4px;">Tap Self Check-In again to add the other game.</div>`;
+      } else if (doneNow) {
+        panelHtml = `<div style="color:#00ff88; font-weight:bold;">✓ You're checked into ${escHtml(getRsvpConfirmationLabel(gameNum, type))}.</div>`;
+      }
+      const panel = `<div id="checkin_ui_${id}" style="display:${panelHtml ? 'block' : 'none'}; padding: 10px; background: #222; border-radius: 8px; margin-bottom: 15px; text-align: center; border: 1px solid #444;">${panelHtml}</div>`;
+
+      let button = '';
+      if (allDone) {
+        button = '';
+      } else if (phase === 'pause' && !isChampWeek) {
+        button = `<button class="rsvp-btn" style="background:#555; color:#bbb; font-weight:bold; margin-bottom: 15px; width: 100%; border:none; padding:16px; cursor:not-allowed; opacity:0.75;" disabled>Game 2 check-in opens at 8:30 PM</button>`;
+      } else {
+        button = `<button id="geofence_btn_${id}" onclick="startSelfCheckIn('${id}', '${game.date}', '${escHtml(game.location)}', ${isChampWeek}, '${type}')" class="rsvp-btn" style="background:linear-gradient(135deg, #00ff88, #00cc66); color:#000; font-weight:bold; margin-bottom: 15px; width: 100%; border:none; padding:16px;">📍 Self Check-In (At Venue)</button>`;
+      }
+      return panel + button;
+    }
+
+    // The RSVP tab used to render once at page load, so the check-in button was
+    // a snapshot of whatever time the app happened to open. Re-render the cards
+    // whenever the phase flips — ticker for a live tab, visibilitychange for a
+    // PWA resumed from the background (where timers get frozen).
+    let lastCheckinPhase = getCheckinPhase();
+    function syncCheckinPhase() {
+      const phase = getCheckinPhase();
+      if (phase === lastCheckinPhase) return;
+      lastCheckinPhase = phase;
+      if (rsvpLoaded) renderRsvpGames();
+    }
+    setInterval(syncCheckinPhase, 30000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) syncCheckinPhase(); });
+
+    function renderRsvpGames() {
+      const today = new Date(); today.setHours(0,0,0,0);
+      
+      // Get next upcoming game for Tight End
+      const teGame = allEvents.find(e => {
+        const dt = new Date(e.date); dt.setHours(12,0,0,0);
+        return dt >= today && (e.location || '').toLowerCase().includes('tight');
+      });
+
+      // Get next upcoming game for Wild Corgi
+      const wcGame = allEvents.find(e => {
+        const dt = new Date(e.date); dt.setHours(12,0,0,0);
+        return dt >= today && (e.location || '').toLowerCase().includes('corgi');
+      });
+
+      const games = [teGame, wcGame].filter(Boolean);
+
+      if (!games.length) {
+        document.getElementById('rsvpContent').innerHTML =
+          `<div class="no-games">No upcoming games scheduled.</div>`;
+        return;
+      }
+
+      let html = '';
+      games.forEach((game, gi) => {
+        const dt = new Date(game.date);
+        const dateLabel = dt.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+        const type = (game.type || 'Regular').toLowerCase();
+        const isChampWeek = type.includes('championship') || type.includes('big stack');
+        const game1Label = type.includes('big stack') ? 'Big Stack Tournament' : 'Bounty';
+        const game2Label = type.includes('big stack') ? 'Consolation' : 'Championship';
+        const theme = game.theme || '';
+        const venue = game.location || '';
+        const id = `game_${gi}`;
+
+        const isTodayGame = dt.getTime() === today.getTime();
+        const checkinPhase = getCheckinPhase();
+        const isCheckinWindow = isTodayGame && checkinPhase !== 'before' && checkinPhase !== 'after';
+
+        const rsvpBtns = isChampWeek ? `
+          <div style="font-size:0.7rem;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;">Game 1 — Bounty</div>
+          <div class="rsvp-btns" style="margin-bottom:10px;">
+            <button class="rsvp-btn rsvp-btn-g1" onclick="submitRsvp('${id}','${game.date}','1','${venue}','active', '${type}')">✓ I'm In</button>
+            <button class="rsvp-btn rsvp-btn-decline" onclick="submitRsvp('${id}','${game.date}','1','${venue}','declined', '${type}')">✗ Can't Make It</button>
+          </div>
+          <div style="font-size:0.7rem;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;">Game 2 — Championship</div>
+          <div class="rsvp-btns">
+            <button class="rsvp-btn rsvp-btn-g2" onclick="submitRsvp('${id}','${game.date}','2','${venue}','active', '${type}')">✓ I'm In</button>
+            <button class="rsvp-btn rsvp-btn-decline" onclick="submitRsvp('${id}','${game.date}','2','${venue}','declined', '${type}')">✗ Can't Make It</button>
+          </div>` : `
+          <div class="rsvp-btns">
+            <button class="rsvp-btn rsvp-btn-g1" onclick="submitRsvp('${id}','${game.date}','1','${venue}','active', '${type}')">Game 1</button>
+            <button class="rsvp-btn rsvp-btn-g2" onclick="submitRsvp('${id}','${game.date}','2','${venue}','active', '${type}')">Game 2</button>
+            <button class="rsvp-btn rsvp-btn-both" onclick="submitRsvp('${id}','${game.date}','both','${venue}','active', '${type}')">Both</button>
+            <button class="rsvp-btn rsvp-btn-decline" onclick="submitRsvp('${id}','${game.date}','both','${venue}','declined', '${type}')">✗ Can't Make It</button>
+          </div>`;
+
+        const labeledRsvpBtns = isChampWeek
+          ? rsvpBtns.replace('Bounty', game1Label).replace('Championship', game2Label)
+          : rsvpBtns;
+
+        const btns = isCheckinWindow
+          ? renderSelfCheckinBlock(id, game, type, isChampWeek, checkinPhase) + labeledRsvpBtns
+          : labeledRsvpBtns;
+
+        html += `
+          <div class="game-card">
+            <div class="game-card-header">
+              <div style="flex:1;">
+                <div class="game-date-label" style="color:var(--accent-gold);">${venue}</div>
+                <div class="game-subtitle" style="font-size:0.9rem; color:#fff; font-weight:700; margin-top:2px;">${dateLabel}</div>
+                <div class="game-subtitle" style="color:#666; font-size:0.75rem; margin-top:4px;">${game.type || 'Regular'}${theme ? ' · ' + theme : ''}</div>
+              </div>
+            </div>
+            ${btns}
+            <div id="status_${id}" class="rsvp-status" style="display:none;"></div>
+          </div>`;
+      });
+
+      document.getElementById('rsvpContent').innerHTML = html;
+    }
+
+    function onRsvpNameInput() {
+      updateClearBtn('rsvp-name', 'rsvp-name-clear');
+      const val = document.getElementById('rsvp-name').value.trim().toLowerCase();
+      const suggEl = document.getElementById('rsvp-sugg');
+      if (val.length < 2 || !playerList.length) { suggEl.style.display = 'none'; return; }
+      const matches = PlayerSearch.rank(playerList, val, 8);
+      if (!matches.length) { suggEl.style.display = 'none'; return; }
+      suggEl.innerHTML = matches.map(p =>
+        `<div class="suggestion-item" onmousedown="selectRsvpPlayer('${p.replace(/'/g,"\\'")}')">
+          ${escHtml(p)}
+        </div>`).join('');
+      suggEl.style.display = 'block';
+    }
+
+    function selectRsvpPlayer(name) {
+      document.getElementById('rsvp-name').value = name;
+      document.getElementById('rsvp-sugg').style.display = 'none';
+    }
+
+    function hideRsvpSugg() {
+      const el = document.getElementById('rsvp-sugg');
+      if (el) el.style.display = 'none';
+    }
+
+    function toggleAddPlayer() {
+      const panel = document.getElementById('add-player-panel');
+      const open = panel.style.display !== 'none';
+      panel.style.display = open ? 'none' : 'block';
+      if (!open) {
+        document.getElementById('new-player-name').value = '';
+        const st = document.getElementById('add-player-status');
+        st.style.display = 'none';
+        setTimeout(() => document.getElementById('new-player-name').focus(), 50);
+      }
+    }
+
+    async function submitAddPlayer() {
+      const name = document.getElementById('new-player-name').value.trim();
+      const statusEl = document.getElementById('add-player-status');
+      if (!name) {
+        statusEl.className = 'rsvp-status error';
+        statusEl.textContent = 'Please enter a name.';
+        statusEl.style.display = 'block';
+        return;
+      }
+      statusEl.className = 'rsvp-status';
+      statusEl.textContent = 'Adding…';
+      statusEl.style.display = 'block';
+      try {
+        const fn = httpsCallable(functions, 'addPlayer');
+        await fn({ name });
+        if (!playerList.includes(name)) playerList.push(name);
+        playerList.sort((a, b) => a.localeCompare(b));
+        document.getElementById('rsvp-name').value = name;
+        statusEl.className = 'rsvp-status success';
+        statusEl.textContent = `✓ ${name} added! You can now RSVP below.`;
+        setTimeout(toggleAddPlayer, 1800);
+      } catch (err) {
+        statusEl.className = 'rsvp-status error';
+        statusEl.textContent = err.message || 'Something went wrong.';
+      }
+    }
+
+    function getRsvpConfirmationLabel(gameNum, eventType = '') {
+      const normalizedType = String(eventType || '').toLowerCase();
+      if (gameNum === 'both') return 'both games';
+      if (normalizedType.includes('big stack')) return gameNum === '1' ? 'Big Stack Tournament' : 'Consolation';
+      if (normalizedType.includes('championship')) return gameNum === '1' ? 'Bounty' : 'Championship';
+      return gameNum === '1' ? 'Game 1' : 'Game 2';
+    }
+
+    async function submitRsvp(id, date, gameNum, venue, status, eventType = '') {
+      const player = document.getElementById('rsvp-name').value.trim();
+      if (!player) {
+        showRsvpStatus(id, 'error', 'Enter your name at the top first.');
+        return;
+      }
+      const statusEl = document.getElementById('status_' + id);
+      statusEl.className = 'rsvp-status';
+      statusEl.textContent = 'Saving…';
+      statusEl.style.display = 'block';
+
+      try {
+        const fn = httpsCallable(functions, 'rsvp');
+        const result = await fn({ player, date, gameNum, venue, status });
+        const msg = status === 'declined'
+          ? `Got it — marked as can't make it.`
+          : `✓ RSVP confirmed for ${getRsvpConfirmationLabel(gameNum, eventType)}!`;
+        showRsvpStatus(id, 'success', msg);
+      } catch (err) {
+        showRsvpStatus(id, 'error', err.message || 'Something went wrong.');
+      }
+    }
+
+    function showRsvpStatus(id, type, msg) {
+      const el = document.getElementById('status_' + id);
+      el.className = 'rsvp-status ' + type;
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    // ══════════════════════════════════
+    // STANDINGS
+    // ══════════════════════════════════
+    let stVenue = 'Tight End';
+    let stType = 'bounty';  // 'championship' | 'bounty'
+
+    async function checkAnnouncements() {
+      try {
+        const posts = await PokerAPI.getAnnouncements(1);
+        if (posts.length > 0) {
+          const latestId = posts[0].id;
+          const lastViewed = localStorage.getItem('lastAnnId');
+          if (latestId !== lastViewed) {
+            // The FAB may be in "shots" mode, where its innerHTML is rewritten
+            // and #notiDot no longer exists — guard so this stays a safe no-op
+            // (state is recomputed when the bell is restored to 'noti' mode).
+            const dot = document.getElementById('notiDot');
+            if (dot) dot.style.display = 'block';
+            const btn = document.getElementById('notiBtn');
+            if (btn) btn.style.color = '#d4af37';
+          }
+        }
+      } catch (e) {}
+    }
+
+    window.handleNotificationClick = function() {
+      // Clear dot
+      document.getElementById('notiDot').style.display = 'none';
+      document.getElementById('notiBtn').style.color = '#888';
+      // Mark as read
+      PokerAPI.getAnnouncements(1).then(posts => {
+        if (posts.length > 0) localStorage.setItem('lastAnnId', posts[0].id);
+      });
+      // Navigate
+      window.location.href = '/announcements.html';
+    }
+
+    // ── Shots shortcut: on game nights, the notification FAB becomes a discreet
+    //    "Shots" button from 6:30–9:50 PM. Notifications stay reachable via the
+    //    bell on the shots page itself. ───────────────────────────────────────
+    let notiFabHTML = null;     // captured bell markup (with dot) for restore
+    let shotsFabMode = 'noti';  // 'noti' | 'shots'
+    let shotsFabGameTonight = null, shotsFabDay = null;
+
+    function setShotsFabMode(mode) {
+      const btn = document.getElementById('notiBtn');
+      if (!btn || shotsFabMode === mode) return;
+      if (notiFabHTML === null) notiFabHTML = btn.innerHTML;
+      shotsFabMode = mode;
+      if (mode === 'shots') {
+        btn.innerHTML = '<span style="font-size:1.5rem;line-height:1">🥃</span>';
+        btn.style.color = '#d4af37';
+        btn.style.background = 'rgba(212,175,55,0.16)';
+        btn.style.borderColor = 'rgba(212,175,55,0.5)';
+        btn.setAttribute('aria-label', 'Order a shot round');
+        btn.onclick = () => { window.location.href = '/shots.html'; };
+      } else {
+        btn.innerHTML = notiFabHTML;
+        btn.style.color = '#888';
+        btn.style.background = '#1a1a1a';
+        btn.style.borderColor = '#2a2a2a';
+        btn.setAttribute('aria-label', 'Announcements');
+        btn.onclick = () => window.handleNotificationClick();
+        checkAnnouncements(); // restore unread-dot state
+      }
+    }
+
+    async function isGameTonight() {
+      const day = PokerSession.todayStr();
+      if (shotsFabDay === day && shotsFabGameTonight !== null) return shotsFabGameTonight;
+      try {
+        const { entries } = await PokerSession.getTonight();
+        shotsFabGameTonight = entries.length > 0;
+      } catch (e) { shotsFabGameTonight = false; }
+      shotsFabDay = day;
+      return shotsFabGameTonight;
+    }
+
+    async function updateShotsFab() {
+      // On any game night (Tue/Thu) the Shots shortcut replaces the notification
+      // FAB ALL DAY — the league wants ordering reachable the whole day, not just
+      // in an evening window. Notifications stay reachable via the bell on the
+      // shots page itself.
+      const game = await isGameTonight();
+      setShotsFabMode(game ? 'shots' : 'noti');
+    }
+
+    const notiBtnEl = document.getElementById('notiBtn');
+    if (notiBtnEl) notiFabHTML = notiBtnEl.innerHTML;
+    updateShotsFab();
+    setInterval(updateShotsFab, 60000); // re-checks in case tonight's schedule loads late
+
+    // ── Recent notification cards in RSVP tab ───────────────────
+    function getDismissedNotiIds() {
+      try { return new Set(JSON.parse(localStorage.getItem('dismissedNotiIds') || '[]')); }
+      catch { return new Set(); }
+    }
+    function saveDismissedNotiIds(set) {
+      localStorage.setItem('dismissedNotiIds', JSON.stringify([...set]));
+    }
+
+    function notiTypeIcon(type) {
+      switch ((type || '').toLowerCase()) {
+        case 'alert': return '🚨';
+        case 'promo': return '🎉';
+        case 'event': return '📅';
+        default:      return '📢';
+      }
+    }
+
+    function notiRelativeAge(ts) {
+      if (!ts) return '';
+      const ms = ts.toDate ? ts.toDate() : new Date(ts);
+      const diff = Date.now() - ms.getTime();
+      const m = Math.floor(diff / 60000);
+      if (m < 60)  return m <= 1 ? 'Just now' : `${m}m ago`;
+      const h = Math.floor(m / 60);
+      if (h < 24)  return `${h}h ago`;
+      const d = Math.floor(h / 24);
+      if (d < 7)   return `${d}d ago`;
+      return ms.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    async function loadRecentNotiCards() {
+      try {
+        const posts = await PokerAPI.getAnnouncements(10);
+        const dismissed = getDismissedNotiIds();
+        const visible = posts.filter(p => !dismissed.has(p.id)).slice(0, 5);
+        const strip  = document.getElementById('recentNotiStrip');
+        const cards  = document.getElementById('recentNotiCards');
+        if (!visible.length) { strip.style.display = 'none'; return; }
+        cards.innerHTML = visible.map(p => `
+          <div class="noti-card type-${(p.type||'info').toLowerCase()}" onclick="window.location.href='/announcements.html'" data-id="${p.id}">
+            <span class="noti-card-icon">${notiTypeIcon(p.type)}</span>
+            <div class="noti-card-body">
+              <div class="noti-card-title">${p.title || 'Announcement'}</div>
+              <div class="noti-card-age">${notiRelativeAge(p.createdAt)}</div>
+            </div>
+            <button class="noti-card-dismiss" onclick="dismissNotiCard(event,'${p.id}')" aria-label="Dismiss">✕</button>
+          </div>`).join('');
+        strip.style.display = 'block';
+      } catch (e) {}
+    }
+
+    window.dismissNotiCard = function(e, id) {
+      e.stopPropagation();
+      const card = document.querySelector(`.noti-card[data-id="${id}"]`);
+      if (card) {
+        card.style.transition = 'opacity 0.2s, max-height 0.25s, margin 0.25s, padding 0.25s';
+        card.style.opacity = '0';
+        card.style.maxHeight = card.offsetHeight + 'px';
+        requestAnimationFrame(() => {
+          card.style.maxHeight = '0';
+          card.style.marginBottom = '0';
+          card.style.padding = '0';
+          card.style.overflow = 'hidden';
+        });
+        setTimeout(() => {
+          card.remove();
+          const remaining = document.querySelectorAll('.noti-card').length;
+          if (!remaining) document.getElementById('recentNotiStrip').style.display = 'none';
+        }, 280);
+      }
+      const dismissed = getDismissedNotiIds();
+      dismissed.add(id);
+      saveDismissedNotiIds(dismissed);
+    }
+
+    async function loadHighHands() {
+      try {
+        const hands = await PokerAPI.getHighHands();
+        const te = hands['Tight End'];
+        const wc = hands['Wild Corgi'];
+        
+        let html = '';
+        const venues = [
+          { name: 'Tight End', data: te },
+          { name: 'Wild Corgi', data: wc }
+        ];
+
+        venues.forEach(v => {
+          if (v.data && v.data.player) {
+            html += `
+              <div class="hh-row">
+                <div class="hh-venue">${v.name}</div>
+                <div class="hh-player">${escHtml(v.data.player)}</div>
+                <div class="hh-hand">${escHtml(v.data.hand)}</div>
+                <div class="hh-pot">${v.data.pot || '0'}</div>
+              </div>
+            `;
+          } else {
+            html += `
+              <div class="hh-row">
+                <div class="hh-venue">${v.name}</div>
+                <div class="hh-empty">No Current Leader</div>
+              </div>
+            `;
+          }
+        });
+        document.getElementById('hhContent').innerHTML = html;
+      } catch (e) {
+        console.error('HH Load Error:', e);
+      }
+    }
+
+    function setStVenue(v) {
+      stVenue = v;
+      document.getElementById('stTE').classList.toggle('active', v === 'Tight End');
+      document.getElementById('stWC').classList.toggle('active', v === 'Wild Corgi');
+      document.getElementById('breakdownLink').href = `/stats.html?venue=${encodeURIComponent(v)}`;
+      if (!standingsLoaded[v]) loadStandings(v);
+      else renderStandingsView();
+    }
+
+    function setStType(t) {
+      stType = t;
+      document.getElementById('stChamp').classList.toggle('active', t === 'championship');
+      document.getElementById('stBounty').classList.toggle('active', t === 'bounty');
+      renderStandingsView();
+    }
+
+    function onStandingsSearch() {
+      updateClearBtn('standingsSearch', 'standings-clear');
+      // Pre-load both venues for the player card
+      if (!standingsLoaded['Tight End']) loadStandings('Tight End');
+      if (!standingsLoaded['Wild Corgi']) loadStandings('Wild Corgi');
+      renderStandingsView();
+    }
+
+    async function loadStandings(venue) {
+      if (standingsLoaded[venue] || standingsLoading[venue]) return; // avoid duplicate fetches
+      standingsLoading[venue] = true;
+      try {
+        const fn = httpsCallable(functions, 'getLeaderboard');
+        const res = await fn({ venue });
+        const raw = res.data.standings || [];
+        // Build bounty-sorted list from same data
+        const bountySorted = [...raw].sort((a, b) =>
+          b.bounties - a.bounties || b.gamesPlayed - a.gamesPlayed || (b.rsvpsHonored || 0) - (a.rsvpsHonored || 0) || a.name.localeCompare(b.name));
+        standingsCache[venue] = { champ: raw, bounty: bountySorted };
+        seasonStarted[venue] = seasonHasStarted(raw);
+        // Week-one showcase prep. Names are best-effort (a stale
+        // config/champions doc must not suppress the photo), but the photo
+        // probe has to resolve before render — buildStandingsListHtml is sync
+        // and must not swap the list out for an image that 404s.
+        if (!seasonStarted[venue]) {
+          if (!Object.keys(hallOfFame).length) {
+            try { hallOfFame = await PokerAPI.getHallOfFame(); } catch (e) { hallOfFame = {}; }
+          }
+          await Promise.all([
+            preloadChampionPhoto(venue, 'champion'),
+            preloadChampionPhoto(venue, 'gladiator')
+          ]);
+        }
+        standingsLoaded[venue] = true;
+        standingsError[venue] = false;
+        const standingsSearch = (document.getElementById('standingsSearch')?.value || '').trim();
+        if (venue === stVenue || standingsSearch.length >= 2 || compareCards.length) renderStandingsView();
+      } catch (err) {
+        standingsError[venue] = true;
+        renderStandingsView(); // keep compare cards visible; the list area shows the error state
+      } finally {
+        standingsLoading[venue] = false;
+      }
+    }
+
+    function getRankInList(name, list) {
+      // Find actual rank in sorted list (with tie detection)
+      const idx = list.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
+      if (idx === -1) return null;
+      const p = list[idx];
+      // Compute rank with ties
+      let rank = 1;
+      for (let i = 0; i < idx; i++) {
+        const prev = list[i];
+        const isTied = stType === 'championship'
+          ? (prev.points === p.points && prev.gamesPlayed === p.gamesPlayed)
+          : (prev.bounties === p.bounties && prev.gamesPlayed === p.gamesPlayed);
+        if (!isTied) rank = i + 2;
+      }
+      return { rank, idx, player: p };
+    }
+
+    function renderStandingsView() {
+      const search = (document.getElementById('standingsSearch')?.value || '').trim();
+      if (search.length >= 2) { renderSearchPreview(search); return; }
+
+      // Not searching: pinned comparison cards (if any) above the full standings list.
+      let html = '';
+      if (compareCards.length) {
+        html += `<div class="compare-bar"><span>⚖️ My Compare (${compareCards.length})</span>`
+          + `<button class="compare-clear-all" onclick="clearAllCompareCards()">Clear all</button></div>`;
+        compareCards.forEach((name, i) => { html += buildPlayerCardHtml(name, { action: 'remove', index: i }); });
+        html += `<div class="compare-hint">🔍 Search a name above to add another player to compare.</div>`;
+      }
+      html += buildStandingsListHtml();
+      document.getElementById('standingsContent').innerHTML = html;
+    }
+
+    // Searching shows the single best match as a preview card with a "＋ Compare"
+    // button (uses the shared PlayerSearch.best so "hill" never picks "Uma Umberhill").
+    function renderSearchPreview(search) {
+      const venues = ['Tight End', 'Wild Corgi'];
+      const namePool = [];
+      for (const v of venues) {
+        if (standingsCache[v]) namePool.push(...standingsCache[v].champ.map(p => p.name));
+      }
+      const matchedName = PlayerSearch.best(namePool, search);
+      const el = document.getElementById('standingsContent');
+      if (!matchedName) {
+        currentPreviewName = null;
+        el.innerHTML = `<div class="spinner" style="color:#555;">No player matches “${escHtml(search)}”.</div>`;
+        return;
+      }
+      currentPreviewName = matchedName;
+      const already = compareCards.some(n => n.toLowerCase() === matchedName.toLowerCase());
+      let html = buildPlayerCardHtml(matchedName, { action: already ? 'added' : 'add' });
+      html += `<div class="compare-hint">${already
+        ? 'Already in your compare list — clear the search to see the full list.'
+        : 'Tap ＋ Compare to pin this card, then search the next player.'}</div>`;
+      el.innerHTML = html;
+    }
+
+    // Build one player card (TE/WC × Championship/Bounty grid). opts.action sets
+    // the header button: 'add' (＋ Compare), 'added' (✓), 'remove' (×).
+    function buildPlayerCardHtml(name, opts = {}) {
+      const venues = ['Tight End', 'Wild Corgi'];
+      const types = ['champ', 'bounty'];
+      const labels = { champ: 'Championship', bounty: 'Bounty' };
+      const venueLabels = { 'Tight End': '🎯 TE', 'Wild Corgi': '🐶 WC' };
+
+      let actionBtn = '';
+      if (opts.action === 'add') {
+        actionBtn = `<button class="pc-action pc-add" onclick="addPreviewCard()">＋ Compare</button>`;
+      } else if (opts.action === 'added') {
+        actionBtn = `<span class="pc-added">✓ Added</span>`;
+      } else if (opts.action === 'remove') {
+        actionBtn = `<button class="pc-action pc-remove" onclick="removeCompareCardAt(${opts.index})" aria-label="Remove">×</button>`;
+      }
+
+      let html = `<div class="player-card">
+        <div class="player-card-name"><span>${escHtml(name)}</span>${actionBtn}</div>
+        <div class="player-card-grid">`;
+
+      for (const v of venues) {
+        for (const t of types) {
+          const rawList = standingsCache[v]?.[t];
+          const list = (t === 'champ' && rawList) ? buildChampionshipRanking(rawList) : rawList;
+          const vLabel = venueLabels[v];
+          const tLabel = labels[t];
+          const unit = t === 'champ' ? 'pts' : 'bounties';
+
+          if (!list) {
+            html += `<div class="pc-cell"><div class="pc-label">${vLabel} · ${tLabel}</div><div class="pc-unranked">Loading…</div></div>`;
+            continue;
+          }
+          const found = list.find(p => p.name.toLowerCase() === name.toLowerCase());
+          if (!found) {
+            html += `<div class="pc-cell"><div class="pc-label">${vLabel} · ${tLabel}</div><div class="pc-unranked">Not ranked</div></div>`;
+            continue;
+          }
+          const idx = list.indexOf(found);
+          let rank = 1;
+          for (let i = 0; i < idx; i++) {
+            const prev = list[i];
+            const tied = t === 'champ'
+              ? (prev.points === found.points && prev.gamesPlayed === found.gamesPlayed)
+              : (prev.bounties === found.bounties && prev.gamesPlayed === found.gamesPlayed);
+            if (!tied) rank = i + 2;
+          }
+          const rankClass = rank <= 5 ? 'top5' : rank <= 10 ? 'top10' : rank <= 20 ? 'top20' : '';
+          const score = t === 'champ' ? Math.round(found.points) : found.bounties;
+          html += `<div class="pc-cell">
+            <div class="pc-label">${vLabel} · ${tLabel}</div>
+            <div class="pc-rank ${rankClass}">#${rank} <span style="font-size:0.65rem;color:#555;">of ${list.length}</span></div>
+            <div class="pc-pts">${score} ${unit}</div>
+          </div>`;
+        }
+      }
+      html += `</div></div>`;
+      return html;
+    }
+
+    // ── Comparison cards: add / remove + hybrid persistence ──────────
+    const COMPARE_LS_KEY = 'allin_compareCards';
+
+    function loadCompareCardsLocal() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(COMPARE_LS_KEY) || '[]');
+        if (Array.isArray(raw)) compareCards = raw.filter(n => typeof n === 'string');
+      } catch (e) { /* ignore corrupt storage */ }
+    }
+
+    function saveCompareCards() {
+      try { localStorage.setItem(COMPARE_LS_KEY, JSON.stringify(compareCards)); } catch (e) {}
+      // Sync to the signed-in + linked profile so the list follows the user
+      // across devices. Write the FULL preferences object (same as
+      // savePreferences) so no sibling pref is ever dropped, regardless of how
+      // Firestore merges nested maps.
+      if (currentUser && currentProfile?.linkedName) {
+        currentProfile.preferences = { ...(currentProfile.preferences || {}), pinnedCards: compareCards.slice() };
+        setDoc(doc(db, 'userProfiles', currentUser.uid),
+          { preferences: currentProfile.preferences }, { merge: true }).catch(() => {});
+      }
+    }
+
+    function addCompareCard(name) {
+      if (!name) return;
+      if (!compareCards.some(n => n.toLowerCase() === name.toLowerCase())) {
+        compareCards.push(name);
+        saveCompareCards();
+      }
+      const s = document.getElementById('standingsSearch');
+      if (s) { s.value = ''; updateClearBtn('standingsSearch', 'standings-clear'); }
+      renderStandingsView();
+    }
+
+    function addPreviewCard() { if (currentPreviewName) addCompareCard(currentPreviewName); }
+
+    function removeCompareCardAt(i) {
+      if (i >= 0 && i < compareCards.length) {
+        compareCards.splice(i, 1);
+        saveCompareCards();
+        renderStandingsView();
+      }
+    }
+
+    function clearAllCompareCards() {
+      compareCards = [];
+      saveCompareCards();
+      renderStandingsView();
+    }
+
+    // On sign-in: prefer the account's saved cards, otherwise migrate this
+    // device's cards up to the account, otherwise auto-seed the user's own card.
+    function hydrateCompareFromProfile() {
+      if (!currentUser || compareHydratedUid === currentUser.uid) return; // once per signed-in user
+      compareHydratedUid = currentUser.uid;
+      const pinned = currentProfile?.preferences?.pinnedCards;
+      if (Array.isArray(pinned) && pinned.length) {
+        compareCards = pinned.filter(n => typeof n === 'string');
+        try { localStorage.setItem(COMPARE_LS_KEY, JSON.stringify(compareCards)); } catch (e) {}
+      } else if (compareCards.length) {
+        saveCompareCards();
+      } else if (currentProfile?.linkedName) {
+        compareCards = [currentProfile.linkedName];
+        saveCompareCards();
+      }
+      if (document.getElementById('tab-standings')?.classList.contains('active')) renderStandingsView();
+    }
+
+    window.addPreviewCard = addPreviewCard;
+    window.removeCompareCardAt = removeCompareCardAt;
+    window.clearAllCompareCards = clearAllCompareCards;
+
+    loadCompareCardsLocal();
+
+    // Promote auto-qualifiers (game winners) into top 20, filling remaining spots
+    // with highest-points non-qualifiers — mirrors leaderboard.html and timer.html logic
+    function buildChampionshipRanking(rawData) {
+      const TOTAL_SPOTS = 20;
+      const byPts = (a, b) => b.points - a.points || b.gamesPlayed - a.gamesPlayed || (b.rsvpsHonored || 0) - (a.rsvpsHonored || 0) || a.name.localeCompare(b.name);
+      const qualified = rawData.filter(p => p.qualified).sort(byPts);
+      const nonQualified = rawData.filter(p => !p.qualified).sort(byPts);
+      const spotsLeft = Math.max(0, TOTAL_SPOTS - qualified.length);
+      const topNonQ = nonQualified.slice(0, spotsLeft);
+      const restNonQ = nonQualified.slice(spotsLeft);
+      const top20 = [...qualified, ...topNonQ]
+        .sort((a, b) => b.points - a.points || b.gamesPlayed - a.gamesPlayed || (b.rsvpsHonored || 0) - (a.rsvpsHonored || 0) || a.name.localeCompare(b.name));
+      top20.forEach(p => { p._hasBerth = true; });
+      restNonQ.forEach(p => { p._hasBerth = false; });
+      return [...top20, ...restNonQ];
+    }
+
+    function buildStandingsListHtml() {
+      if (!standingsLoaded[stVenue]) {
+        if (standingsError[stVenue]) return '<div class="spinner" style="color:#555;">Could not load standings — reopen the tab to retry.</div>';
+        loadStandings(stVenue);
+        return '<div class="spinner">Loading…</div>';
+      }
+      const isChamp = stType === 'championship';
+
+      // Week one: last season's podium instead of an empty board. The
+      // Championship tab gets the champion, the Bounty tab gets the gladiator.
+      const award = isChamp ? 'champion' : 'gladiator';
+      if (!seasonStarted[stVenue] && championPhotoReady(stVenue, award)) {
+        return buildShowcaseHtml({
+          venue: stVenue,
+          award,
+          name: championName(hallOfFame, stVenue, award),
+          seasonLabel: championSeasonLabel(hallOfFame, stVenue)
+        });
+      }
+
+      let raw = standingsCache[stVenue]?.[isChamp ? 'champ' : 'bounty'] || [];
+      if (!raw.length) {
+        return '<div class="spinner" style="color:#444;">No data.</div>';
+      }
+      // For championship: reorder so auto-qualifiers are guaranteed in top 20
+      const data = isChamp ? buildChampionshipRanking(raw) : raw;
+
+      let rank = 1;
+      let html = '<div class="standings-list">';
+      data.forEach((p, i) => {
+        if (i > 0) {
+          const prev = data[i - 1];
+          const tied = isChamp
+            ? (prev.points === p.points && prev.gamesPlayed === p.gamesPlayed)
+            : (prev.bounties === p.bounties && prev.gamesPlayed === p.gamesPlayed);
+          if (!tied) rank = i + 1;
+        }
+        const tier = rank <= 5 ? 'tier-1' : rank <= 10 ? 'tier-2' : rank <= 20 ? 'tier-3' : '';
+        const badge = (isChamp && p.qualified) ? '<span class="s-badge">Q</span>' : '';
+        const score = isChamp ? Math.round(p.points) : p.bounties;
+        const rankStr = data.filter((_, j) => j < i && (isChamp ? data[j].points === p.points : data[j].bounties === p.bounties)).length > 0 ? `T${rank}` : rank;
+        const statsUrl = `/stats.html?venue=${encodeURIComponent(stVenue)}&player=${encodeURIComponent(p.name)}`;
+        html += `
+          <div class="standings-entry ${tier}">
+            <span class="s-rank">${rankStr}</span>
+            <span class="s-name"><a href="${statsUrl}" style="color:inherit;text-decoration:none;">${escHtml(p.name)}</a></span>${badge}
+            <span class="s-pts">${score}</span>
+          </div>`;
+      });
+      html += '</div>';
+      html += `<div class="standings-footer">${data.length} players · ${stVenue} · ${isChamp ? 'Championship Points' : 'Bounties'}</div>`;
+      return html;
+    }
+    // ══════════════════════════════════
+    // GEOFENCE SELF CHECK-IN
+    // ══════════════════════════════════
+    function getDistanceMeters(lat1, lon1, lat2, lon2) {
+      const R = 6371e3; // metres
+      const p1 = lat1 * Math.PI/180;
+      const p2 = lat2 * Math.PI/180;
+      const dp = (lat2-lat1) * Math.PI/180;
+      const dl = (lon2-lon1) * Math.PI/180;
+      const a = Math.sin(dp/2) * Math.sin(dp/2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dl/2) * Math.sin(dl/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+
+    function getSelfCheckinChoiceConfig(isChamp, eventType = '') {
+      const normalizedType = String(eventType || '').toLowerCase();
+      if (normalizedType.includes('big stack')) {
+        return { hasChoice: true, game1Label: 'Big Stack Tournament', game2Label: 'Consolation' };
+      }
+      if (isChamp || normalizedType.includes('championship')) {
+        return { hasChoice: true, game1Label: 'Bounty', game2Label: 'Championship' };
+      }
+      return { hasChoice: false, game1Label: 'Game 1', game2Label: 'Game 2' };
+    }
+
+    window.startSelfCheckIn = function(id, date, locationStr, isChamp, eventType = '') {
+      const player = document.getElementById('rsvp-name').value.trim();
+      const btn = document.getElementById('geofence_btn_' + id);
+      
+      if (!player) {
+         showRsvpStatus(id, 'error', 'Enter your name at the top first.');
+         return;
+      }
+      
+      btn.innerText = 'Locating...';
+      btn.disabled = true;
+
+      // Coordinate mapping
+      let venueCoords = null;
+      if (locationStr.toLowerCase().includes('tight end')) venueCoords = {lat: 39.7399, lng: -104.9687};
+      if (locationStr.toLowerCase().includes('corgi')) venueCoords = {lat: 39.7369, lng: -104.9723};
+      
+      if (!venueCoords || !navigator.geolocation) {
+        showRsvpStatus(id, 'error', 'Location services unavailable on this browser.');
+        btn.innerText = '📍 Self Check-In (At Venue)';
+        btn.disabled = false;
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const dist = getDistanceMeters(pos.coords.latitude, pos.coords.longitude, venueCoords.lat, venueCoords.lng);
+          if (dist > 100) { 
+            showRsvpStatus(id, 'error', `You are ~${Math.round(dist)} meters away. You must be within 100m to self check-in.`);
+            btn.innerText = '📍 Self Check-In (At Venue)';
+            btn.disabled = false;
+          } else {
+             const choiceConfig = getSelfCheckinChoiceConfig(isChamp, eventType);
+             btn.style.display = 'none';
+             if (choiceConfig.hasChoice) {
+               renderInnerCheckinUi(id, date, locationStr, isChamp, eventType);
+             } else {
+               executeSelfCheckin(id, date, phaseGameNum(getCheckinPhase()), locationStr, isChamp, eventType);
+             }
+          }
+        },
+        (err) => {
+          showRsvpStatus(id, 'error', 'Location denied or timed out. See Tournament Director.');
+          btn.innerText = '📍 Self Check-In (At Venue)';
+          btn.disabled = false;
+        },
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+      );
+    }
+
+    function renderInnerCheckinUi(id, date, venue, isChamp, eventType = '', note = '') {
+      const ui = document.getElementById('checkin_ui_' + id);
+      ui.style.display = 'block';
+      const choiceConfig = getSelfCheckinChoiceConfig(isChamp, eventType);
+
+      const phase = getCheckinPhase();
+      const isRegularGapWindow = !isChamp && phase === 'pause';
+
+      let contentHtml = `<div style="margin-bottom:12px;font-weight:bold;color:#00ff88;font-size:0.9rem;">✓ Location Match! Selected: <b>${escHtml(document.getElementById('rsvp-name').value.trim())}</b></div>`;
+
+      if (isChamp) {
+         // Championship nights: both games are open all night, so offer each
+         // game AND "Both" — the same three choices as the kiosk. A game already
+         // checked into shows as done and its button goes away; the other stays,
+         // so nobody has to re-run the location check to add the second game
+         // (the owner, after championship night 2026-09-08).
+         const d1 = !!selfCheckinDone[id + '_1'];
+         const d2 = !!selfCheckinDone[id + '_2'];
+         if (note) contentHtml += `<div style="color:#ffbb00; font-weight:bold; margin-bottom:8px;">${escHtml(note)}</div>`;
+         const doneLine = (label) => `<div style="color:#00ff88; font-weight:bold; margin-bottom:8px;">✓ You're checked into ${escHtml(label)}</div>`;
+         const btn = (g, label, bg) => `<button class="rsvp-btn" style="background:${bg}; color:#fff; width:100%; margin-bottom:8px;" onclick="executeSelfCheckin('${id}','${date}','${g}','${venue}', ${isChamp}, '${eventType}')">Check Into ${escHtml(label)}</button>`;
+         contentHtml += d1 ? doneLine(choiceConfig.game1Label) : btn('1', choiceConfig.game1Label, '#ff4444');
+         contentHtml += d2 ? doneLine(choiceConfig.game2Label) : btn('2', choiceConfig.game2Label, '#00aaff');
+         if (!d1 && !d2) contentHtml += btn('both', 'Both Games', 'linear-gradient(135deg, #ff4444, #00aaff)');
+         if (d1 && d2) contentHtml += `<div style="color:#888; font-size:0.8rem;">You're in both games tonight. See you at the table!</div>`;
+      } else {
+         // Regular games: pause self check-in between 7:40 PM and 8:30 PM
+         if (isRegularGapWindow) {
+            contentHtml += `
+              <div style="font-size:0.8rem;color:#ffcc66;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;">Game 1 check-in is closed</div>
+              <button class="rsvp-btn" style="background:#555; color:#bbb; width:100%; cursor:not-allowed; opacity:0.75;" disabled>Game 2 check-in opens at 8:30 PM</button>
+            `;
+         } else if (phase !== 'game2') {
+            contentHtml += `<button class="rsvp-btn" style="background:#ff4444; color:#fff; width:100%;" onclick="executeSelfCheckin('${id}','${date}','1','${venue}', ${isChamp}, '${eventType}')">Check Into Game 1</button>`;
+         } else {
+            contentHtml += `<button class="rsvp-btn" style="background:#00aaff; color:#fff; width:100%;" onclick="executeSelfCheckin('${id}','${date}','2','${venue}', ${isChamp}, '${eventType}')">Check Into Game 2</button>`;
+         }
+      }
+
+      ui.innerHTML = contentHtml;
+    }
+
+    window.executeSelfCheckin = async function(id, date, gameNum, venue, isChamp, eventType = '') {
+      const player = document.getElementById('rsvp-name').value.trim();
+      const ui = document.getElementById('checkin_ui_' + id);
+      ui.style.display = 'block';
+      ui.innerHTML = '<div class="spinner" style="padding:10px;">Checking in...</div>';
+
+      try {
+        if (!isChamp && getCheckinPhase() === 'pause') {
+          ui.innerHTML = '<div style="color:#ffcc66; font-weight:bold;">Game 2 self check-in opens at 8:30 PM.</div>';
+          return;
+        }
+
+        const fn = httpsCallable(functions, 'checkin');
+
+        // Championship nights: 'both' checks into game 1 and game 2 in one tap,
+        // then the panel re-renders with each game's status and any remaining
+        // button, instead of collapsing to a single message.
+        if (isChamp) {
+          const games = String(gameNum) === 'both' ? ['1', '2'] : [String(gameNum)];
+          let dupes = 0;
+          for (const g of games) {
+            const r = await fn({ player, date, gameNum: g, venue });
+            // Remember it either way — "duplicate" still means they're in that game.
+            selfCheckinDone[id + '_' + g] = true;
+            if (r.data && r.data.status === 'duplicate') dupes++;
+          }
+          const note = dupes === games.length ? (games.length > 1 ? '⚠️ You were already checked into both games.' : '⚠️ You were already checked in.') : '';
+          renderInnerCheckinUi(id, date, venue, isChamp, eventType, note);
+          return;
+        }
+
+        const res = await fn({ player, date, gameNum, venue });
+        // Remember it either way — "duplicate" still means they're in that game.
+        selfCheckinDone[id + '_' + String(gameNum)] = true;
+        if (res.data && res.data.status === 'duplicate') {
+           ui.innerHTML = `<div style="color:#ffbb00; font-weight:bold;">⚠️ You are already checked in.</div>`;
+        } else {
+           const label = getRsvpConfirmationLabel(String(gameNum), eventType || (isChamp ? 'championship' : 'regular'));
+           ui.innerHTML = `<div style="color:#00ff88; font-weight:bold;">✓ Successfully checked into ${label}!</div>`;
+        }
+      } catch (e) {
+        ui.innerHTML = `<div style="color:#ff4444;">Error: ${e.message}</div>`;
+      }
+    }
+
+    // ── Invite Friends (Web Share API) ──
+    async function shareApp() {
+      const shareData = {
+        title: 'All-In Poker Club',
+        text: 'Come play free poker with me at All-In Poker Club! Check out the schedule & standings here:',
+        url: 'https://poker-club.example/'
+      };
+      try {
+        if (navigator.share) {
+          await navigator.share(shareData);
+        } else {
+          await navigator.clipboard.writeText(shareData.url);
+          alert('Link copied to clipboard!');
+        }
+      } catch (err) {
+        console.error('Error sharing:', err);
+      }
+    }
+
+    // ── Utils ──
+    function escHtml(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ── Init ── default tab is RSVP
+    loadRsvpTab();
+    rsvpLoaded = true;
+    loadCalendar(); // load in background for when they switch to Schedule
+    checkAnnouncements();
+    loadRecentNotiCards();
+
+    // ── PWA Installation Logic ──
+      let deferredPrompt;
+      const INSTALL_BANNER_KEY = 'aip-install-banner-dismissed-v1';
+      const installBanner = document.getElementById('pwaInstallBanner');
+
+      function hideInstallBanner(persist = false) {
+        if (installBanner) installBanner.style.display = 'none';
+        if (persist) localStorage.setItem(INSTALL_BANNER_KEY, '1');
+      }
+
+      function canShowInstallBanner() {
+        return !isPWA() && !localStorage.getItem(INSTALL_BANNER_KEY);
+      }
+
+      window.dismissInstallBanner = function(event) {
+        if (event) event.stopPropagation();
+        hideInstallBanner(true);
+      }
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (canShowInstallBanner()) installBanner.style.display = 'flex';
+      });
+
+      window.addEventListener('appinstalled', () => {
+        hideInstallBanner(true);
+        deferredPrompt = null;
+      });
+
+    function isIos() {
+      return /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+    }
+
+      function isPWA() {
+        return window.matchMedia('(display-mode: standalone)').matches ||
+          window.navigator.standalone === true ||
+          document.referrer.startsWith('android-app://');
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        if (isIos() && canShowInstallBanner()) installBanner.style.display = 'flex';
+        else hideInstallBanner(false);
+      });
+
+      window.handleInstallClick = function() {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+              hideInstallBanner(true);
+            }
+            deferredPrompt = null;
+          });
+      } else if (isIos()) {
+        document.getElementById('iosInstallModal').style.display = 'flex';
+      } else {
+        alert("To install, tap your browser menu and select 'Add to Home Screen' or 'Install App'.");
+      }
+    }
+
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(err => {
+          console.log('Service Worker registration failed: ', err);
+        });
+      });
+    }
+  </script>
+  <script src="/update-check.js"></script>
+
+  <script type="module" src="./clock-fab.js?v=3"></script>
+</body>
+</html>

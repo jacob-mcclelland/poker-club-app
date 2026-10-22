@@ -1,0 +1,166 @@
+{
+  "frozen_on": "2026-10-02",
+  "frozen_before_any_live_call": true,
+  "source": "BRIEF_4_poker_event_copy_check.md, section 'Frozen expectations' (AI Projects Catalogue, research/jev-integration-2026-10-02)",
+  "how_to_read": {
+    "problem": "the exact choice key Jev must return for the 'problem' question",
+    "needs_review": "true means the draft is labelled for review, false means it carries no flag",
+    "states_unlisted_fact": "high means at or above 0.5, low means below it; high is the bad sign",
+    "names_other_venue": "high means at or above 0.5, low means below it; high is the bad sign",
+    "theme_present": "high means at or above 0.5, low means below it; low is the bad sign",
+    "thresholds": {
+      "review_at_or_above": 0.5,
+      "theme_present_review_below": 0.5
+    }
+  },
+  "notes": [
+    "All eight drafts are synthetic and were written by the worker for this file, in plain English with no dashes. None of them is a real eventContent draft. Their keys (expect-1 to expect-8) are placeholders so that canned answers can be keyed per draft.",
+    "The eight drafts use two schedule rows: Tight End Flannel for cases 1, 4, 6 and 8, Wild Corgi Hoodies for cases 2, 3, 5 and 7. Both rows have a 6:50 PM check-in and a 7:00 PM start, which is what makes 'doors at 8' (case 5) a fact the row does not contain.",
+    "Case 2 deliberately states two times that the row does contain (6:50 PM and 7:00 PM). It tests that a listed time is not mistaken for an invented one. If case 2 fails on states_unlisted_fact, that is a false positive on the exact distinction case 5 depends on.",
+    "Where the brief names only one or two expected labels for a case, only those are asserted. The wording of each draft was chosen so that the other answers should come out clean, but they are not frozen, so a surprising answer there is a finding to report, not a miss.",
+    "needs_review follows the brief rule: true if the choice is not ok, or states_unlisted_fact or names_other_venue is at least 0.5, or theme_present is below 0.5, or an answer is missing."
+  ],
+  "schedule_rows": {
+    "tight_end_flannel": {
+      "date": "10/6/2026",
+      "venue": "Tight End",
+      "type": "Regular",
+      "theme": "Flannel",
+      "gearDescription": "flannel, plaid button-downs, or a flannel over a tee",
+      "checkInTime": "6:50 PM",
+      "startTime": "7:00 PM"
+    },
+    "wild_corgi_hoodies": {
+      "date": "10/15/2026",
+      "venue": "Wild Corgi",
+      "type": "Regular",
+      "theme": "Hoodies",
+      "gearDescription": "hoodies, pullovers, zip-ups, or your most worn-in favorite",
+      "checkInTime": "6:50 PM",
+      "startTime": "7:00 PM"
+    }
+  },
+  "cases": [
+    {
+      "id": 1,
+      "label": "Clean Tight End Flannel copy",
+      "brief_expectation": "ok, no flags",
+      "schedule_row": "tight_end_flannel",
+      "draft": {
+        "title": "Plaid After Dark",
+        "description": "Flannel night settles in at Tight End. Pull on your favorite plaid, take a seat close to the action, and let the cards do the talking. Confident play looks good in flannel, and so do you."
+      },
+      "expected": {
+        "problem": "ok",
+        "needs_review": false,
+        "states_unlisted_fact": "low",
+        "names_other_venue": "low",
+        "theme_present": "high"
+      }
+    },
+    {
+      "id": 2,
+      "label": "Clean Wild Corgi Hoodies copy, with the two listed times",
+      "brief_expectation": "ok, no flags",
+      "schedule_row": "wild_corgi_hoodies",
+      "draft": {
+        "title": "Cozy Corgi Cards",
+        "description": "The hoodies are out at Wild Corgi, and the poker faces are almost convincing. Check-in opens at 6:50 PM and the cards are in the air at 7:00 PM, so grab your coziest pullover, find a seat, and bring your cleverest table talk."
+      },
+      "expected": {
+        "problem": "ok",
+        "needs_review": false,
+        "states_unlisted_fact": "low",
+        "names_other_venue": "low",
+        "theme_present": "high"
+      }
+    },
+    {
+      "id": 3,
+      "label": "Wild Corgi copy written in the Tight End flirty voice",
+      "brief_expectation": "wrong_venue_voice",
+      "schedule_row": "wild_corgi_hoodies",
+      "draft": {
+        "title": "Slip Into Something Hooded",
+        "description": "Come closer, we saved you a seat. Hoodies on, lights low, and just enough trouble to make the night worth staying out for. Slide up to the table, hold your cards a little closer, and let us see how confident you really are."
+      },
+      "expected": {
+        "problem": "wrong_venue_voice",
+        "needs_review": true
+      }
+    },
+    {
+      "id": 4,
+      "label": "Tight End copy promising a $500 guaranteed prize pool",
+      "brief_expectation": "invented_fact, states_unlisted_fact high",
+      "schedule_row": "tight_end_flannel",
+      "draft": {
+        "title": "Flannel and Fortune",
+        "description": "Flannel night at Tight End now comes with a $500 guaranteed prize pool. Pull on your favorite plaid, bring your sharpest reads, and take your seat. Confidence looks good in flannel, and it looks even better with a pot this size."
+      },
+      "expected": {
+        "problem": "invented_fact",
+        "needs_review": true,
+        "states_unlisted_fact": "high"
+      }
+    },
+    {
+      "id": 5,
+      "label": "Wild Corgi copy saying doors at 8",
+      "brief_expectation": "invented_fact, states_unlisted_fact high",
+      "schedule_row": "wild_corgi_hoodies",
+      "draft": {
+        "title": "Pullover Pups",
+        "description": "Hoodie night is back at Wild Corgi, and the poker faces are almost convincing. Doors at 8, so take your time finding your coziest pullover, then settle in for smart plays and friendly chaos."
+      },
+      "expected": {
+        "problem": "invented_fact",
+        "needs_review": true,
+        "states_unlisted_fact": "high"
+      }
+    },
+    {
+      "id": 6,
+      "label": "Tight End copy that mentions Wild Corgi",
+      "brief_expectation": "names_other_venue high",
+      "schedule_row": "tight_end_flannel",
+      "draft": {
+        "title": "Plaid Rivalry",
+        "description": "Flannel night at Tight End is for players who like their plaid sharp and their reads sharper. Wild Corgi has a good crowd of its own, but this is where the best plaid in town ends up. Come in flannel and play like you mean it."
+      },
+      "expected": {
+        "needs_review": true,
+        "names_other_venue": "high"
+      }
+    },
+    {
+      "id": 7,
+      "label": "Wild Corgi copy in baby talk",
+      "brief_expectation": "tone_breach",
+      "schedule_row": "wild_corgi_hoodies",
+      "draft": {
+        "title": "Hoodie Puppy Party",
+        "description": "Come to a widdle puppy party at Wild Corgi! Put on your snuggly hoodie and cuddle up at the wittle poker tables. Who's a good poker player? You are! Yes you are!"
+      },
+      "expected": {
+        "problem": "tone_breach",
+        "needs_review": true
+      }
+    },
+    {
+      "id": 8,
+      "label": "Tight End Flannel night copy entirely about Halloween costumes",
+      "brief_expectation": "off_theme, theme_present low",
+      "schedule_row": "tight_end_flannel",
+      "draft": {
+        "title": "Costume Night Chills",
+        "description": "Tight End is ready for a night of masks, capes, and spooky surprises. Dust off your best Halloween costume and come as a vampire, a witch, or a ghost. The scarier the costume, the better the night."
+      },
+      "expected": {
+        "problem": "off_theme",
+        "needs_review": true,
+        "theme_present": "low"
+      }
+    }
+  ]
+}

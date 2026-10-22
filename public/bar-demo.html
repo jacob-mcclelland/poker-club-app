@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Bar Orders (DEMO) - All-In Poker Club</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon" type="image/svg+xml" href="/img/favicon-staff.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050505;
+      --card: rgba(20,20,20,0.9);
+      --border: rgba(255,255,255,0.09);
+      --gold: #d4af37;
+      --blue: #00aaff;
+      --green: #00ff88;
+      --red: #ff4444;
+      --dim: #888;
+      --text: #ffffff;
+      --suit-hearts: #ff4d6d;
+      --suit-diamonds: #ff8c42;
+      --suit-clubs: #00d4aa;
+      --suit-spades: #a78bfa;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      background: radial-gradient(circle at top left, #1a0020 0%, #050505 55%);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: calc(16px + var(--safe-top)) 20px 14px;
+      border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .header-left { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+    .header-eyebrow { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); }
+    .header-title { font-size: 1.3rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; }
+    .header-context { font-size: 0.72rem; color: var(--gold); font-weight: 600; }
+    .demo-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.7rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+      color: #000; background: var(--gold); border-radius: 20px; padding: 5px 12px; flex-shrink: 0;
+    }
+
+    .demo-banner {
+      background: rgba(212,175,55,0.1);
+      border-bottom: 1px solid rgba(212,175,55,0.25);
+      color: var(--gold); font-size: 0.75rem; font-weight: 600;
+      padding: 8px 20px; text-align: center; flex-shrink: 0;
+    }
+    .demo-controls { display: flex; gap: 8px; padding: 12px 20px 0; flex-shrink: 0; flex-wrap: wrap; }
+    .demo-btn {
+      background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--text);
+      border-radius: 10px; padding: 0 14px; min-height: 40px; font-family: inherit;
+      font-size: 0.78rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
+      transition: all 0.15s;
+    }
+    .demo-btn:active { transform: scale(0.96); }
+    .demo-btn.primary { background: rgba(212,175,55,0.16); border-color: var(--gold); color: var(--gold); }
+
+    .filter-row { display: flex; gap: 8px; padding: 12px 20px 0; flex-shrink: 0; flex-wrap: wrap; align-items: center; }
+    .seg { display: flex; gap: 0; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 10px; padding: 3px; width: fit-content; }
+    .seg-btn {
+      background: none; border: none; border-radius: 7px; color: var(--dim); cursor: pointer; font-family: inherit;
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.5px; min-height: 44px; padding: 0 16px;
+      transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 6px;
+    }
+    .seg-btn.active { background: rgba(255,255,255,0.13); color: var(--text); }
+    .seg-btn .seg-count { background: rgba(212,175,55,0.3); color: var(--gold); border-radius: 20px; font-size: 0.68rem; padding: 1px 7px; min-width: 20px; text-align: center; }
+    .seg-btn:not(.active) .seg-count { background: rgba(255,255,255,0.1); color: var(--dim); }
+
+    .tab-bar { display: flex; gap: 4px; padding: 14px 20px 0; border-bottom: 1px solid var(--border); flex-shrink: 0; overflow-x: auto; scrollbar-width: none; }
+    .tab-bar::-webkit-scrollbar { display: none; }
+    .suit-tab {
+      background: none; border: none; border-bottom: 2px solid transparent; border-radius: 8px 8px 0 0; color: var(--dim);
+      cursor: pointer; font-family: inherit; font-size: 0.85rem; font-weight: 700; min-height: 44px; padding: 0 18px;
+      white-space: nowrap; transition: all 0.2s; display: flex; align-items: center; gap: 5px;
+    }
+    .suit-tab[data-suit="hearts"].active   { border-color: var(--suit-hearts); color: var(--suit-hearts); }
+    .suit-tab[data-suit="diamonds"].active { border-color: var(--suit-diamonds); color: var(--suit-diamonds); }
+    .suit-tab[data-suit="clubs"].active    { border-color: var(--suit-clubs); color: var(--suit-clubs); }
+    .suit-tab[data-suit="spades"].active   { border-color: var(--suit-spades); color: var(--suit-spades); }
+    .tab-count { background: rgba(255,255,255,0.1); border-radius: 20px; font-size: 0.7rem; padding: 1px 6px; min-width: 20px; text-align: center; }
+    .suit-tab.active .tab-count { background: rgba(255,255,255,0.2); }
+
+    .suit-tab.tab-flash, .seg-btn.tab-flash { animation: tabFlash 0.85s ease-in-out infinite; }
+    @keyframes tabFlash { 0%,100% { background: rgba(212,175,55,0); } 50% { background: rgba(212,175,55,0.28); } }
+
+    .content { flex: 1; overflow-y: auto; padding: 16px 20px calc(20px + var(--safe-bottom)); }
+
+    .order-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 12px; overflow: hidden; animation: slideIn 0.3s ease; }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+    .order-card.filled { opacity: 0.45; }
+    .order-card.flash-new { border-color: var(--gold); animation: slideIn 0.3s ease, flashNew 0.9s ease-in-out 3; }
+    @keyframes flashNew { 0%,100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); } 50% { box-shadow: 0 0 20px 2px rgba(212,175,55,0.6); } }
+
+    .order-card-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border); gap: 10px; }
+    .order-head-left { display: flex; align-items: center; min-width: 0; }
+    .order-table-badge { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .order-table-badge[data-suit="hearts"]   { color: var(--suit-hearts); }
+    .order-table-badge[data-suit="diamonds"] { color: var(--suit-diamonds); }
+    .order-table-badge[data-suit="clubs"]    { color: var(--suit-clubs); }
+    .order-table-badge[data-suit="spades"]   { color: var(--suit-spades); }
+    .late-badge { font-size: 0.58rem; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: #000; background: var(--gold); border-radius: 5px; padding: 2px 7px; margin-left: 9px; flex-shrink: 0; }
+    .order-time { font-size: 0.75rem; color: var(--dim); flex-shrink: 0; }
+
+    .order-card-body { padding: 14px 16px; }
+    .order-player-row { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04); gap: 12px; }
+    .order-player-row:last-child { border-bottom: none; }
+    .op-left { display: flex; align-items: center; gap: 7px; min-width: 0; flex-wrap: wrap; }
+    .order-player-name { font-weight: 700; font-size: 0.95rem; }
+    .order-player-shots { font-size: 0.88rem; color: #ccc; text-align: right; flex-shrink: 0; }
+    .order-player-note { font-size: 0.82rem; color: var(--gold); font-style: italic; padding: 1px 0 7px; border-bottom: 1px solid rgba(255,255,255,0.04); line-height: 1.35; }
+
+    .pay-tag { font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; padding: 2px 7px; border-radius: 5px; flex-shrink: 0; }
+    .pay-tag.card { color: var(--dim); border: 1px solid rgba(255,255,255,0.16); }
+    .pay-tag.cash { color: #000; background: var(--green); }
+
+    .order-total-row { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(212,175,55,0.25); gap: 12px; }
+    .order-total-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); flex-shrink: 0; }
+    .order-total-text { font-size: 0.88rem; font-weight: 600; color: var(--gold); text-align: right; }
+
+    .order-card-footer { padding: 8px 16px 10px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .order-submitter { font-size: 0.75rem; color: var(--dim); }
+    .order-submitter strong { color: var(--blue); font-weight: 700; }
+
+    .mark-filled-btn {
+      background: rgba(0,255,136,0.1); border: 1px solid rgba(0,255,136,0.3); border-radius: 8px; color: var(--green);
+      cursor: pointer; font-family: inherit; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px; min-height: 44px;
+      padding: 10px 16px; display: inline-flex; align-items: center; justify-content: center; text-transform: uppercase; transition: all 0.2s; flex-shrink: 0;
+    }
+    .mark-filled-btn:active { background: rgba(0,255,136,0.2); }
+    .mark-filled-btn.filled { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: var(--dim); cursor: default; }
+
+    .pour-total { position: sticky; top: 0; z-index: 5; background: rgba(24,20,8,0.97); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border: 1px solid rgba(212,175,55,0.45); border-radius: 14px; padding: 13px 15px; margin-bottom: 14px; }
+    .pour-total.done { background: rgba(255,255,255,0.04); border-color: var(--border); }
+    .pour-total-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 10px; }
+    .pour-total.done .pour-total-head { margin-bottom: 0; }
+    .pour-total-title { font-size: 0.68rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); }
+    .pour-total.done .pour-total-title { color: var(--dim); }
+    .pour-total-count { font-size: 1.3rem; font-weight: 800; color: var(--gold); white-space: nowrap; flex-shrink: 0; }
+    .pour-total-count small { font-size: 0.62rem; color: var(--dim); font-weight: 700; letter-spacing: 0.5px; }
+    .pour-done { font-size: 0.8rem; font-weight: 800; color: var(--green); }
+    .pour-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pour-chip { background: rgba(212,175,55,0.14); border: 1px solid rgba(212,175,55,0.3); color: #fff; font-size: 0.85rem; font-weight: 700; padding: 5px 10px; border-radius: 8px; }
+    .pour-chip b { color: var(--gold); }
+    .pour-bytable { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 11px; padding-top: 10px; border-top: 1px solid rgba(212,175,55,0.2); }
+    .pour-bytable .pt { font-size: 0.82rem; font-weight: 800; }
+
+    /* EDITED badge + flash (an order changed after being sent) */
+    .edited-badge { font-size: 0.58rem; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; color: #000; background: var(--gold); border-radius: 5px; padding: 2px 7px; margin-left: 9px; flex-shrink: 0; }
+    .order-card.edited { border-color: var(--gold); }
+
+    /* Footer: submitter + progress tags + lifecycle actions */
+    .order-card-footer { flex-direction: column; align-items: stretch; gap: 8px; }
+    .order-foot-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .order-state-tags { display: flex; gap: 6px; flex-shrink: 0; }
+    .state-tag { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px; padding: 2px 7px; border-radius: 5px; }
+    .state-tag.pour { color: var(--green); border: 1px solid rgba(0,255,136,0.4); }
+    .state-tag.paid { color: var(--blue);  border: 1px solid rgba(0,170,255,0.4); }
+    .order-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .act-btn { flex: 1 1 0; min-width: 84px; min-height: 46px; border-radius: 9px; cursor: pointer; font-family: inherit; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.3px; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s; }
+    .act-btn:active { transform: scale(0.97); }
+    .act-pour { background: rgba(0,255,136,0.12); border: 1px solid rgba(0,255,136,0.4); color: var(--green); }
+    .act-paid { background: rgba(0,170,255,0.12); border: 1px solid rgba(0,170,255,0.4); color: var(--blue); }
+    .act-both { background: rgba(212,175,55,0.14); border: 1px solid rgba(212,175,55,0.45); color: var(--gold); }
+    .order-done-tag { color: var(--dim); font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding: 10px 0; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--dim); }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.4; }
+    .empty-text { font-size: 0.9rem; }
+    html.back-nav-on .header { padding-left: 68px; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-eyebrow">All In Poker Club</div>
+    <div class="header-title">Bar Orders</div>
+    <div class="header-context">Tight End · sample shift</div>
+  </div>
+  <div class="demo-pill">● Demo</div>
+</div>
+
+<div class="demo-banner">Sample data — tap around freely. Nothing here is saved or counted in your stats.</div>
+
+<div class="demo-controls">
+  <button class="demo-btn primary" id="sim-btn">▶ Simulate new order</button>
+  <button class="demo-btn" id="edit-btn">✎ Simulate edit</button>
+  <button class="demo-btn" id="reset-btn">↻ Reset demo</button>
+</div>
+
+<div class="filter-row" id="game-row"><div class="seg" id="game-seg"></div></div>
+
+<div class="filter-row">
+  <div class="seg">
+    <button class="seg-btn active" id="tab-toggle-btn">By Table</button>
+    <button class="seg-btn" id="card-toggle-btn">All Orders</button>
+  </div>
+</div>
+
+<div class="tab-bar" id="tab-bar">
+  <button class="suit-tab active" data-suit="hearts"><span>♥</span> Hearts <span class="tab-count" id="count-hearts">0</span></button>
+  <button class="suit-tab" data-suit="diamonds"><span>♦</span> Diamonds <span class="tab-count" id="count-diamonds">0</span></button>
+  <button class="suit-tab" data-suit="clubs"><span>♣</span> Clubs <span class="tab-count" id="count-clubs">0</span></button>
+  <button class="suit-tab" data-suit="spades"><span>♠</span> Spades <span class="tab-count" id="count-spades">0</span></button>
+</div>
+
+<div class="content" id="content"></div>
+
+<script>
+  // ── Pure front-end demo. No Firestore, no writes, no stats impact. ──────────
+  const DEMO_CURRENT_GAME = 2;
+  let view = 'tab', activeSuit = 'hearts', selectedGame = DEMO_CURRENT_GAME;
+  let allOrders = [], flashOrderIds = new Set(), editedOrderIds = new Set(), simCount = 0, simEditCount = 0;
+
+  // Lifecycle: status draft/pending/closed + poured/paid flags ('filled' legacy).
+  function orderPoured(o) { return !!(o && (o.poured || o.status === 'closed' || o.status === 'filled')); }
+  function orderPaid(o)   { return !!(o && (o.paid   || o.status === 'closed')); }
+  function orderClosed(o) { return !!(o && (o.status === 'closed' || o.status === 'filled')); }
+
+  const SUIT_LABELS = {
+    hearts:   { symbol: '♥', label: 'Hearts' },
+    diamonds: { symbol: '♦', label: 'Diamonds' },
+    clubs:    { symbol: '♣', label: 'Clubs' },
+    spades:   { symbol: '♠', label: 'Spades' },
+  };
+
+  function mkTs(h, m) {
+    const d = new Date(); d.setHours(h, m, 0, 0);
+    const ms = d.getTime();
+    return { toDate: () => new Date(ms), toMillis: () => ms };
+  }
+  function withTotal(o) {
+    const total = {};
+    o.players.forEach(p => p.shots.forEach(s => { total[s.type] = (total[s.type] || 0) + s.qty; }));
+    o.total = total;
+    return o;
+  }
+
+  function seed() {
+    // P(name, drink='House', qty=1, payment='card', drink2, qty2) — pass
+    // undefined to keep a default (e.g. House) while setting a later arg.
+    const P = (name, drink = 'House', qty = 1, pay = 'card', d2 = null, q2 = 1) => {
+      const shots = [{ type: drink, qty }];
+      if (d2) shots.push({ type: d2, qty: q2 });
+      return { name, payment: pay, shots };
+    };
+    // Snapshot ~9:16pm — about 15 min into the 9pm game. Main rounds came in at
+    // game start; Hearts & Clubs are already poured, Spades & Diamonds are being
+    // worked, and a few single stragglers are trickling in. No table over ~9-10.
+    return [
+      // Diamonds — full 9-person round, just in, still to pour (the big one)
+      { id:'dia-main', table:'diamonds', gameNum:2, status:'pending', timestamp:mkTs(21,8), submitter:{name:'Gray Pellbrook'}, players:[
+        P('Gray Pellbrook'), P('Jordan Sablewood'), P('Shay Zephyrine','Pickle'), P('Melissa noonan',undefined,1,'cash'),
+        P('Sage Kestrelton'), P('Eren yazzie','Espolon'), P('Parker Corrimore'), P('Morgan Ashgrove'), P('Indy Fenwhistle',undefined,1,'cash') ] },
+
+      // Spades — 7-person round in + one straggler, being worked now
+      { id:'spd-main', table:'spades', gameNum:2, status:'pending', poured:true, timestamp:mkTs(21,6), submitter:{name:'Xan Rastervale'}, players:[
+        P('Xan Rastervale'), P('Alex Rastervale',undefined,1,'cash'), { ...P('Xan Dellacourt','Pickle'), shots:[{type:'Pickle',qty:1,note:'Any schnapps — not peppermint'}] }, P('Robb taylor'),
+        P('Wren Ingleby-Rhys'), P('Emery Vossington','Jim Beam',1,'cash'), P('Logan Tamberline') ] },
+      { id:'spd-1', table:'spades', gameNum:2, status:'pending', timestamp:mkTs(21,13), submitter:{name:'Bailey Larkspurne'}, players:[ P('Bailey Larkspurne','Pickle',1,'cash') ] },
+
+      // Hearts — round already poured; one late single still to make
+      { id:'hrt-main', table:'hearts', gameNum:2, status:'closed', poured:true, paid:true, timestamp:mkTs(21,4), submitter:{name:'Jacob McClelland'}, players:[
+        P('Jacob McClelland'), P('Shay Hollowmere','Tequila'), P('Tatum Dellacourt'), P('Casey Corrimore',undefined,1,'cash'), P('Eli Pellbrook'), P('Frankie Marlowind','Jameson') ] },
+      { id:'hrt-1', table:'hearts', gameNum:2, status:'pending', timestamp:mkTs(21,14), submitter:{name:'Riley Kestrelton'}, players:[ P('Riley Kestrelton','Tequila',1,'cash') ] },
+
+      // Clubs — round already poured; two stragglers still to make
+      { id:'clb-main', table:'clubs', gameNum:2, status:'closed', poured:true, paid:true, timestamp:mkTs(21,5), submitter:{name:'Alex Larkspurne'}, players:[
+        P('Alex Larkspurne'), P('Morgan Umberhill'), P('Logan Kestrelton','Tequila'), P('Sage Dellacourt',undefined,1,'cash'),
+        P('Harper Yarrowdale'), P('Bailey Sablewood','Dobel'), P('Kai Ingleby-Rhys'), P('Oakley Corrimore',undefined,1,'cash') ] },
+      { id:'clb-1', table:'clubs', gameNum:2, status:'pending', timestamp:mkTs(21,12), submitter:{name:'Val Wexmoor'}, players:[ P('Val Wexmoor','Dobel') ] },
+      { id:'clb-2', table:'clubs', gameNum:2, status:'pending', timestamp:mkTs(21,15), submitter:{name:'Uma Ingleby-Rhys'}, players:[ P('Uma Ingleby-Rhys','Tequila',1,'cash') ] },
+
+      // ── Game 1 (earlier 7pm game) — all four tables, all poured ──
+      { id:'g1-hrt', table:'hearts', gameNum:1, status:'closed', poured:true, paid:true, timestamp:mkTs(19,11), submitter:{name:'Jacob McClelland'}, players:[
+        P('Jacob McClelland'), P('Shay Hollowmere','Tequila'), P('Tatum Dellacourt'), P('Casey Corrimore',undefined,1,'cash'),
+        P('Eli Pellbrook'), P('Frankie Marlowind','Jameson'), P('Riley Kestrelton','Tequila',1,'cash'), P('Eli Ashgrove'), P('Gray Marlowind') ] },
+      { id:'g1-dia', table:'diamonds', gameNum:1, status:'closed', poured:true, paid:true, timestamp:mkTs(19,14), submitter:{name:'Gray Pellbrook'}, players:[
+        P('Gray Pellbrook'), P('Jordan Sablewood'), P('Shay Zephyrine','Pickle'), P('Melissa noonan',undefined,1,'cash'),
+        P('Sage Kestrelton'), P('Eren yazzie','Espolon'), P('Parker Corrimore'), P('Morgan Ashgrove'), P('Indy Fenwhistle',undefined,1,'cash'), P('Shay Kestrelton') ] },
+      { id:'g1-clb', table:'clubs', gameNum:1, status:'closed', poured:true, paid:true, timestamp:mkTs(19,13), submitter:{name:'Alex Larkspurne'}, players:[
+        P('Alex Larkspurne'), P('Morgan Umberhill'), P('Logan Kestrelton','Tequila'), P('Sage Dellacourt',undefined,1,'cash'),
+        P('Harper Yarrowdale'), P('Bailey Sablewood','Dobel'), P('Kai Ingleby-Rhys'), P('Oakley Corrimore',undefined,1,'cash'), P('Jordan Orrinsby','Pickle') ] },
+      { id:'g1-spd', table:'spades', gameNum:1, status:'closed', poured:true, paid:true, timestamp:mkTs(19,10), submitter:{name:'Xan Rastervale'}, players:[
+        P('Xan Rastervale'), P('Alex Rastervale',undefined,1,'cash'), P('Xan Dellacourt','Pickle'), P('Robb taylor'),
+        P('Wren Ingleby-Rhys'), P('Emery Vossington','Jim Beam',1,'cash'), P('Logan Tamberline'), P('Parker Sablewood'), P('Indy Wexmoor') ] },
+    ].map(withTotal);
+  }
+
+  function gameOrders() { return allOrders.filter(o => (o.gameNum || 1) === selectedGame); }
+
+  function sortForDisplay(orders) {
+    return orders.slice().sort((a, b) => {
+      const af = orderClosed(a) ? 1 : 0, bf = orderClosed(b) ? 1 : 0;
+      if (af !== bf) return af - bf;
+      return tsMillis(b) - tsMillis(a);
+    });
+  }
+  function tsMillis(o) { return o.timestamp && o.timestamp.toMillis ? o.timestamp.toMillis() : 0; }
+
+  function renderGameSegment() {
+    const seg = document.getElementById('game-seg'); seg.innerHTML = '';
+    const counts = { 1: allOrders.filter(o => (o.gameNum||1)===1).length, 2: allOrders.filter(o => (o.gameNum||1)===2).length };
+    [1,2].forEach(n => {
+      if (!(n === DEMO_CURRENT_GAME || counts[n] > 0 || n === selectedGame)) return;
+      const b = document.createElement('button');
+      b.dataset.game = n;
+      const hasFlash = allOrders.some(o => (o.gameNum||1)===n && flashOrderIds.has(o.id));
+      b.className = 'seg-btn' + (n===selectedGame?' active':'') + (hasFlash?' tab-flash':'');
+      const pending = allOrders.filter(o => (o.gameNum||1)===n && !orderPoured(o)).length;
+      const label = n === 1 ? 'Game 1 · 7PM' : 'Game 2 · 9PM';
+      b.innerHTML = `${label}${n===DEMO_CURRENT_GAME?' • now':''}` + (pending>0?` <span class="seg-count">${pending}</span>`:'');
+      b.addEventListener('click', () => { selectedGame = n; renderGameSegment(); renderContent(); });
+      seg.appendChild(b);
+    });
+  }
+
+  function updateTabCountsAndFlash() {
+    const game = gameOrders(), pending = game.filter(o => !orderPoured(o));
+    ['hearts','diamonds','clubs','spades'].forEach(suit => {
+      const el = document.getElementById('count-'+suit), tab = document.querySelector('.suit-tab[data-suit="'+suit+'"]');
+      const n = pending.filter(o => o.table===suit).length;
+      if (el) { el.textContent = n; el.style.background = n>0?'rgba(212,175,55,0.3)':'rgba(255,255,255,0.1)'; el.style.color = n>0?'#d4af37':''; }
+      if (tab) tab.classList.toggle('tab-flash', game.some(o => o.table===suit && flashOrderIds.has(o.id)));
+    });
+    document.querySelectorAll('#game-seg .seg-btn').forEach(btn => {
+      const n = Number(btn.dataset.game);
+      btn.classList.toggle('tab-flash', allOrders.some(o => (o.gameNum||1)===n && flashOrderIds.has(o.id)));
+    });
+  }
+
+  function escHtml(s) { return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+  function sumOrder(o) { return Object.values(o.total || {}).reduce((a, n) => a + (Number(n) || 0), 0); }
+  function aggregateShots(orders) {
+    const totals = {}; let count = 0;
+    orders.forEach(o => Object.entries(o.total || {}).forEach(([t, q]) => { q = Number(q) || 0; totals[t] = (totals[t] || 0) + q; count += q; }));
+    return { totals, count };
+  }
+  function buildPourTotal(scopeOrders, isAllView) {
+    const pending = scopeOrders.filter(o => !orderPoured(o));
+    const el = document.createElement('div'); el.className = 'pour-total';
+    const scopeLabel = isAllView ? 'All tables' : `${SUIT_LABELS[activeSuit].symbol} ${SUIT_LABELS[activeSuit].label}`;
+    if (!pending.length) {
+      el.classList.add('done');
+      el.innerHTML = `<div class="pour-total-head"><span class="pour-total-title">${scopeLabel} · to pour</span><span class="pour-done">All poured ✓</span></div>`;
+      return el;
+    }
+    const { totals, count } = aggregateShots(pending);
+    const chips = Object.entries(totals).sort((a, b) => b[1] - a[1]).map(([t, q]) => `<span class="pour-chip"><b>${q}×</b> ${escHtml(t)}</span>`).join('');
+    let perTable = '';
+    if (isAllView) {
+      const parts = ['hearts','diamonds','clubs','spades'].map(s => {
+        const c = pending.filter(o => o.table === s).reduce((a, o) => a + sumOrder(o), 0);
+        return c ? `<span class="pt" style="color:var(--suit-${s})">${SUIT_LABELS[s].symbol} ${c}</span>` : '';
+      }).filter(Boolean).join('');
+      if (parts) perTable = `<div class="pour-bytable">${parts}</div>`;
+    }
+    el.innerHTML = `<div class="pour-total-head"><span class="pour-total-title">${scopeLabel} · still to pour</span><span class="pour-total-count">${count} <small>shots · ${pending.length} ${pending.length===1?'card':'cards'}</small></span></div><div class="pour-chips">${chips}</div>${perTable}`;
+    return el;
+  }
+
+  function renderContent() {
+    const container = document.getElementById('content'); container.innerHTML = '';
+    const ctxOrders = gameOrders();
+    const firstByTable = {};
+    ctxOrders.forEach(o => { const ms = tsMillis(o); if (firstByTable[o.table]===undefined || ms<firstByTable[o.table]) firstByTable[o.table]=ms; });
+
+    let orders = ctxOrders;
+    if (view === 'tab') orders = orders.filter(o => o.table === activeSuit);
+    orders = sortForDisplay(orders);
+
+    if (!orders.length) {
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">🥃</div><div class="empty-text">No orders yet${view==='tab'?' for this table':''}.</div></div>`;
+      updateTabCountsAndFlash(); return;
+    }
+    container.appendChild(buildPourTotal(orders, view === 'card'));
+    const acked = [];
+    orders.forEach(order => {
+      const isLate = tsMillis(order) > (firstByTable[order.table] ?? 0);
+      const isFlash = flashOrderIds.has(order.id);
+      if (isFlash) acked.push(order.id);
+      container.appendChild(buildOrderCard(order, isLate, isFlash));
+    });
+    acked.forEach(id => flashOrderIds.delete(id));
+    updateTabCountsAndFlash();
+  }
+
+  function buildOrderCard(order, isLate, isFlash) {
+    const suit = SUIT_LABELS[order.table] || { symbol:'?', label:order.table };
+    const poured = orderPoured(order), paid = orderPaid(order), closed = orderClosed(order);
+    const isEdited = editedOrderIds.has(order.id);
+    const card = document.createElement('div');
+    card.className = 'order-card' + (closed?' filled':'') + (isFlash?' flash-new':'') + (isEdited?' edited':'');
+
+    const header = document.createElement('div'); header.className = 'order-card-header';
+    const headLeft = document.createElement('div'); headLeft.className = 'order-head-left';
+    const badge = document.createElement('div'); badge.className = 'order-table-badge'; badge.dataset.suit = order.table;
+    badge.innerHTML = `<span>${suit.symbol}</span> ${suit.label}`;
+    headLeft.appendChild(badge);
+    if (isLate) { const lb = document.createElement('span'); lb.className='late-badge'; lb.textContent='Add-on'; headLeft.appendChild(lb); }
+    if (isEdited) { const eb = document.createElement('span'); eb.className='edited-badge'; eb.textContent='Edited'; headLeft.appendChild(eb); }
+    const time = document.createElement('div'); time.className='order-time'; time.textContent = formatTime(order.timestamp);
+    header.appendChild(headLeft); header.appendChild(time); card.appendChild(header);
+
+    const body = document.createElement('div'); body.className = 'order-card-body';
+    order.players.forEach(player => {
+      const row = document.createElement('div'); row.className = 'order-player-row';
+      const left = document.createElement('div'); left.className = 'op-left';
+      const nameEl = document.createElement('span'); nameEl.className='order-player-name'; nameEl.textContent = player.name; left.appendChild(nameEl);
+      const pay = player.payment === 'cash' ? 'cash' : 'card';
+      const payTag = document.createElement('span'); payTag.className = 'pay-tag '+pay; payTag.textContent = pay==='cash'?'Cash':'Card'; left.appendChild(payTag);
+      const shotsEl = document.createElement('div'); shotsEl.className='order-player-shots';
+      shotsEl.textContent = player.shots.map(s => `${s.qty>1?s.qty+'× ':''}${s.type}`).join(' + ');
+      row.appendChild(left); row.appendChild(shotsEl); body.appendChild(row);
+      (player.shots || []).forEach(s => {
+        if (!s.note) return;
+        const noteEl = document.createElement('div'); noteEl.className = 'order-player-note';
+        noteEl.textContent = `📝 ${s.type} — ${s.note}`; body.appendChild(noteEl);
+      });
+    });
+    if (order.total && Object.keys(order.total).length) {
+      const tr = document.createElement('div'); tr.className='order-total-row';
+      const tl = document.createElement('div'); tl.className='order-total-label'; tl.textContent='Total';
+      const tt = document.createElement('div'); tt.className='order-total-text';
+      tt.textContent = Object.entries(order.total).map(([t,q]) => `${q>1?q+'× ':''}${t}`).join(', ');
+      tr.appendChild(tl); tr.appendChild(tt); body.appendChild(tr);
+    }
+    card.appendChild(body);
+
+    const footer = document.createElement('div'); footer.className='order-card-footer';
+
+    const footTop = document.createElement('div'); footTop.className = 'order-foot-top';
+    const sub = document.createElement('div'); sub.className='order-submitter'; sub.innerHTML = 'Order by <strong></strong>';
+    sub.querySelector('strong').textContent = order.submitter.name;
+    footTop.appendChild(sub);
+    const tags = document.createElement('div'); tags.className = 'order-state-tags';
+    if (poured) tags.appendChild(demoStateTag('✓ Poured', 'pour'));
+    if (paid) tags.appendChild(demoStateTag('✓ Paid', 'paid'));
+    footTop.appendChild(tags);
+    footer.appendChild(footTop);
+
+    const actions = document.createElement('div'); actions.className = 'order-actions';
+    if (closed) {
+      const done = document.createElement('span'); done.className = 'order-done-tag'; done.textContent = 'Closed ✓';
+      actions.appendChild(done);
+    } else {
+      if (!poured) actions.appendChild(demoActionBtn('🍸 Pouring', 'pour', () => demoSet(order, { poured:true })));
+      if (!paid)   actions.appendChild(demoActionBtn('💲 Payment', 'paid', () => demoSet(order, { paid:true })));
+      actions.appendChild(demoActionBtn('Both ✓', 'both', () => demoSet(order, { poured:true, paid:true })));
+    }
+    footer.appendChild(actions);
+    card.appendChild(footer);
+    return card;
+  }
+
+  function demoStateTag(label, kind) { const t = document.createElement('span'); t.className = 'state-tag ' + kind; t.textContent = label; return t; }
+  function demoActionBtn(label, kind, onClick) { const b = document.createElement('button'); b.className = 'act-btn act-' + kind; b.textContent = label; b.addEventListener('click', onClick); return b; }
+
+  // Demo-only: advance an order's lifecycle in memory (no Firestore).
+  function demoSet(order, patch) {
+    Object.assign(order, patch);
+    if (orderPoured(order) && orderPaid(order)) order.status = 'closed';
+    editedOrderIds.delete(order.id);
+    flashOrderIds.delete(order.id);
+    renderContent();
+  }
+
+  function formatTime(ts) {
+    const d = ts.toDate();
+    const h = d.getHours(), m = String(d.getMinutes()).padStart(2,'0'), ap = h>=12?'pm':'am';
+    return `${h%12||12}:${m} ${ap}`;
+  }
+
+  // Demo control: drop a fresh order onto a table and flash it.
+  function simulateNew() {
+    simCount++;
+    const suits = ['clubs','diamonds','spades','hearts'];
+    const suit = suits[(simCount-1) % suits.length];
+    const picks = [
+      { name:'Riley Juniperhart', payment:'cash', shots:[{type:'Tequila',qty:1}] },
+      { name:'Indy Hollowmere',  payment:'card', shots:[{type:'House',qty:1}] },
+      { name:'Yael Wexmoor',  payment:'card', shots:[{type:'Dobel',qty:1},{type:'Pickle',qty:1}] },
+      { name:'Edgar C',       payment:'cash', shots:[{type:'Jim Beam',qty:2}] },
+    ];
+    const pick = picks[(simCount-1) % picks.length];
+    const o = withTotal({
+      id: 'sim'+simCount, table: suit, gameNum: DEMO_CURRENT_GAME, status: 'pending',
+      timestamp: mkTs(21, 38 + simCount * 2), submitter: { name: pick.name }, // ~40 min in: a late straggler
+      players: [ { ...pick } ]
+    });
+    allOrders.push(o);
+    flashOrderIds.add(o.id);
+    selectedGame = DEMO_CURRENT_GAME;
+    renderGameSegment();
+    renderContent();
+  }
+
+  // Demo control: a player tweaks an already-sent order → flag it EDITED + flash.
+  function simulateEdit() {
+    const cand = gameOrders().filter(o => !orderPoured(o));
+    if (!cand.length) return;
+    const o = cand[simEditCount % cand.length];
+    simEditCount++;
+    o.players[0].shots.push({ type: 'Pickle', qty: 1 }); // they added a shot
+    withTotal(o);
+    editedOrderIds.add(o.id);
+    flashOrderIds.add(o.id);
+    selectedGame = o.gameNum; activeSuit = o.table;
+    document.querySelectorAll('.suit-tab').forEach(t => t.classList.toggle('active', t.dataset.suit === o.table));
+    renderGameSegment(); renderContent();
+  }
+
+  function resetDemo() { allOrders = seed(); flashOrderIds = new Set(); editedOrderIds = new Set(); simCount = 0; simEditCount = 0; selectedGame = DEMO_CURRENT_GAME; activeSuit = 'hearts';
+    document.querySelectorAll('.suit-tab').forEach(t => t.classList.toggle('active', t.dataset.suit === 'hearts'));
+    renderGameSegment(); renderContent();
+  }
+
+  document.getElementById('sim-btn').addEventListener('click', simulateNew);
+  document.getElementById('edit-btn').addEventListener('click', simulateEdit);
+  document.getElementById('reset-btn').addEventListener('click', resetDemo);
+  document.getElementById('tab-toggle-btn').addEventListener('click', () => {
+    view='tab'; document.getElementById('tab-toggle-btn').classList.add('active'); document.getElementById('card-toggle-btn').classList.remove('active');
+    document.getElementById('tab-bar').classList.remove('hidden'); document.getElementById('tab-bar').style.display='flex'; renderContent();
+  });
+  document.getElementById('card-toggle-btn').addEventListener('click', () => {
+    view='card'; document.getElementById('card-toggle-btn').classList.add('active'); document.getElementById('tab-toggle-btn').classList.remove('active');
+    document.getElementById('tab-bar').style.display='none'; renderContent();
+  });
+  document.querySelectorAll('.suit-tab').forEach(tab => tab.addEventListener('click', () => {
+    document.querySelectorAll('.suit-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active'); activeSuit = tab.dataset.suit; renderContent();
+  }));
+
+  allOrders = seed();
+  renderGameSegment();
+  renderContent();
+</script>
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="/clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/admin/"></script>
+</body>
+</html>

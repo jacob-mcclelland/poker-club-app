@@ -1,0 +1,815 @@
+{
+ "player-0001": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Wren Gallowpike",
+  "nameLower": "wren gallowpike"
+ },
+ "player-0002": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Wren Larkspurne",
+  "nameLower": "wren larkspurne"
+ },
+ "player-0003": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Frankie Larkspurne",
+  "nameLower": "frankie larkspurne"
+ },
+ "player-0004": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Jordan Wexmoor",
+  "nameLower": "jordan wexmoor"
+ },
+ "player-0005": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Oakley Kestrelton",
+  "nameLower": "oakley kestrelton"
+ },
+ "player-0006": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Avery Orrinsby",
+  "nameLower": "avery orrinsby"
+ },
+ "player-0007": {
+  "aliases": [
+   "Yaely"
+  ],
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Yael Larkspurne",
+  "nameLower": "yael larkspurne"
+ },
+ "player-0008": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Jordan Dellacourt",
+  "nameLower": "jordan dellacourt"
+ },
+ "player-0009": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Zion Brindlewood",
+  "nameLower": "zion brindlewood"
+ },
+ "player-0010": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Jordan Coldharbour",
+  "nameLower": "jordan coldharbour"
+ },
+ "player-0011": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Cameron Yarrowdale",
+  "nameLower": "cameron yarrowdale"
+ },
+ "player-0012": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Noel Vossington",
+  "nameLower": "noel vossington"
+ },
+ "player-0013": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Finley Vossington",
+  "nameLower": "finley vossington"
+ },
+ "player-0014": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Shay Fenwhistle",
+  "nameLower": "shay fenwhistle"
+ },
+ "player-0015": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Morgan Quillfeather",
+  "nameLower": "morgan quillfeather"
+ },
+ "player-0016": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Hayden Hollowmere",
+  "nameLower": "hayden hollowmere"
+ },
+ "player-0017": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Yael Thistlecombe",
+  "nameLower": "yael thistlecombe"
+ },
+ "player-0018": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Oakley Fenwhistle",
+  "nameLower": "oakley fenwhistle"
+ },
+ "player-0019": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Hayden Kestrelton",
+  "nameLower": "hayden kestrelton"
+ },
+ "player-0020": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Parker Rastervale",
+  "nameLower": "parker rastervale"
+ },
+ "player-0021": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Alex Pellbrook",
+  "nameLower": "alex pellbrook"
+ },
+ "player-0022": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Rowan Wexmoor",
+  "nameLower": "rowan wexmoor"
+ },
+ "player-0023": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Dana Dellacourt",
+  "nameLower": "dana dellacourt"
+ },
+ "player-0024": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Kendall Sablewood",
+  "nameLower": "kendall sablewood"
+ },
+ "player-0025": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Kendall Vossington",
+  "nameLower": "kendall vossington"
+ },
+ "player-0026": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Riley Thistlecombe",
+  "nameLower": "riley thistlecombe"
+ },
+ "player-0027": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Gray Dellacourt",
+  "nameLower": "gray dellacourt"
+ },
+ "player-0028": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Indy Kestrelton",
+  "nameLower": "indy kestrelton"
+ },
+ "player-0029": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Noel Orrinsby",
+  "nameLower": "noel orrinsby"
+ },
+ "player-0030": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Tatum Pellbrook",
+  "nameLower": "tatum pellbrook"
+ },
+ "player-0031": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Bailey Umberhill",
+  "nameLower": "bailey umberhill"
+ },
+ "player-0032": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Yael Sablewood",
+  "nameLower": "yael sablewood"
+ },
+ "player-0033": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Kendall Everhollow",
+  "nameLower": "kendall everhollow"
+ },
+ "player-0034": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Riley Corrimore",
+  "nameLower": "riley corrimore"
+ },
+ "player-0035": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Frankie Wexmoor",
+  "nameLower": "frankie wexmoor"
+ },
+ "player-0036": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Sage Juniperhart",
+  "nameLower": "sage juniperhart"
+ },
+ "player-0037": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Val Thistlecombe",
+  "nameLower": "val thistlecombe"
+ },
+ "player-0038": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Shay Rastervale",
+  "nameLower": "shay rastervale"
+ },
+ "player-0039": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Drew Ashgrove",
+  "nameLower": "drew ashgrove"
+ },
+ "player-0040": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Blake Thistlecombe",
+  "nameLower": "blake thistlecombe"
+ },
+ "player-0041": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Casey Fenwhistle",
+  "nameLower": "casey fenwhistle"
+ },
+ "player-0042": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Gray Rastervale",
+  "nameLower": "gray rastervale"
+ },
+ "player-0043": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Casey Brackenridge-Vale",
+  "nameLower": "casey brackenridge-vale"
+ },
+ "player-0044": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Cameron Vossington",
+  "nameLower": "cameron vossington"
+ },
+ "player-0045": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Ellis Thistlecombe",
+  "nameLower": "ellis thistlecombe"
+ },
+ "player-0046": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Emery Larkspurne",
+  "nameLower": "emery larkspurne"
+ },
+ "player-0047": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Cameron Nettlefield",
+  "nameLower": "cameron nettlefield"
+ },
+ "player-0048": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Wren Everhollow",
+  "nameLower": "wren everhollow"
+ },
+ "player-0049": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Finley Inglebrook",
+  "nameLower": "finley inglebrook"
+ },
+ "player-0050": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Finley Pellbrook",
+  "nameLower": "finley pellbrook"
+ },
+ "player-0051": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Emery Inglebrook",
+  "nameLower": "emery inglebrook"
+ },
+ "player-0052": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Frankie Juniperhart",
+  "nameLower": "frankie juniperhart"
+ },
+ "player-0053": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Marlow Hollowmere",
+  "nameLower": "marlow hollowmere"
+ },
+ "player-0054": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Oakley Gallowpike",
+  "nameLower": "oakley gallowpike"
+ },
+ "player-0055": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Blake Duskwater",
+  "nameLower": "blake duskwater"
+ },
+ "player-0056": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Oakley Thistlecombe",
+  "nameLower": "oakley thistlecombe"
+ },
+ "player-0057": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Morgan Wexmoor",
+  "nameLower": "morgan wexmoor"
+ },
+ "player-0058": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Kai Duskwater",
+  "nameLower": "kai duskwater"
+ },
+ "player-0059": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Casey Umberhill",
+  "nameLower": "casey umberhill"
+ },
+ "player-0060": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Rowan Larkspurne",
+  "nameLower": "rowan larkspurne"
+ },
+ "player-0061": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Jesse Larkspurne",
+  "nameLower": "jesse larkspurne"
+ },
+ "player-0062": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Dana Kestrelton",
+  "nameLower": "dana kestrelton"
+ },
+ "player-0063": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Remy Gallowpike",
+  "nameLower": "remy gallowpike"
+ },
+ "player-0064": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Frankie Pellbrook",
+  "nameLower": "frankie pellbrook"
+ },
+ "player-0065": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Shay Inglebrook",
+  "nameLower": "shay inglebrook"
+ },
+ "player-0066": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Kai Gallowpike",
+  "nameLower": "kai gallowpike"
+ },
+ "player-0067": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Cameron Embervale",
+  "nameLower": "cameron embervale"
+ },
+ "player-0068": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Yael Embervale",
+  "nameLower": "yael embervale"
+ },
+ "player-0069": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Zion Orrinsby",
+  "nameLower": "zion orrinsby"
+ },
+ "player-0070": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Frankie Rastervale",
+  "nameLower": "frankie rastervale"
+ },
+ "player-0071": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Avery Brackenridge-Vale",
+  "nameLower": "avery brackenridge-vale"
+ },
+ "player-0072": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Eli Yarrowdale",
+  "nameLower": "eli yarrowdale"
+ },
+ "player-0073": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Oakley Corrimore",
+  "nameLower": "oakley corrimore"
+ },
+ "player-0074": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Remy Yarrowdale",
+  "nameLower": "remy yarrowdale"
+ },
+ "player-0075": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Eli Tamberline",
+  "nameLower": "eli tamberline"
+ },
+ "player-0076": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Bailey Thistlecombe",
+  "nameLower": "bailey thistlecombe"
+ },
+ "player-0077": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Alex Tamberline",
+  "nameLower": "alex tamberline"
+ },
+ "player-0078": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Riley Everhollow",
+  "nameLower": "riley everhollow"
+ },
+ "player-0079": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Blake Fenwhistle",
+  "nameLower": "blake fenwhistle"
+ },
+ "player-0080": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Yael Quillfeather",
+  "nameLower": "yael quillfeather"
+ },
+ "player-0081": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Avery Dellacourt",
+  "nameLower": "avery dellacourt"
+ },
+ "player-0082": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Riley Tamberline",
+  "nameLower": "riley tamberline"
+ },
+ "player-0083": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Sage Wexmoor",
+  "nameLower": "sage wexmoor"
+ },
+ "player-0084": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Shay Dellacourt",
+  "nameLower": "shay dellacourt"
+ },
+ "player-0085": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Oakley Wexmoor",
+  "nameLower": "oakley wexmoor"
+ },
+ "player-0086": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Blake Larkspurne",
+  "nameLower": "blake larkspurne"
+ },
+ "player-0087": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Eli Brindlewood",
+  "nameLower": "eli brindlewood"
+ },
+ "player-0088": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Alex Ashgrove",
+  "nameLower": "alex ashgrove"
+ },
+ "player-0089": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Kai Coldharbour",
+  "nameLower": "kai coldharbour"
+ },
+ "player-0090": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Shay Brindlewood",
+  "nameLower": "shay brindlewood"
+ },
+ "player-0091": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Tatum Duskwater",
+  "nameLower": "tatum duskwater"
+ },
+ "player-0092": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Eli Zephyrine",
+  "nameLower": "eli zephyrine"
+ },
+ "player-0093": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Parker Hollowmere",
+  "nameLower": "parker hollowmere"
+ },
+ "player-0094": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Bailey Zephyrine",
+  "nameLower": "bailey zephyrine"
+ },
+ "player-0095": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Shay Wexmoor",
+  "nameLower": "shay wexmoor"
+ },
+ "player-0096": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Hayden Nettlefield",
+  "nameLower": "hayden nettlefield"
+ },
+ "player-0097": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Cameron Dellacourt",
+  "nameLower": "cameron dellacourt"
+ },
+ "player-0098": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Rowan Inglebrook",
+  "nameLower": "rowan inglebrook"
+ },
+ "player-0099": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Morgan Thistlecombe",
+  "nameLower": "morgan thistlecombe"
+ },
+ "player-0100": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Quinn Embervale",
+  "nameLower": "quinn embervale"
+ },
+ "player-0101": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Alex Quillfeather",
+  "nameLower": "alex quillfeather"
+ },
+ "player-0102": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Uma Inglebrook",
+  "nameLower": "uma inglebrook"
+ },
+ "player-0103": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Rowan Thistlecombe",
+  "nameLower": "rowan thistlecombe"
+ },
+ "player-0104": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Quinn Yarrowdale",
+  "nameLower": "quinn yarrowdale"
+ },
+ "player-0105": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Kai Hollowmere",
+  "nameLower": "kai hollowmere"
+ },
+ "player-0106": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Tatum Sablewood",
+  "nameLower": "tatum sablewood"
+ },
+ "player-0107": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Indy Vossington",
+  "nameLower": "indy vossington"
+ },
+ "player-0108": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Emery Nettlefield",
+  "nameLower": "emery nettlefield"
+ },
+ "player-0109": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Val Hollowmere",
+  "nameLower": "val hollowmere"
+ },
+ "player-0110": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Jordan Hollowmere",
+  "nameLower": "jordan hollowmere"
+ },
+ "player-0111": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Oakley Umberhill",
+  "nameLower": "oakley umberhill"
+ },
+ "player-0112": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Drew Quillfeather",
+  "nameLower": "drew quillfeather"
+ },
+ "player-0113": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Marlow Marlowind",
+  "nameLower": "marlow marlowind"
+ },
+ "player-0114": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Remy Tamberline",
+  "nameLower": "remy tamberline"
+ },
+ "player-0115": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Morgan Pellbrook",
+  "nameLower": "morgan pellbrook"
+ },
+ "player-0116": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Kai Thistlecombe",
+  "nameLower": "kai thistlecombe"
+ },
+ "player-0117": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Lane Gallowpike",
+  "nameLower": "lane gallowpike"
+ },
+ "player-0118": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Cameron Duskwater",
+  "nameLower": "cameron duskwater"
+ },
+ "player-0119": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Avery Umberhill",
+  "nameLower": "avery umberhill"
+ },
+ "player-0120": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Kai Everhollow",
+  "nameLower": "kai everhollow"
+ },
+ "player-0121": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Uma Sablewood",
+  "nameLower": "uma sablewood"
+ },
+ "player-0122": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Frankie Yarrowdale",
+  "nameLower": "frankie yarrowdale"
+ },
+ "player-0123": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Uma Brackenridge-Vale",
+  "nameLower": "uma brackenridge-vale"
+ },
+ "player-0124": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Noel Zephyrine",
+  "nameLower": "noel zephyrine"
+ },
+ "player-0125": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Sage Fenwhistle",
+  "nameLower": "sage fenwhistle"
+ },
+ "player-0126": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Lane Ashgrove",
+  "nameLower": "lane ashgrove"
+ },
+ "player-0127": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Rowan Yarrowdale",
+  "nameLower": "rowan yarrowdale"
+ },
+ "player-0128": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Shay Larkspurne",
+  "nameLower": "shay larkspurne"
+ },
+ "player-0129": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Blake Sablewood",
+  "nameLower": "blake sablewood"
+ },
+ "player-0130": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Remy Duskwater",
+  "nameLower": "remy duskwater"
+ },
+ "player-0131": {
+  "addedVia": "import",
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Drew Hollowmere",
+  "nameLower": "drew hollowmere"
+ },
+ "player-0132": {
+  "addedVia": "import",
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Kai Yarrowdale",
+  "nameLower": "kai yarrowdale"
+ },
+ "player-0133": {
+  "addedVia": "import",
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Logan Tamberline",
+  "nameLower": "logan tamberline"
+ },
+ "player-0134": {
+  "addedVia": "import",
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Eli Sablewood",
+  "nameLower": "eli sablewood"
+ },
+ "player-0135": {
+  "addedVia": "import",
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Quinn Rastervale",
+  "nameLower": "quinn rastervale"
+ },
+ "player-0136": {
+  "addedVia": "import",
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Ellis Inglebrook",
+  "nameLower": "ellis inglebrook"
+ },
+ "player-0137": {
+  "addedVia": "import",
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Emery Dellacourt",
+  "nameLower": "emery dellacourt"
+ },
+ "player-0138": {
+  "addedVia": "import",
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Bailey Rastervale",
+  "nameLower": "bailey rastervale"
+ },
+ "player-0139": {
+  "addedVia": "import",
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Noel Quillfeather",
+  "nameLower": "noel quillfeather"
+ },
+ "player-0140": {
+  "addedVia": "import",
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Avery Inglebrook",
+  "nameLower": "avery inglebrook"
+ },
+ "player-0141": {
+  "addedVia": "import",
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Marlow Wexmoor",
+  "nameLower": "marlow wexmoor"
+ },
+ "player-0142": {
+  "addedVia": "import",
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Sage Sablewood",
+  "nameLower": "sage sablewood"
+ },
+ "player-0143": {
+  "addedVia": "import",
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Shay Quillfeather",
+  "nameLower": "shay quillfeather"
+ },
+ "player-0144": {
+  "addedVia": "import",
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Alex Rastervale",
+  "nameLower": "alex rastervale"
+ },
+ "player-0145": {
+  "addedVia": "import",
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Kai Dellacourt",
+  "nameLower": "kai dellacourt"
+ },
+ "player-0146": {
+  "addedVia": "import",
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Remy Ashgrove",
+  "nameLower": "remy ashgrove"
+ },
+ "player-0147": {
+  "addedVia": "import",
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Val Nettlefield",
+  "nameLower": "val nettlefield"
+ },
+ "player-0148": {
+  "addedVia": "import",
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Tatum Vossington",
+  "nameLower": "tatum vossington"
+ },
+ "player-0149": {
+  "addedVia": "import",
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Dana Thistlecombe",
+  "nameLower": "dana thistlecombe"
+ },
+ "player-0150": {
+  "addedVia": "import",
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Hayden Rastervale",
+  "nameLower": "hayden rastervale"
+ },
+ "player-0151": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "wren gallowpike",
+  "nameLower": "wren gallowpike"
+ },
+ "player-0152": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Wren  Larkspurne",
+  "nameLower": "wren  larkspurne"
+ },
+ "player-0153": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Frankie",
+  "nameLower": "frankie"
+ },
+ "player-0154": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Jordan W",
+  "nameLower": "jordan w"
+ },
+ "player-0155": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Oakley K",
+  "nameLower": "oakley k"
+ },
+ "player-0156": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "Avery Orrinsb",
+  "nameLower": "avery orrinsb"
+ },
+ "player-0157": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "test",
+  "nameLower": "test"
+ },
+ "player-0158": {
+  "createdAt": "2026-01-15T18:00:00.000Z",
+  "name": "asdf",
+  "nameLower": "asdf"
+ }
+}

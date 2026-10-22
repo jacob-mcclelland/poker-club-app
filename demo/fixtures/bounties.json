@@ -1,0 +1,3772 @@
+{
+ "bounty-00045": {
+  "count": 2,
+  "createdAt": "2026-07-01T02:30:00.000Z",
+  "date": "6/30/2026",
+  "gameNum": 1,
+  "player": "Avery Orrinsby",
+  "playerLower": "avery orrinsby",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00046": {
+  "count": 2,
+  "createdAt": "2026-07-01T02:30:00.000Z",
+  "date": "6/30/2026",
+  "gameNum": 1,
+  "player": "Casey Umberhill",
+  "playerLower": "casey umberhill",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00047": {
+  "count": 7,
+  "createdAt": "2026-07-01T02:30:00.000Z",
+  "date": "6/30/2026",
+  "gameNum": 1,
+  "player": "Hayden Kestrelton",
+  "playerLower": "hayden kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00048": {
+  "count": 3,
+  "createdAt": "2026-07-01T02:30:00.000Z",
+  "date": "6/30/2026",
+  "gameNum": 1,
+  "player": "Jordan Wexmoor",
+  "playerLower": "jordan wexmoor",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00049": {
+  "count": 3,
+  "createdAt": "2026-07-01T02:30:00.000Z",
+  "date": "6/30/2026",
+  "gameNum": 1,
+  "player": "Kendall Everhollow",
+  "playerLower": "kendall everhollow",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00050": {
+  "count": 1,
+  "createdAt": "2026-07-01T02:30:00.000Z",
+  "date": "6/30/2026",
+  "gameNum": 1,
+  "player": "Rowan Wexmoor",
+  "playerLower": "rowan wexmoor",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00051": {
+  "count": 4,
+  "createdAt": "2026-07-01T02:30:00.000Z",
+  "date": "6/30/2026",
+  "gameNum": 1,
+  "player": "Val Hollowmere",
+  "playerLower": "val hollowmere",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00052": {
+  "count": 4,
+  "createdAt": "2026-07-01T02:30:00.000Z",
+  "date": "6/30/2026",
+  "gameNum": 1,
+  "player": "Yael Sablewood",
+  "playerLower": "yael sablewood",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00053": {
+  "count": 6,
+  "createdAt": "2026-07-01T02:30:00.000Z",
+  "date": "6/30/2026",
+  "gameNum": 1,
+  "player": "Zion Brindlewood",
+  "playerLower": "zion brindlewood",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00099": {
+  "count": 3,
+  "createdAt": "2026-07-01T04:30:00.000Z",
+  "date": "6/30/2026",
+  "gameNum": 2,
+  "player": "Cameron Yarrowdale",
+  "playerLower": "cameron yarrowdale",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00100": {
+  "count": 2,
+  "createdAt": "2026-07-01T04:30:00.000Z",
+  "date": "6/30/2026",
+  "gameNum": 2,
+  "player": "Frankie Larkspurne",
+  "playerLower": "frankie larkspurne",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00101": {
+  "count": 3,
+  "createdAt": "2026-07-01T04:30:00.000Z",
+  "date": "6/30/2026",
+  "gameNum": 2,
+  "player": "Hayden Hollowmere",
+  "playerLower": "hayden hollowmere",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00102": {
+  "count": 4,
+  "createdAt": "2026-07-01T04:30:00.000Z",
+  "date": "6/30/2026",
+  "gameNum": 2,
+  "player": "Kendall Vossington",
+  "playerLower": "kendall vossington",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00103": {
+  "count": 5,
+  "createdAt": "2026-07-01T04:30:00.000Z",
+  "date": "6/30/2026",
+  "gameNum": 2,
+  "player": "Morgan Quillfeather",
+  "playerLower": "morgan quillfeather",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00104": {
+  "count": 5,
+  "createdAt": "2026-07-01T04:30:00.000Z",
+  "date": "6/30/2026",
+  "gameNum": 2,
+  "player": "Yael Sablewood",
+  "playerLower": "yael sablewood",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00159": {
+  "count": 2,
+  "createdAt": "2026-07-08T02:30:00.000Z",
+  "date": "7/7/2026",
+  "gameNum": 1,
+  "player": "Blake Thistlecombe",
+  "playerLower": "blake thistlecombe",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00160": {
+  "count": 4,
+  "createdAt": "2026-07-08T02:30:00.000Z",
+  "date": "7/7/2026",
+  "gameNum": 1,
+  "player": "Indy Kestrelton",
+  "playerLower": "indy kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00161": {
+  "count": 4,
+  "createdAt": "2026-07-08T02:30:00.000Z",
+  "date": "7/7/2026",
+  "gameNum": 1,
+  "player": "Noel Orrinsby",
+  "playerLower": "noel orrinsby",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00162": {
+  "count": 3,
+  "createdAt": "2026-07-08T02:30:00.000Z",
+  "date": "7/7/2026",
+  "gameNum": 1,
+  "player": "Oakley Fenwhistle",
+  "playerLower": "oakley fenwhistle",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00163": {
+  "count": 2,
+  "createdAt": "2026-07-08T02:30:00.000Z",
+  "date": "7/7/2026",
+  "gameNum": 1,
+  "player": "Oakley Kestrelton",
+  "playerLower": "oakley kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00164": {
+  "count": 4,
+  "createdAt": "2026-07-08T02:30:00.000Z",
+  "date": "7/7/2026",
+  "gameNum": 1,
+  "player": "Rowan Wexmoor",
+  "playerLower": "rowan wexmoor",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00165": {
+  "count": 6,
+  "createdAt": "2026-07-08T02:30:00.000Z",
+  "date": "7/7/2026",
+  "gameNum": 1,
+  "player": "Shay Rastervale",
+  "playerLower": "shay rastervale",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00166": {
+  "count": 4,
+  "createdAt": "2026-07-08T02:30:00.000Z",
+  "date": "7/7/2026",
+  "gameNum": 1,
+  "player": "Tatum Pellbrook",
+  "playerLower": "tatum pellbrook",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00216": {
+  "count": 7,
+  "createdAt": "2026-07-08T04:30:00.000Z",
+  "date": "7/7/2026",
+  "gameNum": 2,
+  "player": "Frankie Larkspurne",
+  "playerLower": "frankie larkspurne",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00217": {
+  "count": 4,
+  "createdAt": "2026-07-08T04:30:00.000Z",
+  "date": "7/7/2026",
+  "gameNum": 2,
+  "player": "Gray Dellacourt",
+  "playerLower": "gray dellacourt",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00218": {
+  "count": 6,
+  "createdAt": "2026-07-08T04:30:00.000Z",
+  "date": "7/7/2026",
+  "gameNum": 2,
+  "player": "Hayden Kestrelton",
+  "playerLower": "hayden kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00219": {
+  "count": 2,
+  "createdAt": "2026-07-08T04:30:00.000Z",
+  "date": "7/7/2026",
+  "gameNum": 2,
+  "player": "Jordan Coldharbour",
+  "playerLower": "jordan coldharbour",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00220": {
+  "count": 3,
+  "createdAt": "2026-07-08T04:30:00.000Z",
+  "date": "7/7/2026",
+  "gameNum": 2,
+  "player": "Oakley Fenwhistle",
+  "playerLower": "oakley fenwhistle",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00277": {
+  "count": 10,
+  "createdAt": "2026-07-15T02:30:00.000Z",
+  "date": "7/14/2026",
+  "gameNum": 1,
+  "player": "Avery Dellacourt",
+  "playerLower": "avery dellacourt",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00278": {
+  "count": 6,
+  "createdAt": "2026-07-15T02:30:00.000Z",
+  "date": "7/14/2026",
+  "gameNum": 1,
+  "player": "Bailey Umberhill",
+  "playerLower": "bailey umberhill",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00279": {
+  "count": 8,
+  "createdAt": "2026-07-15T02:30:00.000Z",
+  "date": "7/14/2026",
+  "gameNum": 1,
+  "player": "Frankie Rastervale",
+  "playerLower": "frankie rastervale",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00280": {
+  "count": 9,
+  "createdAt": "2026-07-15T02:30:00.000Z",
+  "date": "7/14/2026",
+  "gameNum": 1,
+  "player": "Kendall Everhollow",
+  "playerLower": "kendall everhollow",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00281": {
+  "count": 4,
+  "createdAt": "2026-07-15T02:30:00.000Z",
+  "date": "7/14/2026",
+  "gameNum": 1,
+  "player": "Oakley Fenwhistle",
+  "playerLower": "oakley fenwhistle",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00333": {
+  "count": 3,
+  "createdAt": "2026-07-15T04:30:00.000Z",
+  "date": "7/14/2026",
+  "gameNum": 2,
+  "player": "Blake Thistlecombe",
+  "playerLower": "blake thistlecombe",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00334": {
+  "count": 7,
+  "createdAt": "2026-07-15T04:30:00.000Z",
+  "date": "7/14/2026",
+  "gameNum": 2,
+  "player": "Frankie Juniperhart",
+  "playerLower": "frankie juniperhart",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00335": {
+  "count": 8,
+  "createdAt": "2026-07-15T04:30:00.000Z",
+  "date": "7/14/2026",
+  "gameNum": 2,
+  "player": "Kendall Sablewood",
+  "playerLower": "kendall sablewood",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00336": {
+  "count": 6,
+  "createdAt": "2026-07-15T04:30:00.000Z",
+  "date": "7/14/2026",
+  "gameNum": 2,
+  "player": "Rowan Wexmoor",
+  "playerLower": "rowan wexmoor",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00337": {
+  "count": 6,
+  "createdAt": "2026-07-15T04:30:00.000Z",
+  "date": "7/14/2026",
+  "gameNum": 2,
+  "player": "Yael Thistlecombe",
+  "playerLower": "yael thistlecombe",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00386": {
+  "count": 2,
+  "createdAt": "2026-07-22T02:30:00.000Z",
+  "date": "7/21/2026",
+  "gameNum": 1,
+  "player": "Indy Kestrelton",
+  "playerLower": "indy kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00387": {
+  "count": 7,
+  "createdAt": "2026-07-22T02:30:00.000Z",
+  "date": "7/21/2026",
+  "gameNum": 1,
+  "player": "Marlow Marlowind",
+  "playerLower": "marlow marlowind",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00388": {
+  "count": 3,
+  "createdAt": "2026-07-22T02:30:00.000Z",
+  "date": "7/21/2026",
+  "gameNum": 1,
+  "player": "Sage Juniperhart",
+  "playerLower": "sage juniperhart",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00389": {
+  "count": 8,
+  "createdAt": "2026-07-22T02:30:00.000Z",
+  "date": "7/21/2026",
+  "gameNum": 1,
+  "player": "Shay Fenwhistle",
+  "playerLower": "shay fenwhistle",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00390": {
+  "count": 8,
+  "createdAt": "2026-07-22T02:30:00.000Z",
+  "date": "7/21/2026",
+  "gameNum": 1,
+  "player": "Tatum Pellbrook",
+  "playerLower": "tatum pellbrook",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00443": {
+  "count": 6,
+  "createdAt": "2026-07-22T04:30:00.000Z",
+  "date": "7/21/2026",
+  "gameNum": 2,
+  "player": "Avery Orrinsby",
+  "playerLower": "avery orrinsby",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00444": {
+  "count": 1,
+  "createdAt": "2026-07-22T04:30:00.000Z",
+  "date": "7/21/2026",
+  "gameNum": 2,
+  "player": "Gray Dellacourt",
+  "playerLower": "gray dellacourt",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00445": {
+  "count": 3,
+  "createdAt": "2026-07-22T04:30:00.000Z",
+  "date": "7/21/2026",
+  "gameNum": 2,
+  "player": "Hayden Hollowmere",
+  "playerLower": "hayden hollowmere",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00446": {
+  "count": 4,
+  "createdAt": "2026-07-22T04:30:00.000Z",
+  "date": "7/21/2026",
+  "gameNum": 2,
+  "player": "Hayden Nettlefield",
+  "playerLower": "hayden nettlefield",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00447": {
+  "count": 4,
+  "createdAt": "2026-07-22T04:30:00.000Z",
+  "date": "7/21/2026",
+  "gameNum": 2,
+  "player": "Kendall Vossington",
+  "playerLower": "kendall vossington",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00448": {
+  "count": 4,
+  "createdAt": "2026-07-22T04:30:00.000Z",
+  "date": "7/21/2026",
+  "gameNum": 2,
+  "player": "Yael Sablewood",
+  "playerLower": "yael sablewood",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00449": {
+  "count": 3,
+  "createdAt": "2026-07-22T04:30:00.000Z",
+  "date": "7/21/2026",
+  "gameNum": 2,
+  "player": "Zion Brindlewood",
+  "playerLower": "zion brindlewood",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00501": {
+  "count": 3,
+  "createdAt": "2026-07-29T02:30:00.000Z",
+  "date": "7/28/2026",
+  "gameNum": 1,
+  "player": "Frankie Larkspurne",
+  "playerLower": "frankie larkspurne",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00502": {
+  "count": 3,
+  "createdAt": "2026-07-29T02:30:00.000Z",
+  "date": "7/28/2026",
+  "gameNum": 1,
+  "player": "Hayden Hollowmere",
+  "playerLower": "hayden hollowmere",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00503": {
+  "count": 3,
+  "createdAt": "2026-07-29T02:30:00.000Z",
+  "date": "7/28/2026",
+  "gameNum": 1,
+  "player": "Hayden Kestrelton",
+  "playerLower": "hayden kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00504": {
+  "count": 2,
+  "createdAt": "2026-07-29T02:30:00.000Z",
+  "date": "7/28/2026",
+  "gameNum": 1,
+  "player": "Sage Juniperhart",
+  "playerLower": "sage juniperhart",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00505": {
+  "count": 4,
+  "createdAt": "2026-07-29T02:30:00.000Z",
+  "date": "7/28/2026",
+  "gameNum": 1,
+  "player": "Shay Fenwhistle",
+  "playerLower": "shay fenwhistle",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00506": {
+  "count": 2,
+  "createdAt": "2026-07-29T02:30:00.000Z",
+  "date": "7/28/2026",
+  "gameNum": 1,
+  "player": "Shay Rastervale",
+  "playerLower": "shay rastervale",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00507": {
+  "count": 2,
+  "createdAt": "2026-07-29T02:30:00.000Z",
+  "date": "7/28/2026",
+  "gameNum": 1,
+  "player": "Wren Larkspurne",
+  "playerLower": "wren larkspurne",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00508": {
+  "count": 2,
+  "createdAt": "2026-07-29T02:30:00.000Z",
+  "date": "7/28/2026",
+  "gameNum": 1,
+  "player": "Yael Sablewood",
+  "playerLower": "yael sablewood",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00509": {
+  "count": 4,
+  "createdAt": "2026-07-29T02:30:00.000Z",
+  "date": "7/28/2026",
+  "gameNum": 1,
+  "player": "Yael Thistlecombe",
+  "playerLower": "yael thistlecombe",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00554": {
+  "count": 7,
+  "createdAt": "2026-07-29T04:30:00.000Z",
+  "date": "7/28/2026",
+  "gameNum": 2,
+  "player": "Avery Orrinsby",
+  "playerLower": "avery orrinsby",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00555": {
+  "count": 3,
+  "createdAt": "2026-07-29T04:30:00.000Z",
+  "date": "7/28/2026",
+  "gameNum": 2,
+  "player": "Drew Ashgrove",
+  "playerLower": "drew ashgrove",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00556": {
+  "count": 4,
+  "createdAt": "2026-07-29T04:30:00.000Z",
+  "date": "7/28/2026",
+  "gameNum": 2,
+  "player": "Frankie Wexmoor",
+  "playerLower": "frankie wexmoor",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00557": {
+  "count": 4,
+  "createdAt": "2026-07-29T04:30:00.000Z",
+  "date": "7/28/2026",
+  "gameNum": 2,
+  "player": "Indy Kestrelton",
+  "playerLower": "indy kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00558": {
+  "count": 3,
+  "createdAt": "2026-07-29T04:30:00.000Z",
+  "date": "7/28/2026",
+  "gameNum": 2,
+  "player": "Oakley Kestrelton",
+  "playerLower": "oakley kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00619": {
+  "count": 4,
+  "createdAt": "2026-08-05T02:30:00.000Z",
+  "date": "8/4/2026",
+  "gameNum": 1,
+  "player": "Avery Dellacourt",
+  "playerLower": "avery dellacourt",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00620": {
+  "count": 4,
+  "createdAt": "2026-08-05T02:30:00.000Z",
+  "date": "8/4/2026",
+  "gameNum": 1,
+  "player": "Bailey Umberhill",
+  "playerLower": "bailey umberhill",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00621": {
+  "count": 8,
+  "createdAt": "2026-08-05T02:30:00.000Z",
+  "date": "8/4/2026",
+  "gameNum": 1,
+  "player": "Finley Vossington",
+  "playerLower": "finley vossington",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00622": {
+  "count": 3,
+  "createdAt": "2026-08-05T02:30:00.000Z",
+  "date": "8/4/2026",
+  "gameNum": 1,
+  "player": "Jordan Dellacourt",
+  "playerLower": "jordan dellacourt",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00623": {
+  "count": 4,
+  "createdAt": "2026-08-05T02:30:00.000Z",
+  "date": "8/4/2026",
+  "gameNum": 1,
+  "player": "Kai Duskwater",
+  "playerLower": "kai duskwater",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00624": {
+  "count": 3,
+  "createdAt": "2026-08-05T02:30:00.000Z",
+  "date": "8/4/2026",
+  "gameNum": 1,
+  "player": "Oakley Wexmoor",
+  "playerLower": "oakley wexmoor",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00625": {
+  "count": 8,
+  "createdAt": "2026-08-05T02:30:00.000Z",
+  "date": "8/4/2026",
+  "gameNum": 1,
+  "player": "Shay Rastervale",
+  "playerLower": "shay rastervale",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00626": {
+  "count": 4,
+  "createdAt": "2026-08-05T02:30:00.000Z",
+  "date": "8/4/2026",
+  "gameNum": 1,
+  "player": "Tatum Pellbrook",
+  "playerLower": "tatum pellbrook",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00670": {
+  "count": 1,
+  "createdAt": "2026-08-05T04:30:00.000Z",
+  "date": "8/4/2026",
+  "gameNum": 2,
+  "player": "Hayden Kestrelton",
+  "playerLower": "hayden kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00671": {
+  "count": 5,
+  "createdAt": "2026-08-05T04:30:00.000Z",
+  "date": "8/4/2026",
+  "gameNum": 2,
+  "player": "Morgan Quillfeather",
+  "playerLower": "morgan quillfeather",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00672": {
+  "count": 3,
+  "createdAt": "2026-08-05T04:30:00.000Z",
+  "date": "8/4/2026",
+  "gameNum": 2,
+  "player": "Oakley Kestrelton",
+  "playerLower": "oakley kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00673": {
+  "count": 4,
+  "createdAt": "2026-08-05T04:30:00.000Z",
+  "date": "8/4/2026",
+  "gameNum": 2,
+  "player": "Shay Rastervale",
+  "playerLower": "shay rastervale",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00674": {
+  "count": 8,
+  "createdAt": "2026-08-05T04:30:00.000Z",
+  "date": "8/4/2026",
+  "gameNum": 2,
+  "player": "Wren Larkspurne",
+  "playerLower": "wren larkspurne",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00768": {
+  "count": 1,
+  "createdAt": "2026-08-26T02:30:00.000Z",
+  "date": "8/25/2026",
+  "gameNum": 1,
+  "player": "Frankie Larkspurne",
+  "playerLower": "frankie larkspurne",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00769": {
+  "count": 6,
+  "createdAt": "2026-08-26T02:30:00.000Z",
+  "date": "8/25/2026",
+  "gameNum": 1,
+  "player": "Hayden Hollowmere",
+  "playerLower": "hayden hollowmere",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00770": {
+  "count": 5,
+  "createdAt": "2026-08-26T02:30:00.000Z",
+  "date": "8/25/2026",
+  "gameNum": 1,
+  "player": "Kendall Sablewood",
+  "playerLower": "kendall sablewood",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00771": {
+  "count": 9,
+  "createdAt": "2026-08-26T02:30:00.000Z",
+  "date": "8/25/2026",
+  "gameNum": 1,
+  "player": "Kendall Vossington",
+  "playerLower": "kendall vossington",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00772": {
+  "count": 4,
+  "createdAt": "2026-08-26T02:30:00.000Z",
+  "date": "8/25/2026",
+  "gameNum": 1,
+  "player": "Parker Rastervale",
+  "playerLower": "parker rastervale",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00773": {
+  "count": 2,
+  "createdAt": "2026-08-26T02:30:00.000Z",
+  "date": "8/25/2026",
+  "gameNum": 1,
+  "player": "Riley Corrimore",
+  "playerLower": "riley corrimore",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00774": {
+  "count": 5,
+  "createdAt": "2026-08-26T02:30:00.000Z",
+  "date": "8/25/2026",
+  "gameNum": 1,
+  "player": "Tatum Pellbrook",
+  "playerLower": "tatum pellbrook",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00826": {
+  "count": 3,
+  "createdAt": "2026-08-26T04:30:00.000Z",
+  "date": "8/25/2026",
+  "gameNum": 2,
+  "player": "Kendall Sablewood",
+  "playerLower": "kendall sablewood",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00827": {
+  "count": 10,
+  "createdAt": "2026-08-26T04:30:00.000Z",
+  "date": "8/25/2026",
+  "gameNum": 2,
+  "player": "Kendall Vossington",
+  "playerLower": "kendall vossington",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00828": {
+  "count": 3,
+  "createdAt": "2026-08-26T04:30:00.000Z",
+  "date": "8/25/2026",
+  "gameNum": 2,
+  "player": "Morgan Quillfeather",
+  "playerLower": "morgan quillfeather",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00829": {
+  "count": 5,
+  "createdAt": "2026-08-26T04:30:00.000Z",
+  "date": "8/25/2026",
+  "gameNum": 2,
+  "player": "Oakley Fenwhistle",
+  "playerLower": "oakley fenwhistle",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00830": {
+  "count": 4,
+  "createdAt": "2026-08-26T04:30:00.000Z",
+  "date": "8/25/2026",
+  "gameNum": 2,
+  "player": "Oakley Kestrelton",
+  "playerLower": "oakley kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00895": {
+  "count": 5,
+  "createdAt": "2026-09-02T02:30:00.000Z",
+  "date": "9/1/2026",
+  "gameNum": 1,
+  "player": "Bailey Umberhill",
+  "playerLower": "bailey umberhill",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00896": {
+  "count": 2,
+  "createdAt": "2026-09-02T02:30:00.000Z",
+  "date": "9/1/2026",
+  "gameNum": 1,
+  "player": "Hayden Hollowmere",
+  "playerLower": "hayden hollowmere",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00897": {
+  "count": 7,
+  "createdAt": "2026-09-02T02:30:00.000Z",
+  "date": "9/1/2026",
+  "gameNum": 1,
+  "player": "Hayden Kestrelton",
+  "playerLower": "hayden kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00898": {
+  "count": 4,
+  "createdAt": "2026-09-02T02:30:00.000Z",
+  "date": "9/1/2026",
+  "gameNum": 1,
+  "player": "Indy Kestrelton",
+  "playerLower": "indy kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00899": {
+  "count": 4,
+  "createdAt": "2026-09-02T02:30:00.000Z",
+  "date": "9/1/2026",
+  "gameNum": 1,
+  "player": "Jordan Wexmoor",
+  "playerLower": "jordan wexmoor",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00900": {
+  "count": 6,
+  "createdAt": "2026-09-02T02:30:00.000Z",
+  "date": "9/1/2026",
+  "gameNum": 1,
+  "player": "Kendall Sablewood",
+  "playerLower": "kendall sablewood",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00901": {
+  "count": 3,
+  "createdAt": "2026-09-02T02:30:00.000Z",
+  "date": "9/1/2026",
+  "gameNum": 1,
+  "player": "Oakley Kestrelton",
+  "playerLower": "oakley kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00902": {
+  "count": 8,
+  "createdAt": "2026-09-02T02:30:00.000Z",
+  "date": "9/1/2026",
+  "gameNum": 1,
+  "player": "Riley Corrimore",
+  "playerLower": "riley corrimore",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00952": {
+  "count": 5,
+  "createdAt": "2026-09-02T04:30:00.000Z",
+  "date": "9/1/2026",
+  "gameNum": 2,
+  "player": "Dana Kestrelton",
+  "playerLower": "dana kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00953": {
+  "count": 5,
+  "createdAt": "2026-09-02T04:30:00.000Z",
+  "date": "9/1/2026",
+  "gameNum": 2,
+  "player": "Oakley Kestrelton",
+  "playerLower": "oakley kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00954": {
+  "count": 6,
+  "createdAt": "2026-09-02T04:30:00.000Z",
+  "date": "9/1/2026",
+  "gameNum": 2,
+  "player": "Tatum Pellbrook",
+  "playerLower": "tatum pellbrook",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-00955": {
+  "count": 10,
+  "createdAt": "2026-09-02T04:30:00.000Z",
+  "date": "9/1/2026",
+  "gameNum": 2,
+  "player": "Yael Thistlecombe",
+  "playerLower": "yael thistlecombe",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01020": {
+  "count": 5,
+  "createdAt": "2026-09-09T02:30:00.000Z",
+  "date": "9/8/2026",
+  "gameNum": 1,
+  "player": "Eli Brindlewood",
+  "playerLower": "eli brindlewood",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01021": {
+  "count": 5,
+  "createdAt": "2026-09-09T02:30:00.000Z",
+  "date": "9/8/2026",
+  "gameNum": 1,
+  "player": "Gray Dellacourt",
+  "playerLower": "gray dellacourt",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01022": {
+  "count": 8,
+  "createdAt": "2026-09-09T02:30:00.000Z",
+  "date": "9/8/2026",
+  "gameNum": 1,
+  "player": "Indy Kestrelton",
+  "playerLower": "indy kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01023": {
+  "count": 15,
+  "createdAt": "2026-09-09T02:30:00.000Z",
+  "date": "9/8/2026",
+  "gameNum": 1,
+  "player": "Oakley Fenwhistle",
+  "playerLower": "oakley fenwhistle",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01024": {
+  "count": 7,
+  "createdAt": "2026-09-09T02:30:00.000Z",
+  "date": "9/8/2026",
+  "gameNum": 1,
+  "player": "Riley Thistlecombe",
+  "playerLower": "riley thistlecombe",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01082": {
+  "count": 4,
+  "createdAt": "2026-09-09T04:30:00.000Z",
+  "date": "9/8/2026",
+  "gameNum": 2,
+  "player": "Avery Orrinsby",
+  "playerLower": "avery orrinsby",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01083": {
+  "count": 5,
+  "createdAt": "2026-09-09T04:30:00.000Z",
+  "date": "9/8/2026",
+  "gameNum": 2,
+  "player": "Jordan Coldharbour",
+  "playerLower": "jordan coldharbour",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01084": {
+  "count": 5,
+  "createdAt": "2026-09-09T04:30:00.000Z",
+  "date": "9/8/2026",
+  "gameNum": 2,
+  "player": "Jordan Dellacourt",
+  "playerLower": "jordan dellacourt",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01085": {
+  "count": 10,
+  "createdAt": "2026-09-09T04:30:00.000Z",
+  "date": "9/8/2026",
+  "gameNum": 2,
+  "player": "Kendall Vossington",
+  "playerLower": "kendall vossington",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01086": {
+  "count": 5,
+  "createdAt": "2026-09-09T04:30:00.000Z",
+  "date": "9/8/2026",
+  "gameNum": 2,
+  "player": "Parker Rastervale",
+  "playerLower": "parker rastervale",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01087": {
+  "count": 3,
+  "createdAt": "2026-09-09T04:30:00.000Z",
+  "date": "9/8/2026",
+  "gameNum": 2,
+  "player": "Wren Larkspurne",
+  "playerLower": "wren larkspurne",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01136": {
+  "count": 4,
+  "createdAt": "2026-09-16T02:30:00.000Z",
+  "date": "9/15/2026",
+  "gameNum": 1,
+  "player": "Alex Pellbrook",
+  "playerLower": "alex pellbrook",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01137": {
+  "count": 9,
+  "createdAt": "2026-09-16T02:30:00.000Z",
+  "date": "9/15/2026",
+  "gameNum": 1,
+  "player": "Noel Orrinsby",
+  "playerLower": "noel orrinsby",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01138": {
+  "count": 6,
+  "createdAt": "2026-09-16T02:30:00.000Z",
+  "date": "9/15/2026",
+  "gameNum": 1,
+  "player": "Shay Fenwhistle",
+  "playerLower": "shay fenwhistle",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01139": {
+  "count": 4,
+  "createdAt": "2026-09-16T02:30:00.000Z",
+  "date": "9/15/2026",
+  "gameNum": 1,
+  "player": "Tatum Pellbrook",
+  "playerLower": "tatum pellbrook",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01140": {
+  "count": 2,
+  "createdAt": "2026-09-16T02:30:00.000Z",
+  "date": "9/15/2026",
+  "gameNum": 1,
+  "player": "Yael Sablewood",
+  "playerLower": "yael sablewood",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01184": {
+  "count": 2,
+  "createdAt": "2026-09-16T04:30:00.000Z",
+  "date": "9/15/2026",
+  "gameNum": 2,
+  "player": "Blake Thistlecombe",
+  "playerLower": "blake thistlecombe",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01185": {
+  "count": 2,
+  "createdAt": "2026-09-16T04:30:00.000Z",
+  "date": "9/15/2026",
+  "gameNum": 2,
+  "player": "Frankie Larkspurne",
+  "playerLower": "frankie larkspurne",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01186": {
+  "count": 5,
+  "createdAt": "2026-09-16T04:30:00.000Z",
+  "date": "9/15/2026",
+  "gameNum": 2,
+  "player": "Indy Kestrelton",
+  "playerLower": "indy kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01187": {
+  "count": 3,
+  "createdAt": "2026-09-16T04:30:00.000Z",
+  "date": "9/15/2026",
+  "gameNum": 2,
+  "player": "Morgan Quillfeather",
+  "playerLower": "morgan quillfeather",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01188": {
+  "count": 3,
+  "createdAt": "2026-09-16T04:30:00.000Z",
+  "date": "9/15/2026",
+  "gameNum": 2,
+  "player": "Shay Rastervale",
+  "playerLower": "shay rastervale",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01189": {
+  "count": 6,
+  "createdAt": "2026-09-16T04:30:00.000Z",
+  "date": "9/15/2026",
+  "gameNum": 2,
+  "player": "Val Thistlecombe",
+  "playerLower": "val thistlecombe",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01190": {
+  "count": 3,
+  "createdAt": "2026-09-16T04:30:00.000Z",
+  "date": "9/15/2026",
+  "gameNum": 2,
+  "player": "Yael Thistlecombe",
+  "playerLower": "yael thistlecombe",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01251": {
+  "count": 6,
+  "createdAt": "2026-09-23T02:30:00.000Z",
+  "date": "9/22/2026",
+  "gameNum": 1,
+  "player": "Alex Quillfeather",
+  "playerLower": "alex quillfeather",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01252": {
+  "count": 4,
+  "createdAt": "2026-09-23T02:30:00.000Z",
+  "date": "9/22/2026",
+  "gameNum": 1,
+  "player": "Avery Umberhill",
+  "playerLower": "avery umberhill",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01253": {
+  "count": 8,
+  "createdAt": "2026-09-23T02:30:00.000Z",
+  "date": "9/22/2026",
+  "gameNum": 1,
+  "player": "Cameron Yarrowdale",
+  "playerLower": "cameron yarrowdale",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01254": {
+  "count": 9,
+  "createdAt": "2026-09-23T02:30:00.000Z",
+  "date": "9/22/2026",
+  "gameNum": 1,
+  "player": "Gray Rastervale",
+  "playerLower": "gray rastervale",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01255": {
+  "count": 5,
+  "createdAt": "2026-09-23T02:30:00.000Z",
+  "date": "9/22/2026",
+  "gameNum": 1,
+  "player": "Hayden Hollowmere",
+  "playerLower": "hayden hollowmere",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01256": {
+  "count": 2,
+  "createdAt": "2026-09-23T02:30:00.000Z",
+  "date": "9/22/2026",
+  "gameNum": 1,
+  "player": "Noel Vossington",
+  "playerLower": "noel vossington",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01257": {
+  "count": 4,
+  "createdAt": "2026-09-23T02:30:00.000Z",
+  "date": "9/22/2026",
+  "gameNum": 1,
+  "player": "Noel Zephyrine",
+  "playerLower": "noel zephyrine",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01299": {
+  "count": 5,
+  "createdAt": "2026-09-23T04:30:00.000Z",
+  "date": "9/22/2026",
+  "gameNum": 2,
+  "player": "Alex Pellbrook",
+  "playerLower": "alex pellbrook",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01300": {
+  "count": 2,
+  "createdAt": "2026-09-23T04:30:00.000Z",
+  "date": "9/22/2026",
+  "gameNum": 2,
+  "player": "Cameron Yarrowdale",
+  "playerLower": "cameron yarrowdale",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01301": {
+  "count": 4,
+  "createdAt": "2026-09-23T04:30:00.000Z",
+  "date": "9/22/2026",
+  "gameNum": 2,
+  "player": "Frankie Larkspurne",
+  "playerLower": "frankie larkspurne",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01302": {
+  "count": 10,
+  "createdAt": "2026-09-23T04:30:00.000Z",
+  "date": "9/22/2026",
+  "gameNum": 2,
+  "player": "Jordan Coldharbour",
+  "playerLower": "jordan coldharbour",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01303": {
+  "count": 1,
+  "createdAt": "2026-09-23T04:30:00.000Z",
+  "date": "9/22/2026",
+  "gameNum": 2,
+  "player": "Wren Larkspurne",
+  "playerLower": "wren larkspurne",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01351": {
+  "count": 4,
+  "createdAt": "2026-09-30T02:30:00.000Z",
+  "date": "9/29/2026",
+  "gameNum": 1,
+  "player": "Dana Dellacourt",
+  "playerLower": "dana dellacourt",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01352": {
+  "count": 4,
+  "createdAt": "2026-09-30T02:30:00.000Z",
+  "date": "9/29/2026",
+  "gameNum": 1,
+  "player": "Drew Ashgrove",
+  "playerLower": "drew ashgrove",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01353": {
+  "count": 2,
+  "createdAt": "2026-09-30T02:30:00.000Z",
+  "date": "9/29/2026",
+  "gameNum": 1,
+  "player": "Kendall Sablewood",
+  "playerLower": "kendall sablewood",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01354": {
+  "count": 2,
+  "createdAt": "2026-09-30T02:30:00.000Z",
+  "date": "9/29/2026",
+  "gameNum": 1,
+  "player": "Rowan Yarrowdale",
+  "playerLower": "rowan yarrowdale",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01355": {
+  "count": 5,
+  "createdAt": "2026-09-30T02:30:00.000Z",
+  "date": "9/29/2026",
+  "gameNum": 1,
+  "player": "Shay Fenwhistle",
+  "playerLower": "shay fenwhistle",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01356": {
+  "count": 3,
+  "createdAt": "2026-09-30T02:30:00.000Z",
+  "date": "9/29/2026",
+  "gameNum": 1,
+  "player": "Wren Gallowpike",
+  "playerLower": "wren gallowpike",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01357": {
+  "count": 3,
+  "createdAt": "2026-09-30T02:30:00.000Z",
+  "date": "9/29/2026",
+  "gameNum": 1,
+  "player": "Wren Larkspurne",
+  "playerLower": "wren larkspurne",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01358": {
+  "count": 4,
+  "createdAt": "2026-09-30T02:30:00.000Z",
+  "date": "9/29/2026",
+  "gameNum": 1,
+  "player": "Yael Thistlecombe",
+  "playerLower": "yael thistlecombe",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01413": {
+  "count": 7,
+  "createdAt": "2026-09-30T04:30:00.000Z",
+  "date": "9/29/2026",
+  "gameNum": 2,
+  "player": "Frankie Larkspurne",
+  "playerLower": "frankie larkspurne",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01414": {
+  "count": 6,
+  "createdAt": "2026-09-30T04:30:00.000Z",
+  "date": "9/29/2026",
+  "gameNum": 2,
+  "player": "Hayden Kestrelton",
+  "playerLower": "hayden kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01415": {
+  "count": 9,
+  "createdAt": "2026-09-30T04:30:00.000Z",
+  "date": "9/29/2026",
+  "gameNum": 2,
+  "player": "Sage Juniperhart",
+  "playerLower": "sage juniperhart",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01416": {
+  "count": 4,
+  "createdAt": "2026-09-30T04:30:00.000Z",
+  "date": "9/29/2026",
+  "gameNum": 2,
+  "player": "Val Thistlecombe",
+  "playerLower": "val thistlecombe",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01417": {
+  "count": 7,
+  "createdAt": "2026-09-30T04:30:00.000Z",
+  "date": "9/29/2026",
+  "gameNum": 2,
+  "player": "Yael Embervale",
+  "playerLower": "yael embervale",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01477": {
+  "count": 5,
+  "createdAt": "2026-10-07T02:30:00.000Z",
+  "date": "10/6/2026",
+  "gameNum": 1,
+  "player": "Bailey Umberhill",
+  "playerLower": "bailey umberhill",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01478": {
+  "count": 6,
+  "createdAt": "2026-10-07T02:30:00.000Z",
+  "date": "10/6/2026",
+  "gameNum": 1,
+  "player": "Hayden Hollowmere",
+  "playerLower": "hayden hollowmere",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01479": {
+  "count": 2,
+  "createdAt": "2026-10-07T02:30:00.000Z",
+  "date": "10/6/2026",
+  "gameNum": 1,
+  "player": "Kendall Vossington",
+  "playerLower": "kendall vossington",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01480": {
+  "count": 4,
+  "createdAt": "2026-10-07T02:30:00.000Z",
+  "date": "10/6/2026",
+  "gameNum": 1,
+  "player": "Oakley Kestrelton",
+  "playerLower": "oakley kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01481": {
+  "count": 3,
+  "createdAt": "2026-10-07T02:30:00.000Z",
+  "date": "10/6/2026",
+  "gameNum": 1,
+  "player": "Riley Thistlecombe",
+  "playerLower": "riley thistlecombe",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01482": {
+  "count": 1,
+  "createdAt": "2026-10-07T02:30:00.000Z",
+  "date": "10/6/2026",
+  "gameNum": 1,
+  "player": "Wren Larkspurne",
+  "playerLower": "wren larkspurne",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01483": {
+  "count": 7,
+  "createdAt": "2026-10-07T02:30:00.000Z",
+  "date": "10/6/2026",
+  "gameNum": 1,
+  "player": "Zion Brindlewood",
+  "playerLower": "zion brindlewood",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01484": {
+  "count": 4,
+  "createdAt": "2026-10-07T02:30:00.000Z",
+  "date": "10/6/2026",
+  "gameNum": 1,
+  "player": "Zion Orrinsby",
+  "playerLower": "zion orrinsby",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01535": {
+  "count": 4,
+  "createdAt": "2026-10-07T04:30:00.000Z",
+  "date": "10/6/2026",
+  "gameNum": 2,
+  "player": "Drew Ashgrove",
+  "playerLower": "drew ashgrove",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01536": {
+  "count": 1,
+  "createdAt": "2026-10-07T04:30:00.000Z",
+  "date": "10/6/2026",
+  "gameNum": 2,
+  "player": "Finley Vossington",
+  "playerLower": "finley vossington",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01537": {
+  "count": 6,
+  "createdAt": "2026-10-07T04:30:00.000Z",
+  "date": "10/6/2026",
+  "gameNum": 2,
+  "player": "Jordan Wexmoor",
+  "playerLower": "jordan wexmoor",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01538": {
+  "count": 5,
+  "createdAt": "2026-10-07T04:30:00.000Z",
+  "date": "10/6/2026",
+  "gameNum": 2,
+  "player": "Noel Orrinsby",
+  "playerLower": "noel orrinsby",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01539": {
+  "count": 3,
+  "createdAt": "2026-10-07T04:30:00.000Z",
+  "date": "10/6/2026",
+  "gameNum": 2,
+  "player": "Wren Larkspurne",
+  "playerLower": "wren larkspurne",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01540": {
+  "count": 6,
+  "createdAt": "2026-10-07T04:30:00.000Z",
+  "date": "10/6/2026",
+  "gameNum": 2,
+  "player": "Yael Thistlecombe",
+  "playerLower": "yael thistlecombe",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01598": {
+  "count": 3,
+  "createdAt": "2026-10-14T02:30:00.000Z",
+  "date": "10/13/2026",
+  "gameNum": 1,
+  "player": "Hayden Hollowmere",
+  "playerLower": "hayden hollowmere",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01599": {
+  "count": 5,
+  "createdAt": "2026-10-14T02:30:00.000Z",
+  "date": "10/13/2026",
+  "gameNum": 1,
+  "player": "Jordan Dellacourt",
+  "playerLower": "jordan dellacourt",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01600": {
+  "count": 5,
+  "createdAt": "2026-10-14T02:30:00.000Z",
+  "date": "10/13/2026",
+  "gameNum": 1,
+  "player": "Morgan Wexmoor",
+  "playerLower": "morgan wexmoor",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01601": {
+  "count": 5,
+  "createdAt": "2026-10-14T02:30:00.000Z",
+  "date": "10/13/2026",
+  "gameNum": 1,
+  "player": "Uma Sablewood",
+  "playerLower": "uma sablewood",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01602": {
+  "count": 8,
+  "createdAt": "2026-10-14T02:30:00.000Z",
+  "date": "10/13/2026",
+  "gameNum": 1,
+  "player": "Yael Sablewood",
+  "playerLower": "yael sablewood",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01603": {
+  "count": 8,
+  "createdAt": "2026-10-14T02:30:00.000Z",
+  "date": "10/13/2026",
+  "gameNum": 1,
+  "player": "Yael Thistlecombe",
+  "playerLower": "yael thistlecombe",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01650": {
+  "count": 2,
+  "createdAt": "2026-10-14T04:30:00.000Z",
+  "date": "10/13/2026",
+  "gameNum": 2,
+  "player": "Dana Dellacourt",
+  "playerLower": "dana dellacourt",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01651": {
+  "count": 3,
+  "createdAt": "2026-10-14T04:30:00.000Z",
+  "date": "10/13/2026",
+  "gameNum": 2,
+  "player": "Drew Ashgrove",
+  "playerLower": "drew ashgrove",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01652": {
+  "count": 2,
+  "createdAt": "2026-10-14T04:30:00.000Z",
+  "date": "10/13/2026",
+  "gameNum": 2,
+  "player": "Frankie Wexmoor",
+  "playerLower": "frankie wexmoor",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01653": {
+  "count": 5,
+  "createdAt": "2026-10-14T04:30:00.000Z",
+  "date": "10/13/2026",
+  "gameNum": 2,
+  "player": "Hayden Hollowmere",
+  "playerLower": "hayden hollowmere",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01654": {
+  "count": 3,
+  "createdAt": "2026-10-14T04:30:00.000Z",
+  "date": "10/13/2026",
+  "gameNum": 2,
+  "player": "Noel Vossington",
+  "playerLower": "noel vossington",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01655": {
+  "count": 4,
+  "createdAt": "2026-10-14T04:30:00.000Z",
+  "date": "10/13/2026",
+  "gameNum": 2,
+  "player": "Shay Fenwhistle",
+  "playerLower": "shay fenwhistle",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01712": {
+  "count": 2,
+  "createdAt": "2026-10-21T02:30:00.000Z",
+  "date": "10/20/2026",
+  "gameNum": 1,
+  "player": "Indy Kestrelton",
+  "playerLower": "indy kestrelton",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01713": {
+  "count": 9,
+  "createdAt": "2026-10-21T02:30:00.000Z",
+  "date": "10/20/2026",
+  "gameNum": 1,
+  "player": "Indy Vossington",
+  "playerLower": "indy vossington",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01714": {
+  "count": 8,
+  "createdAt": "2026-10-21T02:30:00.000Z",
+  "date": "10/20/2026",
+  "gameNum": 1,
+  "player": "Jordan Dellacourt",
+  "playerLower": "jordan dellacourt",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01715": {
+  "count": 5,
+  "createdAt": "2026-10-21T02:30:00.000Z",
+  "date": "10/20/2026",
+  "gameNum": 1,
+  "player": "Noel Vossington",
+  "playerLower": "noel vossington",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01716": {
+  "count": 8,
+  "createdAt": "2026-10-21T02:30:00.000Z",
+  "date": "10/20/2026",
+  "gameNum": 1,
+  "player": "Riley Thistlecombe",
+  "playerLower": "riley thistlecombe",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01717": {
+  "count": 4,
+  "createdAt": "2026-10-21T02:30:00.000Z",
+  "date": "10/20/2026",
+  "gameNum": 1,
+  "player": "Yael Sablewood",
+  "playerLower": "yael sablewood",
+  "status": "processed",
+  "venue": "Tight End"
+ },
+ "bounty-01766": {
+  "count": 6,
+  "createdAt": "2026-10-21T04:30:00.000Z",
+  "date": "10/20/2026",
+  "gameNum": 2,
+  "player": "Bailey Umberhill",
+  "playerLower": "bailey umberhill",
+  "status": "active",
+  "venue": "Tight End"
+ },
+ "bounty-01767": {
+  "count": 8,
+  "createdAt": "2026-10-21T04:30:00.000Z",
+  "date": "10/20/2026",
+  "gameNum": 2,
+  "player": "Hayden Hollowmere",
+  "playerLower": "hayden hollowmere",
+  "status": "active",
+  "venue": "Tight End"
+ },
+ "bounty-01768": {
+  "count": 3,
+  "createdAt": "2026-10-21T04:30:00.000Z",
+  "date": "10/20/2026",
+  "gameNum": 2,
+  "player": "Hayden Kestrelton",
+  "playerLower": "hayden kestrelton",
+  "status": "active",
+  "venue": "Tight End"
+ },
+ "bounty-01769": {
+  "count": 6,
+  "createdAt": "2026-10-21T04:30:00.000Z",
+  "date": "10/20/2026",
+  "gameNum": 2,
+  "player": "Riley Corrimore",
+  "playerLower": "riley corrimore",
+  "status": "active",
+  "venue": "Tight End"
+ },
+ "bounty-01770": {
+  "count": 3,
+  "createdAt": "2026-10-21T04:30:00.000Z",
+  "date": "10/20/2026",
+  "gameNum": 2,
+  "player": "Riley Thistlecombe",
+  "playerLower": "riley thistlecombe",
+  "status": "active",
+  "venue": "Tight End"
+ },
+ "bounty-01771": {
+  "count": 2,
+  "createdAt": "2026-10-21T04:30:00.000Z",
+  "date": "10/20/2026",
+  "gameNum": 2,
+  "player": "Yael Larkspurne",
+  "playerLower": "yael larkspurne",
+  "status": "active",
+  "venue": "Tight End"
+ },
+ "bounty-01834": {
+  "count": 4,
+  "createdAt": "2026-07-03T02:30:00.000Z",
+  "date": "7/2/2026",
+  "gameNum": 1,
+  "player": "Cameron Yarrowdale",
+  "playerLower": "cameron yarrowdale",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-01835": {
+  "count": 5,
+  "createdAt": "2026-07-03T02:30:00.000Z",
+  "date": "7/2/2026",
+  "gameNum": 1,
+  "player": "Dana Dellacourt",
+  "playerLower": "dana dellacourt",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-01836": {
+  "count": 2,
+  "createdAt": "2026-07-03T02:30:00.000Z",
+  "date": "7/2/2026",
+  "gameNum": 1,
+  "player": "Finley Pellbrook",
+  "playerLower": "finley pellbrook",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-01837": {
+  "count": 5,
+  "createdAt": "2026-07-03T02:30:00.000Z",
+  "date": "7/2/2026",
+  "gameNum": 1,
+  "player": "Kendall Sablewood",
+  "playerLower": "kendall sablewood",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-01838": {
+  "count": 3,
+  "createdAt": "2026-07-03T02:30:00.000Z",
+  "date": "7/2/2026",
+  "gameNum": 1,
+  "player": "Noel Vossington",
+  "playerLower": "noel vossington",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-01839": {
+  "count": 9,
+  "createdAt": "2026-07-03T02:30:00.000Z",
+  "date": "7/2/2026",
+  "gameNum": 1,
+  "player": "Riley Everhollow",
+  "playerLower": "riley everhollow",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-01840": {
+  "count": 9,
+  "createdAt": "2026-07-03T02:30:00.000Z",
+  "date": "7/2/2026",
+  "gameNum": 1,
+  "player": "Yael Larkspurne",
+  "playerLower": "yael larkspurne",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-01841": {
+  "count": 5,
+  "createdAt": "2026-07-03T02:30:00.000Z",
+  "date": "7/2/2026",
+  "gameNum": 1,
+  "player": "Zion Brindlewood",
+  "playerLower": "zion brindlewood",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-01894": {
+  "count": 2,
+  "createdAt": "2026-07-03T04:30:00.000Z",
+  "date": "7/2/2026",
+  "gameNum": 2,
+  "player": "Frankie Larkspurne",
+  "playerLower": "frankie larkspurne",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-01895": {
+  "count": 7,
+  "createdAt": "2026-07-03T04:30:00.000Z",
+  "date": "7/2/2026",
+  "gameNum": 2,
+  "player": "Frankie Wexmoor",
+  "playerLower": "frankie wexmoor",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-01896": {
+  "count": 3,
+  "createdAt": "2026-07-03T04:30:00.000Z",
+  "date": "7/2/2026",
+  "gameNum": 2,
+  "player": "Morgan Quillfeather",
+  "playerLower": "morgan quillfeather",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-01897": {
+  "count": 6,
+  "createdAt": "2026-07-03T04:30:00.000Z",
+  "date": "7/2/2026",
+  "gameNum": 2,
+  "player": "Shay Fenwhistle",
+  "playerLower": "shay fenwhistle",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-01898": {
+  "count": 6,
+  "createdAt": "2026-07-03T04:30:00.000Z",
+  "date": "7/2/2026",
+  "gameNum": 2,
+  "player": "Tatum Pellbrook",
+  "playerLower": "tatum pellbrook",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-01899": {
+  "count": 6,
+  "createdAt": "2026-07-03T04:30:00.000Z",
+  "date": "7/2/2026",
+  "gameNum": 2,
+  "player": "Yael Larkspurne",
+  "playerLower": "yael larkspurne",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-01962": {
+  "count": 2,
+  "createdAt": "2026-07-10T02:30:00.000Z",
+  "date": "7/9/2026",
+  "gameNum": 1,
+  "player": "Frankie Juniperhart",
+  "playerLower": "frankie juniperhart",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-01963": {
+  "count": 6,
+  "createdAt": "2026-07-10T02:30:00.000Z",
+  "date": "7/9/2026",
+  "gameNum": 1,
+  "player": "Kendall Everhollow",
+  "playerLower": "kendall everhollow",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-01964": {
+  "count": 10,
+  "createdAt": "2026-07-10T02:30:00.000Z",
+  "date": "7/9/2026",
+  "gameNum": 1,
+  "player": "Morgan Quillfeather",
+  "playerLower": "morgan quillfeather",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-01965": {
+  "count": 6,
+  "createdAt": "2026-07-10T02:30:00.000Z",
+  "date": "7/9/2026",
+  "gameNum": 1,
+  "player": "Remy Gallowpike",
+  "playerLower": "remy gallowpike",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-01966": {
+  "count": 5,
+  "createdAt": "2026-07-10T02:30:00.000Z",
+  "date": "7/9/2026",
+  "gameNum": 1,
+  "player": "Riley Corrimore",
+  "playerLower": "riley corrimore",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-01967": {
+  "count": 6,
+  "createdAt": "2026-07-10T02:30:00.000Z",
+  "date": "7/9/2026",
+  "gameNum": 1,
+  "player": "Tatum Duskwater",
+  "playerLower": "tatum duskwater",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-01968": {
+  "count": 4,
+  "createdAt": "2026-07-10T02:30:00.000Z",
+  "date": "7/9/2026",
+  "gameNum": 1,
+  "player": "Yael Sablewood",
+  "playerLower": "yael sablewood",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02017": {
+  "count": 3,
+  "createdAt": "2026-07-10T04:30:00.000Z",
+  "date": "7/9/2026",
+  "gameNum": 2,
+  "player": "Avery Orrinsby",
+  "playerLower": "avery orrinsby",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02018": {
+  "count": 2,
+  "createdAt": "2026-07-10T04:30:00.000Z",
+  "date": "7/9/2026",
+  "gameNum": 2,
+  "player": "Bailey Umberhill",
+  "playerLower": "bailey umberhill",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02019": {
+  "count": 3,
+  "createdAt": "2026-07-10T04:30:00.000Z",
+  "date": "7/9/2026",
+  "gameNum": 2,
+  "player": "Blake Thistlecombe",
+  "playerLower": "blake thistlecombe",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02020": {
+  "count": 4,
+  "createdAt": "2026-07-10T04:30:00.000Z",
+  "date": "7/9/2026",
+  "gameNum": 2,
+  "player": "Gray Dellacourt",
+  "playerLower": "gray dellacourt",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02021": {
+  "count": 3,
+  "createdAt": "2026-07-10T04:30:00.000Z",
+  "date": "7/9/2026",
+  "gameNum": 2,
+  "player": "Kendall Sablewood",
+  "playerLower": "kendall sablewood",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02022": {
+  "count": 4,
+  "createdAt": "2026-07-10T04:30:00.000Z",
+  "date": "7/9/2026",
+  "gameNum": 2,
+  "player": "Morgan Quillfeather",
+  "playerLower": "morgan quillfeather",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02023": {
+  "count": 2,
+  "createdAt": "2026-07-10T04:30:00.000Z",
+  "date": "7/9/2026",
+  "gameNum": 2,
+  "player": "Rowan Wexmoor",
+  "playerLower": "rowan wexmoor",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02024": {
+  "count": 1,
+  "createdAt": "2026-07-10T04:30:00.000Z",
+  "date": "7/9/2026",
+  "gameNum": 2,
+  "player": "Yael Larkspurne",
+  "playerLower": "yael larkspurne",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02025": {
+  "count": 2,
+  "createdAt": "2026-07-10T04:30:00.000Z",
+  "date": "7/9/2026",
+  "gameNum": 2,
+  "player": "Yael Sablewood",
+  "playerLower": "yael sablewood",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02076": {
+  "count": 2,
+  "createdAt": "2026-07-17T02:30:00.000Z",
+  "date": "7/16/2026",
+  "gameNum": 1,
+  "player": "Bailey Umberhill",
+  "playerLower": "bailey umberhill",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02077": {
+  "count": 6,
+  "createdAt": "2026-07-17T02:30:00.000Z",
+  "date": "7/16/2026",
+  "gameNum": 1,
+  "player": "Kendall Everhollow",
+  "playerLower": "kendall everhollow",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02078": {
+  "count": 5,
+  "createdAt": "2026-07-17T02:30:00.000Z",
+  "date": "7/16/2026",
+  "gameNum": 1,
+  "player": "Kendall Sablewood",
+  "playerLower": "kendall sablewood",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02079": {
+  "count": 3,
+  "createdAt": "2026-07-17T02:30:00.000Z",
+  "date": "7/16/2026",
+  "gameNum": 1,
+  "player": "Noel Orrinsby",
+  "playerLower": "noel orrinsby",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02080": {
+  "count": 4,
+  "createdAt": "2026-07-17T02:30:00.000Z",
+  "date": "7/16/2026",
+  "gameNum": 1,
+  "player": "Parker Rastervale",
+  "playerLower": "parker rastervale",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02081": {
+  "count": 1,
+  "createdAt": "2026-07-17T02:30:00.000Z",
+  "date": "7/16/2026",
+  "gameNum": 1,
+  "player": "Wren Gallowpike",
+  "playerLower": "wren gallowpike",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02082": {
+  "count": 8,
+  "createdAt": "2026-07-17T02:30:00.000Z",
+  "date": "7/16/2026",
+  "gameNum": 1,
+  "player": "Zion Brindlewood",
+  "playerLower": "zion brindlewood",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02126": {
+  "count": 4,
+  "createdAt": "2026-07-17T04:30:00.000Z",
+  "date": "7/16/2026",
+  "gameNum": 2,
+  "player": "Alex Pellbrook",
+  "playerLower": "alex pellbrook",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02127": {
+  "count": 6,
+  "createdAt": "2026-07-17T04:30:00.000Z",
+  "date": "7/16/2026",
+  "gameNum": 2,
+  "player": "Hayden Kestrelton",
+  "playerLower": "hayden kestrelton",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02128": {
+  "count": 3,
+  "createdAt": "2026-07-17T04:30:00.000Z",
+  "date": "7/16/2026",
+  "gameNum": 2,
+  "player": "Indy Kestrelton",
+  "playerLower": "indy kestrelton",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02129": {
+  "count": 5,
+  "createdAt": "2026-07-17T04:30:00.000Z",
+  "date": "7/16/2026",
+  "gameNum": 2,
+  "player": "Oakley Fenwhistle",
+  "playerLower": "oakley fenwhistle",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02130": {
+  "count": 6,
+  "createdAt": "2026-07-17T04:30:00.000Z",
+  "date": "7/16/2026",
+  "gameNum": 2,
+  "player": "Riley Corrimore",
+  "playerLower": "riley corrimore",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02196": {
+  "count": 9,
+  "createdAt": "2026-07-24T02:30:00.000Z",
+  "date": "7/23/2026",
+  "gameNum": 1,
+  "player": "Eli Tamberline",
+  "playerLower": "eli tamberline",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02197": {
+  "count": 5,
+  "createdAt": "2026-07-24T02:30:00.000Z",
+  "date": "7/23/2026",
+  "gameNum": 1,
+  "player": "Lane Ashgrove",
+  "playerLower": "lane ashgrove",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02198": {
+  "count": 10,
+  "createdAt": "2026-07-24T02:30:00.000Z",
+  "date": "7/23/2026",
+  "gameNum": 1,
+  "player": "Marlow Marlowind",
+  "playerLower": "marlow marlowind",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02199": {
+  "count": 10,
+  "createdAt": "2026-07-24T02:30:00.000Z",
+  "date": "7/23/2026",
+  "gameNum": 1,
+  "player": "Noel Orrinsby",
+  "playerLower": "noel orrinsby",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02200": {
+  "count": 4,
+  "createdAt": "2026-07-24T02:30:00.000Z",
+  "date": "7/23/2026",
+  "gameNum": 1,
+  "player": "Wren Larkspurne",
+  "playerLower": "wren larkspurne",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02256": {
+  "count": 5,
+  "createdAt": "2026-07-24T04:30:00.000Z",
+  "date": "7/23/2026",
+  "gameNum": 2,
+  "player": "Alex Pellbrook",
+  "playerLower": "alex pellbrook",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02257": {
+  "count": 8,
+  "createdAt": "2026-07-24T04:30:00.000Z",
+  "date": "7/23/2026",
+  "gameNum": 2,
+  "player": "Frankie Larkspurne",
+  "playerLower": "frankie larkspurne",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02258": {
+  "count": 9,
+  "createdAt": "2026-07-24T04:30:00.000Z",
+  "date": "7/23/2026",
+  "gameNum": 2,
+  "player": "Hayden Kestrelton",
+  "playerLower": "hayden kestrelton",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02259": {
+  "count": 2,
+  "createdAt": "2026-07-24T04:30:00.000Z",
+  "date": "7/23/2026",
+  "gameNum": 2,
+  "player": "Rowan Inglebrook",
+  "playerLower": "rowan inglebrook",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02260": {
+  "count": 8,
+  "createdAt": "2026-07-24T04:30:00.000Z",
+  "date": "7/23/2026",
+  "gameNum": 2,
+  "player": "Shay Fenwhistle",
+  "playerLower": "shay fenwhistle",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02325": {
+  "count": 5,
+  "createdAt": "2026-07-31T02:30:00.000Z",
+  "date": "7/30/2026",
+  "gameNum": 1,
+  "player": "Avery Dellacourt",
+  "playerLower": "avery dellacourt",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02326": {
+  "count": 5,
+  "createdAt": "2026-07-31T02:30:00.000Z",
+  "date": "7/30/2026",
+  "gameNum": 1,
+  "player": "Casey Brackenridge-Vale",
+  "playerLower": "casey brackenridge-vale",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02327": {
+  "count": 3,
+  "createdAt": "2026-07-31T02:30:00.000Z",
+  "date": "7/30/2026",
+  "gameNum": 1,
+  "player": "Dana Dellacourt",
+  "playerLower": "dana dellacourt",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02328": {
+  "count": 5,
+  "createdAt": "2026-07-31T02:30:00.000Z",
+  "date": "7/30/2026",
+  "gameNum": 1,
+  "player": "Finley Pellbrook",
+  "playerLower": "finley pellbrook",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02329": {
+  "count": 1,
+  "createdAt": "2026-07-31T02:30:00.000Z",
+  "date": "7/30/2026",
+  "gameNum": 1,
+  "player": "Hayden Kestrelton",
+  "playerLower": "hayden kestrelton",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02330": {
+  "count": 8,
+  "createdAt": "2026-07-31T02:30:00.000Z",
+  "date": "7/30/2026",
+  "gameNum": 1,
+  "player": "Oakley Fenwhistle",
+  "playerLower": "oakley fenwhistle",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02331": {
+  "count": 6,
+  "createdAt": "2026-07-31T02:30:00.000Z",
+  "date": "7/30/2026",
+  "gameNum": 1,
+  "player": "Oakley Kestrelton",
+  "playerLower": "oakley kestrelton",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02332": {
+  "count": 5,
+  "createdAt": "2026-07-31T02:30:00.000Z",
+  "date": "7/30/2026",
+  "gameNum": 1,
+  "player": "Riley Corrimore",
+  "playerLower": "riley corrimore",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02333": {
+  "count": 2,
+  "createdAt": "2026-07-31T02:30:00.000Z",
+  "date": "7/30/2026",
+  "gameNum": 1,
+  "player": "Shay Fenwhistle",
+  "playerLower": "shay fenwhistle",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02387": {
+  "count": 3,
+  "createdAt": "2026-07-31T04:30:00.000Z",
+  "date": "7/30/2026",
+  "gameNum": 2,
+  "player": "Alex Pellbrook",
+  "playerLower": "alex pellbrook",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02388": {
+  "count": 2,
+  "createdAt": "2026-07-31T04:30:00.000Z",
+  "date": "7/30/2026",
+  "gameNum": 2,
+  "player": "Bailey Umberhill",
+  "playerLower": "bailey umberhill",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02389": {
+  "count": 9,
+  "createdAt": "2026-07-31T04:30:00.000Z",
+  "date": "7/30/2026",
+  "gameNum": 2,
+  "player": "Eli Zephyrine",
+  "playerLower": "eli zephyrine",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02390": {
+  "count": 1,
+  "createdAt": "2026-07-31T04:30:00.000Z",
+  "date": "7/30/2026",
+  "gameNum": 2,
+  "player": "Frankie Larkspurne",
+  "playerLower": "frankie larkspurne",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02391": {
+  "count": 4,
+  "createdAt": "2026-07-31T04:30:00.000Z",
+  "date": "7/30/2026",
+  "gameNum": 2,
+  "player": "Jordan Wexmoor",
+  "playerLower": "jordan wexmoor",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02392": {
+  "count": 2,
+  "createdAt": "2026-07-31T04:30:00.000Z",
+  "date": "7/30/2026",
+  "gameNum": 2,
+  "player": "Morgan Quillfeather",
+  "playerLower": "morgan quillfeather",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02393": {
+  "count": 3,
+  "createdAt": "2026-07-31T04:30:00.000Z",
+  "date": "7/30/2026",
+  "gameNum": 2,
+  "player": "Shay Rastervale",
+  "playerLower": "shay rastervale",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02394": {
+  "count": 1,
+  "createdAt": "2026-07-31T04:30:00.000Z",
+  "date": "7/30/2026",
+  "gameNum": 2,
+  "player": "Yael Larkspurne",
+  "playerLower": "yael larkspurne",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02395": {
+  "count": 3,
+  "createdAt": "2026-07-31T04:30:00.000Z",
+  "date": "7/30/2026",
+  "gameNum": 2,
+  "player": "Yael Sablewood",
+  "playerLower": "yael sablewood",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02463": {
+  "count": 5,
+  "createdAt": "2026-08-07T02:30:00.000Z",
+  "date": "8/6/2026",
+  "gameNum": 1,
+  "player": "Bailey Umberhill",
+  "playerLower": "bailey umberhill",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02464": {
+  "count": 8,
+  "createdAt": "2026-08-07T02:30:00.000Z",
+  "date": "8/6/2026",
+  "gameNum": 1,
+  "player": "Finley Inglebrook",
+  "playerLower": "finley inglebrook",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02465": {
+  "count": 5,
+  "createdAt": "2026-08-07T02:30:00.000Z",
+  "date": "8/6/2026",
+  "gameNum": 1,
+  "player": "Noel Orrinsby",
+  "playerLower": "noel orrinsby",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02466": {
+  "count": 6,
+  "createdAt": "2026-08-07T02:30:00.000Z",
+  "date": "8/6/2026",
+  "gameNum": 1,
+  "player": "Riley Everhollow",
+  "playerLower": "riley everhollow",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02467": {
+  "count": 9,
+  "createdAt": "2026-08-07T02:30:00.000Z",
+  "date": "8/6/2026",
+  "gameNum": 1,
+  "player": "Shay Rastervale",
+  "playerLower": "shay rastervale",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02468": {
+  "count": 4,
+  "createdAt": "2026-08-07T02:30:00.000Z",
+  "date": "8/6/2026",
+  "gameNum": 1,
+  "player": "Yael Larkspurne",
+  "playerLower": "yael larkspurne",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02469": {
+  "count": 3,
+  "createdAt": "2026-08-07T02:30:00.000Z",
+  "date": "8/6/2026",
+  "gameNum": 1,
+  "player": "Zion Brindlewood",
+  "playerLower": "zion brindlewood",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02521": {
+  "count": 10,
+  "createdAt": "2026-08-07T04:30:00.000Z",
+  "date": "8/6/2026",
+  "gameNum": 2,
+  "player": "Alex Tamberline",
+  "playerLower": "alex tamberline",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02522": {
+  "count": 2,
+  "createdAt": "2026-08-07T04:30:00.000Z",
+  "date": "8/6/2026",
+  "gameNum": 2,
+  "player": "Bailey Umberhill",
+  "playerLower": "bailey umberhill",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02523": {
+  "count": 3,
+  "createdAt": "2026-08-07T04:30:00.000Z",
+  "date": "8/6/2026",
+  "gameNum": 2,
+  "player": "Jordan Dellacourt",
+  "playerLower": "jordan dellacourt",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02524": {
+  "count": 4,
+  "createdAt": "2026-08-07T04:30:00.000Z",
+  "date": "8/6/2026",
+  "gameNum": 2,
+  "player": "Kendall Vossington",
+  "playerLower": "kendall vossington",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02525": {
+  "count": 3,
+  "createdAt": "2026-08-07T04:30:00.000Z",
+  "date": "8/6/2026",
+  "gameNum": 2,
+  "player": "Noel Vossington",
+  "playerLower": "noel vossington",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02526": {
+  "count": 6,
+  "createdAt": "2026-08-07T04:30:00.000Z",
+  "date": "8/6/2026",
+  "gameNum": 2,
+  "player": "Sage Juniperhart",
+  "playerLower": "sage juniperhart",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02619": {
+  "count": 5,
+  "createdAt": "2026-08-28T02:30:00.000Z",
+  "date": "8/27/2026",
+  "gameNum": 1,
+  "player": "Avery Orrinsby",
+  "playerLower": "avery orrinsby",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02620": {
+  "count": 7,
+  "createdAt": "2026-08-28T02:30:00.000Z",
+  "date": "8/27/2026",
+  "gameNum": 1,
+  "player": "Bailey Umberhill",
+  "playerLower": "bailey umberhill",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02621": {
+  "count": 5,
+  "createdAt": "2026-08-28T02:30:00.000Z",
+  "date": "8/27/2026",
+  "gameNum": 1,
+  "player": "Jordan Dellacourt",
+  "playerLower": "jordan dellacourt",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02622": {
+  "count": 8,
+  "createdAt": "2026-08-28T02:30:00.000Z",
+  "date": "8/27/2026",
+  "gameNum": 1,
+  "player": "Rowan Wexmoor",
+  "playerLower": "rowan wexmoor",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02623": {
+  "count": 5,
+  "createdAt": "2026-08-28T02:30:00.000Z",
+  "date": "8/27/2026",
+  "gameNum": 1,
+  "player": "Shay Dellacourt",
+  "playerLower": "shay dellacourt",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02624": {
+  "count": 7,
+  "createdAt": "2026-08-28T02:30:00.000Z",
+  "date": "8/27/2026",
+  "gameNum": 1,
+  "player": "Yael Embervale",
+  "playerLower": "yael embervale",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02675": {
+  "count": 1,
+  "createdAt": "2026-08-28T04:30:00.000Z",
+  "date": "8/27/2026",
+  "gameNum": 2,
+  "player": "Frankie Larkspurne",
+  "playerLower": "frankie larkspurne",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02676": {
+  "count": 5,
+  "createdAt": "2026-08-28T04:30:00.000Z",
+  "date": "8/27/2026",
+  "gameNum": 2,
+  "player": "Hayden Kestrelton",
+  "playerLower": "hayden kestrelton",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02677": {
+  "count": 4,
+  "createdAt": "2026-08-28T04:30:00.000Z",
+  "date": "8/27/2026",
+  "gameNum": 2,
+  "player": "Morgan Quillfeather",
+  "playerLower": "morgan quillfeather",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02678": {
+  "count": 2,
+  "createdAt": "2026-08-28T04:30:00.000Z",
+  "date": "8/27/2026",
+  "gameNum": 2,
+  "player": "Oakley Kestrelton",
+  "playerLower": "oakley kestrelton",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02679": {
+  "count": 1,
+  "createdAt": "2026-08-28T04:30:00.000Z",
+  "date": "8/27/2026",
+  "gameNum": 2,
+  "player": "Val Thistlecombe",
+  "playerLower": "val thistlecombe",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02680": {
+  "count": 7,
+  "createdAt": "2026-08-28T04:30:00.000Z",
+  "date": "8/27/2026",
+  "gameNum": 2,
+  "player": "Yael Larkspurne",
+  "playerLower": "yael larkspurne",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02681": {
+  "count": 3,
+  "createdAt": "2026-08-28T04:30:00.000Z",
+  "date": "8/27/2026",
+  "gameNum": 2,
+  "player": "Yael Sablewood",
+  "playerLower": "yael sablewood",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02682": {
+  "count": 3,
+  "createdAt": "2026-08-28T04:30:00.000Z",
+  "date": "8/27/2026",
+  "gameNum": 2,
+  "player": "Yael Thistlecombe",
+  "playerLower": "yael thistlecombe",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02740": {
+  "count": 8,
+  "createdAt": "2026-09-04T02:30:00.000Z",
+  "date": "9/3/2026",
+  "gameNum": 1,
+  "player": "Bailey Umberhill",
+  "playerLower": "bailey umberhill",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02741": {
+  "count": 3,
+  "createdAt": "2026-09-04T02:30:00.000Z",
+  "date": "9/3/2026",
+  "gameNum": 1,
+  "player": "Gray Dellacourt",
+  "playerLower": "gray dellacourt",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02742": {
+  "count": 6,
+  "createdAt": "2026-09-04T02:30:00.000Z",
+  "date": "9/3/2026",
+  "gameNum": 1,
+  "player": "Kendall Everhollow",
+  "playerLower": "kendall everhollow",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02743": {
+  "count": 7,
+  "createdAt": "2026-09-04T02:30:00.000Z",
+  "date": "9/3/2026",
+  "gameNum": 1,
+  "player": "Shay Fenwhistle",
+  "playerLower": "shay fenwhistle",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02744": {
+  "count": 9,
+  "createdAt": "2026-09-04T02:30:00.000Z",
+  "date": "9/3/2026",
+  "gameNum": 1,
+  "player": "Shay Larkspurne",
+  "playerLower": "shay larkspurne",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02745": {
+  "count": 4,
+  "createdAt": "2026-09-04T02:30:00.000Z",
+  "date": "9/3/2026",
+  "gameNum": 1,
+  "player": "Yael Embervale",
+  "playerLower": "yael embervale",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02789": {
+  "count": 3,
+  "createdAt": "2026-09-04T04:30:00.000Z",
+  "date": "9/3/2026",
+  "gameNum": 2,
+  "player": "Cameron Yarrowdale",
+  "playerLower": "cameron yarrowdale",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02790": {
+  "count": 1,
+  "createdAt": "2026-09-04T04:30:00.000Z",
+  "date": "9/3/2026",
+  "gameNum": 2,
+  "player": "Frankie Wexmoor",
+  "playerLower": "frankie wexmoor",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02791": {
+  "count": 1,
+  "createdAt": "2026-09-04T04:30:00.000Z",
+  "date": "9/3/2026",
+  "gameNum": 2,
+  "player": "Indy Kestrelton",
+  "playerLower": "indy kestrelton",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02792": {
+  "count": 1,
+  "createdAt": "2026-09-04T04:30:00.000Z",
+  "date": "9/3/2026",
+  "gameNum": 2,
+  "player": "Jordan Dellacourt",
+  "playerLower": "jordan dellacourt",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02793": {
+  "count": 4,
+  "createdAt": "2026-09-04T04:30:00.000Z",
+  "date": "9/3/2026",
+  "gameNum": 2,
+  "player": "Jordan Wexmoor",
+  "playerLower": "jordan wexmoor",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02794": {
+  "count": 6,
+  "createdAt": "2026-09-04T04:30:00.000Z",
+  "date": "9/3/2026",
+  "gameNum": 2,
+  "player": "Rowan Wexmoor",
+  "playerLower": "rowan wexmoor",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02795": {
+  "count": 1,
+  "createdAt": "2026-09-04T04:30:00.000Z",
+  "date": "9/3/2026",
+  "gameNum": 2,
+  "player": "Sage Juniperhart",
+  "playerLower": "sage juniperhart",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02796": {
+  "count": 3,
+  "createdAt": "2026-09-04T04:30:00.000Z",
+  "date": "9/3/2026",
+  "gameNum": 2,
+  "player": "Yael Larkspurne",
+  "playerLower": "yael larkspurne",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02797": {
+  "count": 2,
+  "createdAt": "2026-09-04T04:30:00.000Z",
+  "date": "9/3/2026",
+  "gameNum": 2,
+  "player": "Yael Thistlecombe",
+  "playerLower": "yael thistlecombe",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02855": {
+  "count": 7,
+  "createdAt": "2026-09-11T02:30:00.000Z",
+  "date": "9/10/2026",
+  "gameNum": 1,
+  "player": "Alex Quillfeather",
+  "playerLower": "alex quillfeather",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02856": {
+  "count": 1,
+  "createdAt": "2026-09-11T02:30:00.000Z",
+  "date": "9/10/2026",
+  "gameNum": 1,
+  "player": "Cameron Yarrowdale",
+  "playerLower": "cameron yarrowdale",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02857": {
+  "count": 5,
+  "createdAt": "2026-09-11T02:30:00.000Z",
+  "date": "9/10/2026",
+  "gameNum": 1,
+  "player": "Jordan Wexmoor",
+  "playerLower": "jordan wexmoor",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02858": {
+  "count": 7,
+  "createdAt": "2026-09-11T02:30:00.000Z",
+  "date": "9/10/2026",
+  "gameNum": 1,
+  "player": "Oakley Fenwhistle",
+  "playerLower": "oakley fenwhistle",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02859": {
+  "count": 5,
+  "createdAt": "2026-09-11T02:30:00.000Z",
+  "date": "9/10/2026",
+  "gameNum": 1,
+  "player": "Sage Juniperhart",
+  "playerLower": "sage juniperhart",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02860": {
+  "count": 4,
+  "createdAt": "2026-09-11T02:30:00.000Z",
+  "date": "9/10/2026",
+  "gameNum": 1,
+  "player": "Sage Wexmoor",
+  "playerLower": "sage wexmoor",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02861": {
+  "count": 7,
+  "createdAt": "2026-09-11T02:30:00.000Z",
+  "date": "9/10/2026",
+  "gameNum": 1,
+  "player": "Wren Gallowpike",
+  "playerLower": "wren gallowpike",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02901": {
+  "count": 2,
+  "createdAt": "2026-09-11T04:30:00.000Z",
+  "date": "9/10/2026",
+  "gameNum": 2,
+  "player": "Blake Thistlecombe",
+  "playerLower": "blake thistlecombe",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02902": {
+  "count": 2,
+  "createdAt": "2026-09-11T04:30:00.000Z",
+  "date": "9/10/2026",
+  "gameNum": 2,
+  "player": "Dana Dellacourt",
+  "playerLower": "dana dellacourt",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02903": {
+  "count": 3,
+  "createdAt": "2026-09-11T04:30:00.000Z",
+  "date": "9/10/2026",
+  "gameNum": 2,
+  "player": "Jordan Coldharbour",
+  "playerLower": "jordan coldharbour",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02904": {
+  "count": 2,
+  "createdAt": "2026-09-11T04:30:00.000Z",
+  "date": "9/10/2026",
+  "gameNum": 2,
+  "player": "Jordan Dellacourt",
+  "playerLower": "jordan dellacourt",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02905": {
+  "count": 4,
+  "createdAt": "2026-09-11T04:30:00.000Z",
+  "date": "9/10/2026",
+  "gameNum": 2,
+  "player": "Riley Thistlecombe",
+  "playerLower": "riley thistlecombe",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02906": {
+  "count": 7,
+  "createdAt": "2026-09-11T04:30:00.000Z",
+  "date": "9/10/2026",
+  "gameNum": 2,
+  "player": "Yael Larkspurne",
+  "playerLower": "yael larkspurne",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02963": {
+  "count": 9,
+  "createdAt": "2026-09-18T02:30:00.000Z",
+  "date": "9/17/2026",
+  "gameNum": 1,
+  "player": "Cameron Yarrowdale",
+  "playerLower": "cameron yarrowdale",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02964": {
+  "count": 8,
+  "createdAt": "2026-09-18T02:30:00.000Z",
+  "date": "9/17/2026",
+  "gameNum": 1,
+  "player": "Finley Vossington",
+  "playerLower": "finley vossington",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02965": {
+  "count": 4,
+  "createdAt": "2026-09-18T02:30:00.000Z",
+  "date": "9/17/2026",
+  "gameNum": 1,
+  "player": "Oakley Fenwhistle",
+  "playerLower": "oakley fenwhistle",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02966": {
+  "count": 5,
+  "createdAt": "2026-09-18T02:30:00.000Z",
+  "date": "9/17/2026",
+  "gameNum": 1,
+  "player": "Shay Fenwhistle",
+  "playerLower": "shay fenwhistle",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02967": {
+  "count": 5,
+  "createdAt": "2026-09-18T02:30:00.000Z",
+  "date": "9/17/2026",
+  "gameNum": 1,
+  "player": "Shay Rastervale",
+  "playerLower": "shay rastervale",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-02968": {
+  "count": 3,
+  "createdAt": "2026-09-18T02:30:00.000Z",
+  "date": "9/17/2026",
+  "gameNum": 1,
+  "player": "Tatum Pellbrook",
+  "playerLower": "tatum pellbrook",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03020": {
+  "count": 5,
+  "createdAt": "2026-09-18T04:30:00.000Z",
+  "date": "9/17/2026",
+  "gameNum": 2,
+  "player": "Alex Pellbrook",
+  "playerLower": "alex pellbrook",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03021": {
+  "count": 11,
+  "createdAt": "2026-09-18T04:30:00.000Z",
+  "date": "9/17/2026",
+  "gameNum": 2,
+  "player": "Blake Thistlecombe",
+  "playerLower": "blake thistlecombe",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03022": {
+  "count": 3,
+  "createdAt": "2026-09-18T04:30:00.000Z",
+  "date": "9/17/2026",
+  "gameNum": 2,
+  "player": "Indy Kestrelton",
+  "playerLower": "indy kestrelton",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03023": {
+  "count": 7,
+  "createdAt": "2026-09-18T04:30:00.000Z",
+  "date": "9/17/2026",
+  "gameNum": 2,
+  "player": "Kendall Vossington",
+  "playerLower": "kendall vossington",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03024": {
+  "count": 6,
+  "createdAt": "2026-09-18T04:30:00.000Z",
+  "date": "9/17/2026",
+  "gameNum": 2,
+  "player": "Tatum Pellbrook",
+  "playerLower": "tatum pellbrook",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03081": {
+  "count": 6,
+  "createdAt": "2026-09-25T02:30:00.000Z",
+  "date": "9/24/2026",
+  "gameNum": 1,
+  "player": "Jordan Coldharbour",
+  "playerLower": "jordan coldharbour",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03082": {
+  "count": 5,
+  "createdAt": "2026-09-25T02:30:00.000Z",
+  "date": "9/24/2026",
+  "gameNum": 1,
+  "player": "Jordan Wexmoor",
+  "playerLower": "jordan wexmoor",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03083": {
+  "count": 4,
+  "createdAt": "2026-09-25T02:30:00.000Z",
+  "date": "9/24/2026",
+  "gameNum": 1,
+  "player": "Kendall Sablewood",
+  "playerLower": "kendall sablewood",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03084": {
+  "count": 3,
+  "createdAt": "2026-09-25T02:30:00.000Z",
+  "date": "9/24/2026",
+  "gameNum": 1,
+  "player": "Noel Orrinsby",
+  "playerLower": "noel orrinsby",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03085": {
+  "count": 2,
+  "createdAt": "2026-09-25T02:30:00.000Z",
+  "date": "9/24/2026",
+  "gameNum": 1,
+  "player": "Parker Rastervale",
+  "playerLower": "parker rastervale",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03086": {
+  "count": 5,
+  "createdAt": "2026-09-25T02:30:00.000Z",
+  "date": "9/24/2026",
+  "gameNum": 1,
+  "player": "Riley Corrimore",
+  "playerLower": "riley corrimore",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03087": {
+  "count": 4,
+  "createdAt": "2026-09-25T02:30:00.000Z",
+  "date": "9/24/2026",
+  "gameNum": 1,
+  "player": "Rowan Wexmoor",
+  "playerLower": "rowan wexmoor",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03088": {
+  "count": 3,
+  "createdAt": "2026-09-25T02:30:00.000Z",
+  "date": "9/24/2026",
+  "gameNum": 1,
+  "player": "Shay Rastervale",
+  "playerLower": "shay rastervale",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03143": {
+  "count": 4,
+  "createdAt": "2026-09-25T04:30:00.000Z",
+  "date": "9/24/2026",
+  "gameNum": 2,
+  "player": "Bailey Umberhill",
+  "playerLower": "bailey umberhill",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03144": {
+  "count": 6,
+  "createdAt": "2026-09-25T04:30:00.000Z",
+  "date": "9/24/2026",
+  "gameNum": 2,
+  "player": "Drew Ashgrove",
+  "playerLower": "drew ashgrove",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03145": {
+  "count": 5,
+  "createdAt": "2026-09-25T04:30:00.000Z",
+  "date": "9/24/2026",
+  "gameNum": 2,
+  "player": "Kendall Everhollow",
+  "playerLower": "kendall everhollow",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03146": {
+  "count": 5,
+  "createdAt": "2026-09-25T04:30:00.000Z",
+  "date": "9/24/2026",
+  "gameNum": 2,
+  "player": "Kendall Sablewood",
+  "playerLower": "kendall sablewood",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03147": {
+  "count": 5,
+  "createdAt": "2026-09-25T04:30:00.000Z",
+  "date": "9/24/2026",
+  "gameNum": 2,
+  "player": "Remy Gallowpike",
+  "playerLower": "remy gallowpike",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03148": {
+  "count": 7,
+  "createdAt": "2026-09-25T04:30:00.000Z",
+  "date": "9/24/2026",
+  "gameNum": 2,
+  "player": "Tatum Pellbrook",
+  "playerLower": "tatum pellbrook",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03210": {
+  "count": 8,
+  "createdAt": "2026-10-02T02:30:00.000Z",
+  "date": "10/1/2026",
+  "gameNum": 1,
+  "player": "Avery Orrinsby",
+  "playerLower": "avery orrinsby",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03211": {
+  "count": 10,
+  "createdAt": "2026-10-02T02:30:00.000Z",
+  "date": "10/1/2026",
+  "gameNum": 1,
+  "player": "Blake Thistlecombe",
+  "playerLower": "blake thistlecombe",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03212": {
+  "count": 4,
+  "createdAt": "2026-10-02T02:30:00.000Z",
+  "date": "10/1/2026",
+  "gameNum": 1,
+  "player": "Frankie Juniperhart",
+  "playerLower": "frankie juniperhart",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03213": {
+  "count": 3,
+  "createdAt": "2026-10-02T02:30:00.000Z",
+  "date": "10/1/2026",
+  "gameNum": 1,
+  "player": "Jordan Dellacourt",
+  "playerLower": "jordan dellacourt",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03214": {
+  "count": 4,
+  "createdAt": "2026-10-02T02:30:00.000Z",
+  "date": "10/1/2026",
+  "gameNum": 1,
+  "player": "Parker Rastervale",
+  "playerLower": "parker rastervale",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03215": {
+  "count": 3,
+  "createdAt": "2026-10-02T02:30:00.000Z",
+  "date": "10/1/2026",
+  "gameNum": 1,
+  "player": "Rowan Wexmoor",
+  "playerLower": "rowan wexmoor",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03216": {
+  "count": 4,
+  "createdAt": "2026-10-02T02:30:00.000Z",
+  "date": "10/1/2026",
+  "gameNum": 1,
+  "player": "Shay Larkspurne",
+  "playerLower": "shay larkspurne",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03217": {
+  "count": 5,
+  "createdAt": "2026-10-02T02:30:00.000Z",
+  "date": "10/1/2026",
+  "gameNum": 1,
+  "player": "Zion Brindlewood",
+  "playerLower": "zion brindlewood",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03272": {
+  "count": 3,
+  "createdAt": "2026-10-02T04:30:00.000Z",
+  "date": "10/1/2026",
+  "gameNum": 2,
+  "player": "Alex Pellbrook",
+  "playerLower": "alex pellbrook",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03273": {
+  "count": 6,
+  "createdAt": "2026-10-02T04:30:00.000Z",
+  "date": "10/1/2026",
+  "gameNum": 2,
+  "player": "Frankie Wexmoor",
+  "playerLower": "frankie wexmoor",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03274": {
+  "count": 7,
+  "createdAt": "2026-10-02T04:30:00.000Z",
+  "date": "10/1/2026",
+  "gameNum": 2,
+  "player": "Hayden Kestrelton",
+  "playerLower": "hayden kestrelton",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03275": {
+  "count": 3,
+  "createdAt": "2026-10-02T04:30:00.000Z",
+  "date": "10/1/2026",
+  "gameNum": 2,
+  "player": "Indy Kestrelton",
+  "playerLower": "indy kestrelton",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03276": {
+  "count": 5,
+  "createdAt": "2026-10-02T04:30:00.000Z",
+  "date": "10/1/2026",
+  "gameNum": 2,
+  "player": "Noel Orrinsby",
+  "playerLower": "noel orrinsby",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03277": {
+  "count": 1,
+  "createdAt": "2026-10-02T04:30:00.000Z",
+  "date": "10/1/2026",
+  "gameNum": 2,
+  "player": "Oakley Kestrelton",
+  "playerLower": "oakley kestrelton",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03278": {
+  "count": 3,
+  "createdAt": "2026-10-02T04:30:00.000Z",
+  "date": "10/1/2026",
+  "gameNum": 2,
+  "player": "Rowan Wexmoor",
+  "playerLower": "rowan wexmoor",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03279": {
+  "count": 3,
+  "createdAt": "2026-10-02T04:30:00.000Z",
+  "date": "10/1/2026",
+  "gameNum": 2,
+  "player": "Tatum Pellbrook",
+  "playerLower": "tatum pellbrook",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03338": {
+  "count": 7,
+  "createdAt": "2026-10-09T02:30:00.000Z",
+  "date": "10/8/2026",
+  "gameNum": 1,
+  "player": "Hayden Kestrelton",
+  "playerLower": "hayden kestrelton",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03339": {
+  "count": 2,
+  "createdAt": "2026-10-09T02:30:00.000Z",
+  "date": "10/8/2026",
+  "gameNum": 1,
+  "player": "Indy Kestrelton",
+  "playerLower": "indy kestrelton",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03340": {
+  "count": 8,
+  "createdAt": "2026-10-09T02:30:00.000Z",
+  "date": "10/8/2026",
+  "gameNum": 1,
+  "player": "Jordan Wexmoor",
+  "playerLower": "jordan wexmoor",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03341": {
+  "count": 4,
+  "createdAt": "2026-10-09T02:30:00.000Z",
+  "date": "10/8/2026",
+  "gameNum": 1,
+  "player": "Parker Rastervale",
+  "playerLower": "parker rastervale",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03342": {
+  "count": 7,
+  "createdAt": "2026-10-09T02:30:00.000Z",
+  "date": "10/8/2026",
+  "gameNum": 1,
+  "player": "Riley Thistlecombe",
+  "playerLower": "riley thistlecombe",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03343": {
+  "count": 7,
+  "createdAt": "2026-10-09T02:30:00.000Z",
+  "date": "10/8/2026",
+  "gameNum": 1,
+  "player": "Yael Sablewood",
+  "playerLower": "yael sablewood",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03397": {
+  "count": 7,
+  "createdAt": "2026-10-09T04:30:00.000Z",
+  "date": "10/8/2026",
+  "gameNum": 2,
+  "player": "Alex Pellbrook",
+  "playerLower": "alex pellbrook",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03398": {
+  "count": 2,
+  "createdAt": "2026-10-09T04:30:00.000Z",
+  "date": "10/8/2026",
+  "gameNum": 2,
+  "player": "Indy Kestrelton",
+  "playerLower": "indy kestrelton",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03399": {
+  "count": 1,
+  "createdAt": "2026-10-09T04:30:00.000Z",
+  "date": "10/8/2026",
+  "gameNum": 2,
+  "player": "Kendall Everhollow",
+  "playerLower": "kendall everhollow",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03400": {
+  "count": 6,
+  "createdAt": "2026-10-09T04:30:00.000Z",
+  "date": "10/8/2026",
+  "gameNum": 2,
+  "player": "Lane Gallowpike",
+  "playerLower": "lane gallowpike",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03401": {
+  "count": 7,
+  "createdAt": "2026-10-09T04:30:00.000Z",
+  "date": "10/8/2026",
+  "gameNum": 2,
+  "player": "Morgan Quillfeather",
+  "playerLower": "morgan quillfeather",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03402": {
+  "count": 7,
+  "createdAt": "2026-10-09T04:30:00.000Z",
+  "date": "10/8/2026",
+  "gameNum": 2,
+  "player": "Rowan Wexmoor",
+  "playerLower": "rowan wexmoor",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03454": {
+  "count": 4,
+  "createdAt": "2026-10-16T02:30:00.000Z",
+  "date": "10/15/2026",
+  "gameNum": 1,
+  "player": "Blake Thistlecombe",
+  "playerLower": "blake thistlecombe",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03455": {
+  "count": 4,
+  "createdAt": "2026-10-16T02:30:00.000Z",
+  "date": "10/15/2026",
+  "gameNum": 1,
+  "player": "Dana Kestrelton",
+  "playerLower": "dana kestrelton",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03456": {
+  "count": 8,
+  "createdAt": "2026-10-16T02:30:00.000Z",
+  "date": "10/15/2026",
+  "gameNum": 1,
+  "player": "Parker Rastervale",
+  "playerLower": "parker rastervale",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03457": {
+  "count": 5,
+  "createdAt": "2026-10-16T02:30:00.000Z",
+  "date": "10/15/2026",
+  "gameNum": 1,
+  "player": "Riley Thistlecombe",
+  "playerLower": "riley thistlecombe",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03458": {
+  "count": 3,
+  "createdAt": "2026-10-16T02:30:00.000Z",
+  "date": "10/15/2026",
+  "gameNum": 1,
+  "player": "Tatum Pellbrook",
+  "playerLower": "tatum pellbrook",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03459": {
+  "count": 5,
+  "createdAt": "2026-10-16T02:30:00.000Z",
+  "date": "10/15/2026",
+  "gameNum": 1,
+  "player": "Yael Sablewood",
+  "playerLower": "yael sablewood",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03513": {
+  "count": 2,
+  "createdAt": "2026-10-16T04:30:00.000Z",
+  "date": "10/15/2026",
+  "gameNum": 2,
+  "player": "Alex Pellbrook",
+  "playerLower": "alex pellbrook",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03514": {
+  "count": 4,
+  "createdAt": "2026-10-16T04:30:00.000Z",
+  "date": "10/15/2026",
+  "gameNum": 2,
+  "player": "Cameron Yarrowdale",
+  "playerLower": "cameron yarrowdale",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03515": {
+  "count": 4,
+  "createdAt": "2026-10-16T04:30:00.000Z",
+  "date": "10/15/2026",
+  "gameNum": 2,
+  "player": "Indy Kestrelton",
+  "playerLower": "indy kestrelton",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03516": {
+  "count": 5,
+  "createdAt": "2026-10-16T04:30:00.000Z",
+  "date": "10/15/2026",
+  "gameNum": 2,
+  "player": "Jordan Wexmoor",
+  "playerLower": "jordan wexmoor",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03517": {
+  "count": 9,
+  "createdAt": "2026-10-16T04:30:00.000Z",
+  "date": "10/15/2026",
+  "gameNum": 2,
+  "player": "Shay Rastervale",
+  "playerLower": "shay rastervale",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ },
+ "bounty-03518": {
+  "count": 4,
+  "createdAt": "2026-10-16T04:30:00.000Z",
+  "date": "10/15/2026",
+  "gameNum": 2,
+  "player": "Yael Sablewood",
+  "playerLower": "yael sablewood",
+  "status": "processed",
+  "venue": "Wild Corgi"
+ }
+}

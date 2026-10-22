@@ -1,0 +1,18 @@
+{
+ "house": {
+  "count": 0,
+  "name": "House"
+ },
+ "lemon_drop": {
+  "count": 0,
+  "name": "Lemon drop"
+ },
+ "pickle": {
+  "count": 0,
+  "name": "Pickle"
+ },
+ "tequila": {
+  "count": 0,
+  "name": "Tequila"
+ }
+}

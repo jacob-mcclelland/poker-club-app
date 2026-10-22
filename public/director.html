@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Tournament Director - All-In Poker Club</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <link rel="icon" type="image/svg+xml" href="/img/favicon-staff.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+  <link rel="apple-touch-icon" href="/img/gameday-apple-icon.png">
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 15px;
+      max-width: 600px;
+      margin: 0 auto;
+      padding-bottom: 100px;
+    }
+
+    h1 { color: #d4af37; text-align: center; margin: 0 0 15px 0; font-size: 1.3rem; text-transform: uppercase; letter-spacing: 3px; }
+
+    .controls { background: #000; padding: 12px; border-radius: 10px; border: 1px solid #333; margin-bottom: 15px; }
+    .controls label { display: block; color: #888; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    select { width: 100%; background: #1a1a1a; color: #d4af37; border: 1px solid #333; padding: 10px; font-size: 1rem; border-radius: 6px; margin-bottom: 10px; font-weight: 600; }
+    select:last-child { margin-bottom: 0; }
+
+    .section { background: #1a1a1a; margin-bottom: 12px; padding: 12px; border-radius: 10px; border: 1px solid #333; }
+    .section h3 { margin: 0 0 12px 0; font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 1px; padding-bottom: 8px; border-bottom: 1px solid #333; }
+
+    .player-bubble { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; background: #252525; border: 2px solid #333; border-radius: 20px; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; color: white; }
+    .player-bubble:hover { background: #2a2a2a; border-color: #444; }
+    .player-bubble.has-bounty { background: #1a2a1a; border-color: #00ff88; }
+    .player-bubble .bounty-count { background: #00ff88; color: #000; font-weight: bold; padding: 2px 6px; border-radius: 10px; font-size: 0.75rem; min-width: 20px; text-align: center; }
+
+    .player-btn { width: 100%; padding: 12px; background: #252525; color: white; margin-bottom: 6px; text-align: left; border: 1px solid #333; border-radius: 6px; font-size: 0.95rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .player-btn:active { background: #333; }
+    .player-btn.selected-tie { border: 2px solid #ffa500; background: #2a2a1a; }
+
+    .badge { padding: 3px 8px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; }
+    .badge-bounty { background: #8b0000; color: white; }
+
+    .rank-display { text-align: center; padding: 15px; background: #0a0a0a; border-radius: 10px; margin-bottom: 12px; }
+    .rank-label { font-size: 0.7rem; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+    .rank-number { font-size: 3.5rem; color: #d4af37; font-weight: bold; line-height: 1; margin: 8px 0; font-family: 'SF Mono', Monaco, monospace; }
+    .rank-suffix { font-size: 1.3rem; color: #888; }
+
+    .tie-btn { width: 100%; padding: 12px; margin-bottom: 12px; border: 2px solid #333; background: #1a1a1a; color: #888; font-weight: 600; border-radius: 6px; font-size: 0.9rem; cursor: pointer; }
+    .tie-btn.active { background: #ffa500; color: #000; border-color: #ffa500; }
+
+    .finalist-section { background: #0a0a0a; border: 2px solid #333; border-radius: 10px; padding: 12px; }
+    .finalist-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #333; font-size: 0.75rem; color: #888; }
+
+    .eliminated-section { margin-top: 15px; padding-top: 12px; border-top: 1px solid #333; }
+    .eliminated-section h4 { margin: 0 0 10px 0; color: #666; font-size: 0.75rem; text-transform: uppercase; }
+    .elim-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: #1a1a1a; margin-bottom: 5px; border: 1px solid #333; border-radius: 5px; font-size: 0.85rem; }
+    .undo-btn { background: #333; color: #888; border: none; border-radius: 4px; padding: 4px 8px; font-size: 0.7rem; cursor: pointer; }
+    .undo-btn:active { background: #ff4444; color: white; }
+
+    .results-preview { background: #0a0a0a; border-radius: 8px; padding: 12px; margin-top: 12px; }
+    .results-preview h4 { margin: 0 0 8px 0; color: #666; font-size: 0.7rem; text-transform: uppercase; }
+    .result-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #222; font-size: 0.85rem; }
+    .result-row:last-child { border-bottom: none; }
+    .result-rank { color: #d4af37; font-weight: 600; width: 35px; }
+    .result-name { flex: 1; }
+    .result-points { color: #00ff88; }
+
+    .submit-btn { position: fixed; bottom: 0; left: 0; right: 0; background: #00aa00; color: white; font-size: 1.2rem; padding: 18px; border: none; font-weight: 600; cursor: pointer; }
+    .submit-btn:disabled { background: #333; color: #666; }
+    .submit-btn:active:not(:disabled) { background: #008800; }
+
+    .empty-state { text-align: center; color: #555; padding: 20px; font-style: italic; font-size: 0.85rem; }
+
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 20px; max-width: 300px; width: 100%; }
+    .modal h3 { margin: 0 0 12px 0; text-align: center; font-size: 1rem; }
+    .modal-input { width: 100%; padding: 12px; font-size: 1.8rem; text-align: center; background: #0a0a0a; border: 2px solid #333; border-radius: 6px; color: white; margin-bottom: 12px; }
+    .modal-buttons { display: flex; gap: 8px; }
+    .modal-btn { flex: 1; padding: 12px; border: none; border-radius: 6px; font-size: 0.95rem; font-weight: 600; cursor: pointer; }
+    .modal-btn-cancel { background: #333; color: #fff; }
+    .modal-btn-confirm { background: #ffa500; color: #000; }
+
+    .refresh-btn { background: #333; color: #d4af37; border: 1px solid #d4af37; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; margin-left: 10px; }
+    .refresh-btn:active { background: #d4af37; color: #000; }
+
+    .autocomplete-container { position: relative; flex: 1; }
+    .autocomplete-suggestions { display: none; position: absolute; top: 100%; left: 0; right: 0; background: #1a1a1a; border: 1px solid #333; border-top: none; border-radius: 0 0 6px 6px; max-height: 200px; overflow-y: auto; z-index: 100; }
+    .autocomplete-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #2a2a2a; color: white; font-size: 0.9rem; }
+    .autocomplete-item:last-child { border-bottom: none; }
+    .autocomplete-item:hover { background: #2a2a2a; }
+
+    .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    html.back-nav-on .header-row { padding-left: 52px; }
+    .stats-bar { display: flex; gap: 15px; justify-content: center; margin-bottom: 15px; padding: 10px; background: #1a1a1a; border-radius: 8px; }
+    .stat-item { text-align: center; }
+    .stat-value { font-size: 1.5rem; font-weight: bold; color: #00ff88; }
+    .stat-label { font-size: 0.7rem; color: #666; text-transform: uppercase; }
+
+    /* Submission reconciliation + receipt modals */
+    #reconciliationModal .modal, #receiptModal .modal { max-width: 360px; }
+    .verdict-pill { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 1rem; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+    .verdict-pill .vp-ico { font-size: 1.1rem; }
+    .verdict-sub { text-align: center; color: #aaa; font-size: 0.78rem; margin-bottom: 14px; line-height: 1.35; }
+    .verdict-full { background: #0a2a0a; color: #00ff88; border: 1px solid #00aa00; }
+    .verdict-partial { background: #2a2200; color: #ffc14d; border: 1px solid #ffa500; }
+    .verdict-block { background: #2a0a0a; color: #ff6b6b; border: 1px solid #cc2222; }
+    .scorecard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+    .score-tile { background: #0a0a0a; border: 1px solid #333; border-radius: 8px; padding: 10px 4px; text-align: center; }
+    .score-tile.flag-warn { border-left: 3px solid #ffa500; }
+    .score-tile.flag-error { border-left: 3px solid #ff4444; }
+    .score-num { font-size: 1.35rem; font-weight: 700; color: #fff; line-height: 1; }
+    .score-lbl { font-size: 0.58rem; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 5px; }
+    .warn-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; max-height: 210px; overflow-y: auto; }
+    .warn-row { display: flex; gap: 8px; padding: 8px 10px; border-radius: 6px; font-size: 0.8rem; line-height: 1.35; }
+    .warn-row.sev-error { background: #2a0a0a; color: #ffb3b3; border: 1px solid #5a1a1a; }
+    .warn-row.sev-warn { background: #2a2200; color: #ffe0a3; border: 1px solid #5a4a1a; }
+    .warn-row.sev-info { background: #0f0f0f; color: #999; border: 1px solid #2a2a2a; }
+    .warn-ico { flex-shrink: 0; }
+    .recon-loading { text-align: center; color: #888; padding: 34px 10px; font-size: 0.95rem; }
+    .recon-check { display: flex; align-items: flex-start; gap: 8px; font-size: 0.8rem; color: #ddd; margin-bottom: 14px; cursor: pointer; line-height: 1.35; }
+    .recon-check input { width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px; }
+    .points-table { width: 100%; font-size: 0.82rem; border-collapse: collapse; margin: 6px 0 14px; }
+    .points-table td { padding: 5px 6px; border-bottom: 1px solid #222; }
+    .points-table tr:last-child td { border-bottom: none; }
+    .points-table .pt-rank { color: #d4af37; width: 38px; font-weight: 600; }
+    .points-table .pt-pts { color: #00ff88; text-align: right; white-space: nowrap; }
+    .drift-note { background: #2a2200; color: #ffc14d; border: 1px solid #ffa500; border-radius: 6px; padding: 9px 11px; font-size: 0.78rem; margin-bottom: 12px; line-height: 1.35; }
+    .match-note { color: #00ff88; font-size: 0.82rem; text-align: center; margin-bottom: 12px; }
+    .modal-btn:disabled { opacity: 0.45; cursor: default; }
+    .modal-btn-finalize { background: #00aa00; color: #fff; }
+  </style>
+</head>
+<body>
+
+  <div id="app-content">
+    <div class="header-row">
+      <h1 style="margin: 0;">DIRECTOR</h1>
+      <button class="refresh-btn" onclick="manualRefresh()">Refresh</button>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-value" id="totalPlayers">0</div>
+        <div class="stat-label">Players</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="totalBounties" style="color: #ffa500;">0</div>
+        <div class="stat-label">Bounties</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="totalEliminated" style="color: #ff4444;">0</div>
+        <div class="stat-label">Out</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <label>Event Date</label>
+      <select id="eventSelect" onchange="loadRoster()">
+        <option>Loading schedule...</option>
+      </select>
+
+      <label>Game Number</label>
+      <select id="gameSelect" onchange="loadRoster()">
+        <option value="1">Game 1</option>
+        <option value="2">Game 2</option>
+      </select>
+    </div>
+
+    <div class="section" style="background: #1a2a1a; border-color: #2a4a2a;">
+      <h3 style="color: #4ade80;">Quick Check-In (For Late Arrivals)</h3>
+      <div style="display: flex; gap: 8px;">
+        <div class="autocomplete-container">
+          <input type="text" id="manualCheckinInput" placeholder="Start typing player name..." autocomplete="off" oninput="showCheckinSuggestions()" onfocus="showCheckinSuggestions()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #333; background: #000; color: white; font-size: 0.95rem;">
+          <div id="checkinSuggestions" class="autocomplete-suggestions"></div>
+        </div>
+        <button onclick="manualCheckin()" style="background: #4ade80; color: #000; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer;">Check In</button>
+      </div>
+      <div id="manualCheckinMsg" style="color: #4ade80; font-size: 0.8rem; margin-top: 6px; text-align: center; height: 20px;"></div>
+    </div>
+
+    <div class="section">
+      <h3>Step 1: Select Final Table Players</h3>
+      <div style="position: relative; margin-bottom: 12px;">
+        <input type="text" id="playerSearch" placeholder="Search players..." style="width: 100%; padding: 10px 40px 10px 10px; border-radius: 6px; border: 1px solid #333; background: #000; color: white; font-size: 0.95rem;">
+        <button onclick="clearSearch()" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #666; cursor: pointer; font-size: 1.2rem; padding: 4px;">x</button>
+      </div>
+      <div style="color: #666; font-size: 0.75rem; margin-bottom: 8px; text-align: center;">
+        Tap a player to assign bounties - Green = already selected
+      </div>
+      <div id="roster-list" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">
+        <div class="empty-state">Loading players...</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Step 2: Record Eliminations</h3>
+
+      <div class="rank-display">
+        <div class="rank-label">Next Elimination</div>
+        <div class="rank-number">
+          <span id="rankNumber">10</span><span class="rank-suffix" id="rankSuffix">th</span>
+        </div>
+        <div style="display: flex; gap: 8px; justify-content: center; margin-top: 8px;">
+          <button onclick="adjustRank(-1)" style="background: #333; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; cursor: pointer;">-1</button>
+          <button onclick="adjustRank(1)" style="background: #333; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; cursor: pointer;">+1</button>
+          <button onclick="resetRank()" style="background: #444; color: #888; border: none; padding: 6px 12px; border-radius: 4px; font-size: 0.75rem; cursor: pointer;">Reset to 10</button>
+        </div>
+      </div>
+
+      <button class="tie-btn" id="tieBtn" onclick="toggleTie()">Tie Mode: OFF</button>
+
+      <div class="finalist-section">
+        <div class="finalist-header">
+          <span>TAP TO ELIMINATE</span>
+          <span id="finalistCount">0 remaining</span>
+        </div>
+        <div id="finalist-list">
+          <div class="empty-state">Assign bounties to see players here</div>
+        </div>
+      </div>
+
+      <div class="eliminated-section">
+        <h4>Already Eliminated</h4>
+        <div id="eliminated-list">
+          <div class="empty-state">No eliminations yet</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Results Preview</h3>
+      <div class="results-preview" id="resultsPreview">
+        <div class="empty-state">Eliminations will appear here</div>
+      </div>
+    </div>
+
+    <button class="submit-btn" id="submitBtn" onclick="submitResults()" disabled>
+      Save Results
+    </button>
+  </div>
+
+  <!-- Submission Reconciliation Modal (pre-submit gate) -->
+  <div class="modal-overlay" id="reconciliationModal">
+    <div class="modal">
+      <h3 id="reconTitle">Review before finalizing</h3>
+      <div id="reconBody"></div>
+      <div class="modal-buttons" id="reconFooter"></div>
+    </div>
+  </div>
+
+  <!-- Finalize Receipt Modal -->
+  <div class="modal-overlay" id="receiptModal">
+    <div class="modal">
+      <h3 id="receiptTitle">Game finalized</h3>
+      <div id="receiptBody"></div>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-finalize" onclick="receiptDone()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bounty Modal -->
+  <div class="modal-overlay" id="bountyModal">
+    <div class="modal">
+      <h3 id="bountyModalTitle">How many bounties?</h3>
+      <p style="color: #888; font-size: 0.85rem; margin: 0 0 12px 0; text-align: center;">Enter 0 to remove from final table</p>
+      <input type="number" class="modal-input" id="bountyInput" min="0" max="20" value="1">
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-cancel" onclick="closeBountyModal()">Cancel</button>
+        <button class="modal-btn modal-btn-confirm" onclick="confirmBounty()">Set Bounties</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Elimination Modal -->
+  <div class="modal-overlay" id="eliminateModal">
+    <div class="modal">
+      <h3 id="eliminateModalTitle">Confirm Elimination</h3>
+      <p id="eliminateModalText" style="color:#888; text-align:center; margin:0 0 15px 0; font-size:0.9rem;"></p>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-cancel" onclick="closeEliminateModal()">Cancel</button>
+        <button class="modal-btn modal-btn-confirm" onclick="confirmElimination()">Eliminate</button>
+      </div>
+    </div>
+  </div>
+
+<script type="module">
+  import { PokerAPI, PokerRealtime, PlayerSearch } from './firebase-api.js?v=9';
+
+  // ============================================
+  // CONSTANTS
+  // ============================================
+  const BONUS_POINTS = { 1: 90, 2: 85, 3: 80, 4: 70, 5: 60, 6: 50, 7: 40, 8: 30, 9: 20, 10: 10 };
+
+  // ============================================
+  // STATE
+  // ============================================
+  let allPlayers = [];
+  let masterPlayerList = [];
+  let currentRank = 10;
+  let isTieMode = false;
+  let tieBuffer = [];
+  let bountyTarget = null;
+  let eliminateTarget = [];
+  let currentDate = "";
+  let currentLocation = "";
+  let currentGameNum = 1;
+  let syncInterval = null;
+  let realtimeUnsubscribe = null;
+
+  // ============================================
+  // INITIALIZATION
+  // ============================================
+  window.onload = function() {
+    loadSchedule();
+    loadMasterPlayerList();
+
+    document.getElementById('playerSearch').addEventListener('input', (e) => {
+      renderRoster(e.target.value.toLowerCase());
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.autocomplete-container')) {
+        document.getElementById('checkinSuggestions').style.display = 'none';
+      }
+    });
+
+    startSync();
+  };
+
+  function manualRefresh() {
+    loadRoster();
+    syncLiveScoring();
+  }
+  window.manualRefresh = manualRefresh;
+
+  // ============================================
+  // LOAD PLAYER LIST
+  // ============================================
+  async function loadMasterPlayerList() {
+    try {
+      const data = await PokerAPI.getPlayerList();
+      masterPlayerList = data.players || [];
+      masterPlayerList = masterPlayerList.filter(p => p && p !== 'Player Name');
+      console.log('Master player list loaded:', masterPlayerList.length);
+    } catch (err) {
+      console.error('Error loading master player list:', err);
+    }
+  }
+
+  // ============================================
+  // AUTOCOMPLETE
+  // ============================================
+  function showCheckinSuggestions() {
+    const input = document.getElementById('manualCheckinInput');
+    const container = document.getElementById('checkinSuggestions');
+    const val = input.value.trim().toLowerCase();
+
+    if (!val || val.length < 1) {
+      container.style.display = 'none';
+      return;
+    }
+
+    const checkedInNames = allPlayers.map(p => p.name.toLowerCase());
+    const available = masterPlayerList.filter(p => !checkedInNames.includes(p.toLowerCase()));
+    const matches = PlayerSearch.rank(available, val, 8);
+
+    if (matches.length === 0) {
+      container.style.display = 'none';
+      return;
+    }
+
+    container.innerHTML = matches.map(name => `
+      <div class="autocomplete-item" onclick="selectCheckinPlayer('${name.replace(/'/g, "\\'")}')">
+        ${name}
+      </div>
+    `).join('');
+
+    container.style.display = 'block';
+  }
+  window.showCheckinSuggestions = showCheckinSuggestions;
+
+  function selectCheckinPlayer(name) {
+    document.getElementById('manualCheckinInput').value = name;
+    document.getElementById('checkinSuggestions').style.display = 'none';
+  }
+  window.selectCheckinPlayer = selectCheckinPlayer;
+
+  // ============================================
+  // CHECK-IN
+  // ============================================
+  async function manualCheckin() {
+    const input = document.getElementById('manualCheckinInput');
+    const msg = document.getElementById('manualCheckinMsg');
+    const playerName = input.value.trim();
+
+    if (!playerName) {
+      msg.style.color = '#ff4444';
+      msg.textContent = 'Please enter a player name';
+      return;
+    }
+
+    const exactMatch = masterPlayerList.find(p => p.toLowerCase() === playerName.toLowerCase());
+    if (!exactMatch && masterPlayerList.length > 0) {
+      msg.style.color = '#ff4444';
+      msg.textContent = 'Player not found. Select from dropdown.';
+      input.focus();
+      showCheckinSuggestions();
+      return;
+    }
+
+    const validatedName = exactMatch || playerName;
+    const alreadyCheckedIn = allPlayers.some(p => p.name.toLowerCase() === validatedName.toLowerCase());
+    if (alreadyCheckedIn) {
+      msg.style.color = '#ffa500';
+      msg.textContent = `${validatedName} is already checked in`;
+      return;
+    }
+
+    // OPTIMISTIC UI: Add to local list immediately
+    allPlayers.push({ name: validatedName, bounties: 0, rank: null });
+    msg.style.color = '#4ade80';
+    msg.textContent = `${validatedName} checked in for Game ${currentGameNum}`;
+    input.value = '';
+    document.getElementById('checkinSuggestions').style.display = 'none';
+    renderAll();
+
+    try {
+      const result = await PokerAPI.checkin({
+        player: validatedName,
+        date: currentDate,
+        gameNum: currentGameNum,
+        venue: currentLocation
+      });
+
+      if (result.status === "success" || result.status === "duplicate") {
+        console.log(`Backend confirmed: ${validatedName} checked in`);
+      } else {
+        // Backend rejected - rollback
+        const idx = allPlayers.findIndex(p => p.name === validatedName);
+        if (idx >= 0) allPlayers.splice(idx, 1);
+        msg.style.color = '#ff4444';
+        msg.textContent = 'Error: ' + (result.message || 'Check-in failed');
+        renderAll();
+      }
+    } catch (err) {
+      msg.style.color = '#ffa500';
+      msg.textContent = `${validatedName} added (syncing...)`;
+      console.error('Checkin sync error:', err);
+    }
+  }
+  window.manualCheckin = manualCheckin;
+
+  // ============================================
+  // SCHEDULE & ROSTER
+  // ============================================
+  async function loadSchedule() {
+    const select = document.getElementById('eventSelect');
+    select.innerHTML = '<option>Loading...</option>';
+
+    try {
+      const [upcomingRes, historicalRes] = await Promise.all([
+        PokerAPI.getSchedule({ historical: false }),
+        PokerAPI.getSchedule({ historical: true })
+      ]);
+
+      const upcoming = upcomingRes.schedule || [];
+      const historical = historicalRes.schedule || [];
+
+      const seen = new Set();
+      const allGames = [];
+
+      upcoming.forEach(game => {
+        const key = game.date + "|" + (game.location || game.venue);
+        if (!seen.has(key)) {
+          seen.add(key);
+          allGames.push({ ...game, location: game.location || game.venue, isPast: false });
+        }
+      });
+
+      historical.reverse().forEach(game => {
+        const key = game.date + "|" + (game.venue || game.location);
+        if (!seen.has(key)) {
+          seen.add(key);
+          allGames.push({ ...game, location: game.venue || game.location, isPast: true });
+        }
+      });
+
+      allGames.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      select.innerHTML = "";
+
+      if (allGames.length === 0) {
+        select.innerHTML = '<option>No games found</option>';
+        return;
+      }
+
+      const todayStr = new Date().toLocaleDateString();
+      let selectedIndex = 0;
+
+      allGames.forEach((game, index) => {
+        const opt = document.createElement('option');
+        opt.value = game.date + "|" + game.location;
+        let label = `${game.date} - ${game.location}`;
+        if (game.type && game.type !== "Regular") label += ` (${game.type})`;
+        if (game.isPast) label = `Past: ${label}`;
+        opt.innerText = label;
+        select.appendChild(opt);
+
+        if (datesMatch(game.date, todayStr)) selectedIndex = index;
+      });
+
+      select.selectedIndex = selectedIndex;
+      loadRoster();
+    } catch (err) {
+      console.error('Error loading schedule:', err);
+      select.innerHTML = '<option>Error loading schedule</option>';
+    }
+  }
+
+  function datesMatch(d1, d2) {
+    const c1 = String(d1).replace(/\b0/g, "").trim();
+    const c2 = String(d2).replace(/\b0/g, "").trim();
+    return c1 === c2 || c1.includes(c2) || c2.includes(c1);
+  }
+
+  async function loadRoster() {
+    const rawVal = document.getElementById('eventSelect').value;
+    if (!rawVal || rawVal.includes("Loading") || rawVal.includes("No games")) return;
+
+    const [date, loc] = rawVal.split("|");
+    currentDate = date;
+    currentLocation = loc;
+    currentGameNum = parseInt(document.getElementById('gameSelect').value);
+
+    try {
+      const data = await PokerAPI.getDailyStats({ date: currentDate, venue: currentLocation });
+      const gameData = currentGameNum === 1 ? data.game1 : data.game2;
+      const players = gameData?.checkedIn || [];
+
+      allPlayers = players.map(p => ({
+        name: typeof p === 'string' ? p : p.name,
+        bounties: 0,
+        rank: null
+      }));
+
+      currentRank = 10;
+      isTieMode = false;
+      tieBuffer = [];
+      document.getElementById('tieBtn').classList.remove('active');
+      document.getElementById('tieBtn').innerText = 'Tie Mode: OFF';
+
+      renderAll();
+
+      if (realtimeUnsubscribe) realtimeUnsubscribe();
+      const subscriptionDate = currentDate;
+      const subscriptionLocation = currentLocation;
+      const subscriptionGameNum = currentGameNum;
+
+      realtimeUnsubscribe = PokerRealtime.subscribeToCheckins(
+        { date: subscriptionDate, venue: subscriptionLocation, gameNum: subscriptionGameNum },
+        (checkins) => {
+        if (!checkins) return;
+        if (currentDate !== subscriptionDate || currentLocation !== subscriptionLocation || currentGameNum !== subscriptionGameNum) {
+          return;
+        }
+
+        // subscribeToCheckins delivers a flat array of active checkin docs
+        // (each has a `player` name field), not a {game1, game2} shape.
+        const liveNameOrder = checkins.map(c => c.player).filter(Boolean);
+        const liveNameSet = new Set(liveNameOrder);
+        const preservedState = new Map(allPlayers.map(p => [p.name, p]));
+
+        const nextPlayers = liveNameOrder.map(name => {
+          const existing = preservedState.get(name);
+          return existing ? existing : { name, bounties: 0, rank: null };
+        });
+
+        const changed = nextPlayers.length !== allPlayers.length
+          || nextPlayers.some((player, idx) => allPlayers[idx]?.name !== player.name);
+
+        if (!changed) return;
+
+        allPlayers = nextPlayers;
+        if (bountyTarget && !liveNameSet.has(bountyTarget.name)) {
+          closeBountyModal();
+        }
+
+        eliminateTarget = eliminateTarget.filter(p => liveNameSet.has(p.name));
+        if (eliminateTarget.length === 0 && document.getElementById('eliminateModal').classList.contains('active')) {
+          closeEliminateModal();
+        }
+
+        const playerSearch = document.getElementById('playerSearch');
+        const searchTerm = playerSearch ? playerSearch.value.toLowerCase() : '';
+        renderRoster(searchTerm);
+        updateStats();
+
+        if (bountyTarget || eliminateTarget.length > 0) {
+          renderAll();
+        }
+      });
+    } catch (err) {
+      console.error('Error loading roster:', err);
+    }
+  }
+  window.loadRoster = loadRoster;
+
+  // ============================================
+  // RENDERING
+  // ============================================
+  function updateStats() {
+    const totalPlayers = allPlayers.length;
+    const totalBounties = allPlayers.reduce((sum, p) => sum + (p.bounties || 0), 0);
+    const totalEliminated = allPlayers.filter(p => p.rank !== null).length;
+
+    document.getElementById('totalPlayers').innerText = totalPlayers;
+    document.getElementById('totalBounties').innerText = totalBounties;
+    document.getElementById('totalEliminated').innerText = totalEliminated;
+  }
+
+  function renderAll() {
+    renderRoster();
+    renderFinalists();
+    renderEliminated();
+    renderResultsPreview();
+    updateSubmitButton();
+    updateStats();
+  }
+
+  function renderRoster(searchTerm = '') {
+    const container = document.getElementById('roster-list');
+    const active = allPlayers.filter(p => p.rank === null);
+
+    if (active.length === 0) {
+      container.innerHTML = '<div class="empty-state">No players checked in</div>';
+      return;
+    }
+
+    let filtered = searchTerm
+      ? active.filter(p => PlayerSearch.matches(p.name, searchTerm))
+      : active;
+
+    filtered = filtered.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+
+    if (filtered.length === 0) {
+      container.innerHTML = '<div class="empty-state">No players match search</div>';
+      return;
+    }
+
+    container.innerHTML = '';
+    filtered.forEach(p => {
+      const bubble = document.createElement('div');
+      bubble.className = 'player-bubble' + (p.bounties > 0 ? ' has-bounty' : '');
+      bubble.innerHTML = `
+        <span>${p.name}</span>
+        ${p.bounties > 0 ? `<span class="bounty-count">${p.bounties}</span>` : ''}
+      `;
+      bubble.onclick = () => openBountyModal(p);
+      container.appendChild(bubble);
+    });
+  }
+
+  function renderFinalists() {
+    const container = document.getElementById('finalist-list');
+    const finalists = allPlayers.filter(p => p.bounties > 0 && p.rank === null);
+
+    document.getElementById('finalistCount').innerText = `${finalists.length} remaining`;
+
+    if (finalists.length === 0) {
+      container.innerHTML = '<div class="empty-state">Assign bounties to see players here</div>';
+      updateRankDisplay();
+      return;
+    }
+
+    container.innerHTML = '';
+    finalists.forEach(p => {
+      const btn = document.createElement('button');
+      btn.className = 'player-btn';
+      if (tieBuffer.includes(p)) btn.classList.add('selected-tie');
+      btn.innerHTML = `
+        <span>${p.name}</span>
+        <span class="badge badge-bounty">${p.bounties}</span>
+      `;
+      btn.onclick = () => handleEliminationClick(p);
+      container.appendChild(btn);
+    });
+
+    updateRankDisplay();
+  }
+
+  function renderEliminated() {
+    const container = document.getElementById('eliminated-list');
+    const eliminated = allPlayers.filter(p => p.rank !== null).sort((a, b) => a.rank - b.rank);
+
+    if (eliminated.length === 0) {
+      container.innerHTML = '<div class="empty-state">No eliminations yet</div>';
+      return;
+    }
+
+    container.innerHTML = '';
+    eliminated.forEach(p => {
+      const item = document.createElement('div');
+      item.className = 'elim-item';
+      item.innerHTML = `
+        <span>${p.rank}${getOrdinalSuffix(p.rank)}: ${p.name}</span>
+        <button class="undo-btn" onclick="undoElimination('${p.name.replace(/'/g, "\\'")}')">UNDO</button>
+      `;
+      container.appendChild(item);
+    });
+  }
+
+  function renderResultsPreview() {
+    const container = document.getElementById('resultsPreview');
+    const eliminated = allPlayers.filter(p => p.rank !== null).sort((a, b) => a.rank - b.rank);
+
+    if (eliminated.length === 0) {
+      container.innerHTML = '<div class="empty-state">Eliminations will appear here</div>';
+      return;
+    }
+
+    let html = '';
+    eliminated.forEach(p => {
+      const points = calculatePoints(p.rank, eliminated);
+      html += `
+        <div class="result-row">
+          <span class="result-rank">${p.rank}${getOrdinalSuffix(p.rank)}</span>
+          <span class="result-name">${p.name}</span>
+          <span class="result-points">+${Math.round(points)}</span>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+  }
+
+  function updateRankDisplay() {
+    const rankNum = document.getElementById('rankNumber');
+    const rankSuffix = document.getElementById('rankSuffix');
+
+    if (currentRank <= 0) {
+      rankNum.innerText = 'Win';
+      rankSuffix.innerText = '';
+    } else {
+      rankNum.innerText = currentRank;
+      rankSuffix.innerText = getOrdinalSuffix(currentRank);
+    }
+  }
+
+  function adjustRank(delta) {
+    currentRank += delta;
+    if (currentRank < 1) currentRank = 1;
+    if (currentRank > 10) currentRank = 10;
+    updateRankDisplay();
+  }
+  window.adjustRank = adjustRank;
+
+  function resetRank() {
+    currentRank = 10;
+    updateRankDisplay();
+  }
+  window.resetRank = resetRank;
+
+  function clearSearch() {
+    document.getElementById('playerSearch').value = '';
+    renderRoster('');
+  }
+  window.clearSearch = clearSearch;
+
+  function updateSubmitButton() {
+    const btn = document.getElementById('submitBtn');
+    const eliminated = allPlayers.filter(p => p.rank !== null);
+    btn.disabled = eliminated.length === 0;
+  }
+
+  // ============================================
+  // BOUNTY MODAL
+  // ============================================
+  function openBountyModal(player) {
+    bountyTarget = player;
+    document.getElementById('bountyModalTitle').innerText = `How many bounties for ${player.name}?`;
+    document.getElementById('bountyInput').value = player.bounties > 0 ? player.bounties : 1;
+    document.getElementById('bountyModal').classList.add('active');
+    document.getElementById('bountyInput').focus();
+    document.getElementById('bountyInput').select();
+  }
+
+  function closeBountyModal() {
+    document.getElementById('bountyModal').classList.remove('active');
+    bountyTarget = null;
+  }
+  window.closeBountyModal = closeBountyModal;
+
+  async function confirmBounty() {
+    if (!bountyTarget) return;
+    const value = parseInt(document.getElementById('bountyInput').value) || 0;
+    const bountyCount = Math.max(0, Math.min(20, value));
+    const playerName = bountyTarget.name;
+    const previousBounties = bountyTarget.bounties;
+
+    // OPTIMISTIC UI
+    bountyTarget.bounties = bountyCount;
+    closeBountyModal();
+    renderAll();
+
+    try {
+      const result = await PokerAPI.recordBounty({
+        player: playerName,
+        date: currentDate,
+        gameNum: currentGameNum,
+        venue: currentLocation,
+        count: bountyCount
+      });
+
+      if (result.status === "success") {
+        console.log(`Backend confirmed: ${playerName} bounties = ${bountyCount}`);
+      } else {
+        // Rollback
+        const player = allPlayers.find(p => p.name === playerName);
+        if (player) {
+          player.bounties = previousBounties;
+          renderAll();
+        }
+        alert('Error saving bounty: ' + (result.message || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error('Bounty sync error:', err);
+      // Rollback optimistic UI - the write may not have reached Firestore.
+      const player = allPlayers.find(p => p.name === playerName);
+      if (player) {
+        player.bounties = previousBounties;
+        renderAll();
+      }
+      alert(`Network error saving bounty for ${playerName}. It was NOT saved - please try again.`);
+    }
+  }
+  window.confirmBounty = confirmBounty;
+
+  // ============================================
+  // ELIMINATION
+  // ============================================
+  function toggleTie() {
+    isTieMode = !isTieMode;
+    const btn = document.getElementById('tieBtn');
+
+    if (isTieMode) {
+      btn.innerText = 'Tie Mode: ON (Select players, tap again)';
+      btn.classList.add('active');
+    } else {
+      btn.innerText = 'Tie Mode: OFF';
+      btn.classList.remove('active');
+
+      if (tieBuffer.length > 1) {
+        eliminateTarget = [...tieBuffer];
+        openEliminateModal();
+      }
+      tieBuffer = [];
+    }
+
+    renderFinalists();
+  }
+  window.toggleTie = toggleTie;
+
+  function handleEliminationClick(player) {
+    if (isTieMode) {
+      const idx = tieBuffer.indexOf(player);
+      if (idx >= 0) tieBuffer.splice(idx, 1);
+      else tieBuffer.push(player);
+      renderFinalists();
+    } else {
+      eliminateTarget = [player];
+      openEliminateModal();
+    }
+  }
+
+  function openEliminateModal() {
+    const names = eliminateTarget.map(p => p.name).join(' & ');
+    const isTie = eliminateTarget.length > 1;
+
+    let displayRank;
+    if (currentRank === 10) {
+      displayRank = 10;
+    } else {
+      displayRank = currentRank - (eliminateTarget.length - 1);
+    }
+
+    document.getElementById('eliminateModalTitle').innerText = isTie ? 'Confirm Tie' : 'Confirm Elimination';
+    document.getElementById('eliminateModalText').innerText =
+      isTie
+        ? `${names} tied for ${displayRank}${getOrdinalSuffix(displayRank)} place?`
+        : `${names} finished ${displayRank}${getOrdinalSuffix(displayRank)}?`;
+
+    document.getElementById('eliminateModal').classList.add('active');
+  }
+
+  function closeEliminateModal() {
+    document.getElementById('eliminateModal').classList.remove('active');
+    eliminateTarget = [];
+  }
+  window.closeEliminateModal = closeEliminateModal;
+
+  async function confirmElimination() {
+    if (eliminateTarget.length === 0) return;
+
+    let assignedRank;
+    if (currentRank === 10) {
+      assignedRank = 10;
+    } else {
+      assignedRank = currentRank - (eliminateTarget.length - 1);
+    }
+
+    const playersToEliminate = [...eliminateTarget];
+
+    // OPTIMISTIC UI
+    playersToEliminate.forEach(p => {
+      p.rank = assignedRank;
+      p.eliminationId = 'pending-' + Date.now();
+    });
+    currentRank -= playersToEliminate.length;
+    closeEliminateModal();
+    tieBuffer = [];
+
+    if (isTieMode) {
+      isTieMode = false;
+      document.getElementById('tieBtn').innerText = 'Tie Mode: OFF';
+      document.getElementById('tieBtn').classList.remove('active');
+    }
+
+    renderAll();
+
+    // Sync to backend
+    for (const p of playersToEliminate) {
+      try {
+        const result = await PokerAPI.recordElimination({
+          player: p.name,
+          date: currentDate,
+          gameNum: currentGameNum,
+          venue: currentLocation,
+          rank: assignedRank
+        });
+
+        if (result.status === "success") {
+          p.eliminationId = result.eliminationId;
+          console.log(`Backend confirmed: ${p.name} eliminated at rank ${assignedRank}`);
+        } else if (result.status !== "duplicate") {
+          p.rank = null;
+          p.eliminationId = null;
+          currentRank++;
+          renderAll();
+          alert('Error saving elimination for ' + p.name);
+        }
+      } catch (err) {
+        console.error('Elimination sync error:', err);
+        // Rollback optimistic UI - the write may not have reached Firestore.
+        p.rank = null;
+        p.eliminationId = null;
+        currentRank++;
+        renderAll();
+        alert(`Network error saving elimination for ${p.name}. It was NOT saved - please try again.`);
+      }
+    }
+  }
+  window.confirmElimination = confirmElimination;
+
+  async function undoElimination(playerName) {
+    if (!confirm(`Restore ${playerName} to the game?`)) return;
+
+    const player = allPlayers.find(p => p.name === playerName);
+    if (!player || !player.eliminationId) {
+      alert('Cannot undo - entry ID not found. Try refreshing the page.');
+      return;
+    }
+
+    try {
+      const result = await PokerAPI.undoScoring({
+        entryId: player.eliminationId,
+        type: 'elimination'
+      });
+
+      if (result.status === "success") {
+        const eliminatedRank = player.rank;
+        const playersAtSameRank = allPlayers.filter(p => p.rank === eliminatedRank);
+
+        player.rank = null;
+        player.eliminationId = null;
+        currentRank += playersAtSameRank.length;
+
+        renderAll();
+      } else {
+        alert('Error undoing elimination: ' + (result.message || 'Unknown error'));
+      }
+    } catch (err) {
+      alert('Network error undoing elimination');
+      console.error(err);
+    }
+  }
+  window.undoElimination = undoElimination;
+
+  function calculatePoints(rank, allEliminated) {
+    if (rank > 10) return 0;
+
+    const playersAtRank = allEliminated.filter(p => p.rank === rank);
+
+    if (playersAtRank.length > 1) {
+      let totalPoints = 0;
+      for (let r = rank; r < rank + playersAtRank.length && r <= 10; r++) {
+        totalPoints += BONUS_POINTS[r] || 0;
+      }
+      const avgPoints = totalPoints / playersAtRank.length;
+      return Math.ceil(avgPoints / 5) * 5;
+    }
+
+    return BONUS_POINTS[rank] || 0;
+  }
+
+  // Reconciliation report stashed from the pre-submit preview, so the receipt
+  // can show per-player points and run a drift check without a second round-trip.
+  let pendingPreview = null;
+
+  function escapeHtml(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function ordinalNum(n) { return n + getOrdinalSuffix(n); }
+
+  // Step 1: clicking Submit opens the reconciliation gate (it IS the confirm now).
+  async function submitResults() {
+    const eliminated = allPlayers.filter(p => p.rank !== null);
+    if (eliminated.length === 0) { alert('No eliminations recorded'); return; }
+    openReconciliationModal();
+  }
+  window.submitResults = submitResults;
+
+  async function openReconciliationModal() {
+    const modal = document.getElementById('reconciliationModal');
+    const body = document.getElementById('reconBody');
+    const footer = document.getElementById('reconFooter');
+    document.getElementById('reconTitle').innerText = 'Review before finalizing';
+    body.innerHTML = '<div class="recon-loading">Checking game…</div>';
+    footer.innerHTML = '';
+    pendingPreview = null;
+    modal.classList.add('active');
+
+    try {
+      const report = await PokerAPI.previewGameSubmission({
+        date: currentDate,
+        gameNum: currentGameNum,
+        venue: currentLocation
+      });
+      pendingPreview = report;
+      renderReconciliation(report);
+    } catch (err) {
+      console.error('Preview failed:', err);
+      renderPreviewFailure();
+    }
+  }
+  window.openReconciliationModal = openReconciliationModal;
+
+  function closeReconciliationModal() {
+    document.getElementById('reconciliationModal').classList.remove('active');
+  }
+  window.closeReconciliationModal = closeReconciliationModal;
+
+  function scoreTile(num, lbl, flag) {
+    return `<div class="score-tile ${flag || ''}"><div class="score-num">${num}</div><div class="score-lbl">${lbl}</div></div>`;
+  }
+
+  function renderReconciliation(report) {
+    const body = document.getElementById('reconBody');
+    const footer = document.getElementById('reconFooter');
+    document.getElementById('reconTitle').innerText =
+      `Review — ${report.date} · Game ${report.gameNum} · ${report.venue}`;
+
+    const v = report.verdict;
+    const c = report.counts;
+    const pill = v === 'FULL' ? ['verdict-full', '✓', 'Looks Full']
+      : v === 'PARTIAL' ? ['verdict-partial', '!', 'Partial — Check This']
+        : ['verdict-block', '✕', 'Must Fix'];
+    const sub = v === 'FULL' ? 'Top places complete, no gaps, nothing missing.'
+      : v === 'PARTIAL' ? "Something's missing or doesn't match — review before you finalize."
+        : 'This must be fixed before the game can finalize.';
+
+    const placedFlag = report.warnings.some(w => w.id === 'W_RANK_HOLE') ? 'flag-error'
+      : report.warnings.some(w => w.id === 'W_INCOMPLETE_TOP') ? 'flag-warn' : '';
+
+    let tiles = '';
+    tiles += scoreTile(c.checkedIn + (c.removedCheckins ? ` <span style="color:#888;font-size:0.8rem">(−${c.removedCheckins})</span>` : ''), 'Checked In', '');
+    tiles += scoreTile(`${c.ranksFilled}/${c.expectedRanks}`, 'Placed', placedFlag);
+    tiles += scoreTile(c.attendanceOnly, 'Attendance', '');
+    tiles += scoreTile(c.bountyTotal, `Bounties (${c.bountyPlayers}p)`, '');
+    if (c.rsvpUnconverted > 0) tiles += scoreTile(c.rsvpUnconverted, 'RSVP No-show', 'flag-warn');
+
+    let warnHtml = '';
+    report.warnings.forEach(w => {
+      const ico = w.severity === 'error' ? '⛔' : w.severity === 'warn' ? '⚠️' : 'ℹ️';
+      warnHtml += `<div class="warn-row sev-${w.severity}"><span class="warn-ico">${ico}</span><span>${escapeHtml(w.message)}</span></div>`;
+    });
+
+    let html = `<div class="verdict-pill ${pill[0]}"><span class="vp-ico">${pill[1]}</span><span>${pill[2]}</span></div>`;
+    html += `<div class="verdict-sub">${sub}</div>`;
+    html += `<div class="scorecard">${tiles}</div>`;
+    if (warnHtml) html += `<div class="warn-list">${warnHtml}</div>`;
+
+    if (v === 'PARTIAL') {
+      const n = report.warnings.filter(w => w.severity !== 'info').length;
+      html += `<label class="recon-check"><input type="checkbox" id="overrideChk" onchange="onOverrideToggle()"> I reviewed the ${n} warning${n === 1 ? '' : 's'} and want to finalize anyway.</label>`;
+    }
+    body.innerHTML = html;
+
+    if (v === 'BLOCK') {
+      footer.innerHTML =
+        `<button class="modal-btn modal-btn-cancel" onclick="closeReconciliationModal()">Close</button>` +
+        `<button class="modal-btn" disabled>Fix issues to finalize</button>`;
+    } else if (v === 'PARTIAL') {
+      footer.innerHTML =
+        `<button class="modal-btn modal-btn-cancel" onclick="closeReconciliationModal()">Cancel</button>` +
+        `<button class="modal-btn modal-btn-confirm" id="reconConfirmBtn" disabled onclick="confirmFinalizeFromGate()">Finalize anyway</button>`;
+    } else {
+      footer.innerHTML =
+        `<button class="modal-btn modal-btn-cancel" onclick="closeReconciliationModal()">Cancel</button>` +
+        `<button class="modal-btn modal-btn-finalize" onclick="confirmFinalizeFromGate()">Finalize Game</button>`;
+    }
+  }
+
+  function onOverrideToggle() {
+    const chk = document.getElementById('overrideChk');
+    const btn = document.getElementById('reconConfirmBtn');
+    if (btn) btn.disabled = !chk.checked;
+  }
+  window.onOverrideToggle = onOverrideToggle;
+
+  // Fail-open: if the pre-check can't run, still let the director finalize.
+  // The submission is logged as "unverified" for later audit (never blocks a write).
+  function renderPreviewFailure() {
+    const body = document.getElementById('reconBody');
+    const footer = document.getElementById('reconFooter');
+    document.getElementById('reconTitle').innerText = 'Could not verify game';
+    body.innerHTML =
+      `<div class="warn-row sev-warn" style="margin-bottom:14px"><span class="warn-ico">⚠️</span>` +
+      `<span>Couldn't run the pre-submit check (network or server hiccup). You can still finalize — this submission will be logged as <b>unverified</b> for later review.</span></div>`;
+    footer.innerHTML =
+      `<button class="modal-btn modal-btn-cancel" onclick="closeReconciliationModal()">Cancel</button>` +
+      `<button class="modal-btn modal-btn-confirm" onclick="confirmFinalizeUnverified()">Finalize anyway</button>`;
+  }
+
+  function confirmFinalizeFromGate() {
+    const overrideChk = document.getElementById('overrideChk');
+    runFinalize({
+      previewRan: true,
+      overrideAcknowledged: !!(overrideChk && overrideChk.checked),
+      clientVerdict: pendingPreview ? pendingPreview.verdict : null
+    });
+  }
+  window.confirmFinalizeFromGate = confirmFinalizeFromGate;
+
+  function confirmFinalizeUnverified() {
+    runFinalize({ previewRan: false, overrideAcknowledged: false, clientVerdict: 'UNVERIFIED' });
+  }
+  window.confirmFinalizeUnverified = confirmFinalizeUnverified;
+
+  async function runFinalize(submissionMeta) {
+    closeReconciliationModal();
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerText = 'Saving...';
+
+    try {
+      const result = await PokerAPI.finalizeGame({
+        date: currentDate,
+        gameNum: currentGameNum,
+        venue: currentLocation,
+        submissionMeta
+      });
+
+      if (result.status === 'success') {
+        openReceipt(result, pendingPreview);
+      } else {
+        alert('Error: ' + (result.message || 'Unknown error'));
+        btn.disabled = false;
+        btn.innerText = 'Save Results';
+      }
+    } catch (err) {
+      alert('Network error');
+      console.error(err);
+      btn.disabled = false;
+      btn.innerText = 'Save Results';
+    }
+  }
+
+  function openReceipt(result, preview) {
+    const body = document.getElementById('receiptBody');
+    document.getElementById('receiptTitle').innerText =
+      `Game finalized — ${currentDate} · Game ${currentGameNum}`;
+
+    let html = `<div class="match-note">✓ Saved: ${result.eliminations} eliminations · ${result.bounties} bounties · ${result.attendanceOnly} attendance-only</div>`;
+
+    if (preview && Array.isArray(preview.placements) && preview.placements.length) {
+      html += `<table class="points-table"><tbody>`;
+      preview.placements.forEach(p => {
+        const tie = p.numTied > 1 ? ` <span style="color:#888">tie ×${p.numTied}</span>` : '';
+        html += `<tr><td class="pt-rank">${ordinalNum(p.rank)}</td><td>${escapeHtml(p.player)}${tie}</td><td class="pt-pts">+${p.bonusPoints}</td></tr>`;
+      });
+      html += `</tbody></table>`;
+    }
+
+    if (preview) {
+      const drift = (result.eliminations !== preview.counts.placed) ||
+        (result.attendanceOnly !== preview.counts.attendanceOnly);
+      if (drift) {
+        html += `<div class="drift-note">⚠ Server processed ${result.eliminations} placed / ${result.attendanceOnly} attendance, but the preview showed ${preview.counts.placed} / ${preview.counts.attendanceOnly}. Another device or a removed record may differ — tap Refresh on the main screen to re-verify.</div>`;
+      } else {
+        html += `<div class="match-note">✓ Server matches the preview.</div>`;
+      }
+    } else {
+      html += `<div class="drift-note">This submission was finalized <b>unverified</b> (pre-check unavailable) and logged for later review.</div>`;
+    }
+
+    body.innerHTML = html;
+    document.getElementById('receiptModal').classList.add('active');
+  }
+
+  function receiptDone() {
+    document.getElementById('receiptModal').classList.remove('active');
+    allPlayers.forEach(p => { p.rank = null; p.bounties = 0; });
+    currentRank = 10;
+    pendingPreview = null;
+    renderAll();
+    const btn = document.getElementById('submitBtn');
+    btn.innerText = 'Save Results';
+  }
+  window.receiptDone = receiptDone;
+
+  function getOrdinalSuffix(n) {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return s[(v - 20) % 10] || s[v] || s[0];
+  }
+
+  // ============================================
+  // REAL-TIME SYNC
+  // ============================================
+  function startSync() {
+    syncInterval = setInterval(syncLiveScoring, 10000);
+  }
+
+  async function syncLiveScoring() {
+    if (!currentDate || !currentLocation) return;
+
+    try {
+      const data = await PokerAPI.getLiveScoring({
+        date: currentDate,
+        gameNum: currentGameNum,
+        venue: currentLocation
+      });
+
+      if (!data) return;
+
+      // Update bounties
+      const bounties = data.bounties || [];
+      bounties.forEach(b => {
+        const player = allPlayers.find(p => p.name === b.player);
+        if (player) player.bounties = b.count;
+      });
+
+      // Update eliminations
+      const eliminations = data.eliminations || [];
+      eliminations.forEach(e => {
+        const player = allPlayers.find(p => p.name === e.player);
+        if (player && player.rank === null) {
+          player.rank = e.rank;
+          player.eliminationId = e.entryId;
+        }
+      });
+
+      // Recalculate current rank
+      const eliminated = allPlayers.filter(p => p.rank !== null);
+      if (eliminated.length > 0) {
+        const lowestRank = Math.min(...eliminated.map(p => p.rank));
+        currentRank = lowestRank - 1;
+        if (currentRank < 1) currentRank = 1;
+      }
+
+      renderAll();
+    } catch (err) {
+      console.error('Sync error:', err);
+    }
+  }
+</script>
+
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="/clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/gameday.html"></script>
+</body>
+</html>

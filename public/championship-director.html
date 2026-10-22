@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Championship Director</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <link rel="icon" type="image/svg+xml" href="/img/favicon-staff.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+  <link rel="apple-touch-icon" href="/img/gameday-apple-icon.png">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #111;
+      color: #eee;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .header {
+      background: linear-gradient(90deg, #8B0000, #d4af37, #8B0000);
+      text-align: center;
+      padding: 6px 8px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header h1 { font-size: 1.1rem; color: #fff; }
+    .header .subtitle { color: #ffcc00; font-size: 0.75rem; }
+
+    /* Game toggle tabs */
+    .game-tabs {
+      display: flex;
+      position: sticky;
+      top: 42px;
+      z-index: 99;
+    }
+    .game-tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .game-tab.bounty {
+      background: #1a1000;
+      color: #885500;
+      border-bottom: 3px solid #333;
+    }
+    .game-tab.bounty.active {
+      background: rgba(204,102,0,0.2);
+      color: #ff9900;
+      border-bottom: 3px solid #ff9900;
+    }
+    .game-tab.champ {
+      background: #1a1500;
+      color: #886600;
+      border-bottom: 3px solid #333;
+    }
+    .game-tab.champ.active {
+      background: rgba(212,175,55,0.2);
+      color: #d4af37;
+      border-bottom: 3px solid #d4af37;
+    }
+
+    /* Stats bar */
+    .stats-bar {
+      display: flex;
+      justify-content: space-around;
+      padding: 6px 8px;
+      background: #0d0d0d;
+      font-size: 0.75rem;
+      color: #888;
+      border-bottom: 1px solid #222;
+      position: sticky;
+      top: 87px;
+      z-index: 98;
+    }
+    .stat { text-align: center; }
+    .stat .num { font-size: 1.1rem; font-weight: bold; }
+    .stat .num.green { color: #44dd44; }
+    .stat .num.yellow { color: #ffcc00; }
+    .stat .num.red { color: #ff4444; }
+
+    /* Section headers */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      position: sticky;
+      z-index: 50;
+    }
+    .section-header.playing {
+      background: rgba(68,221,68,0.1);
+      color: #44dd44;
+      border-top: 2px solid #44dd44;
+      top: 115px;
+    }
+    .section-header.ondeck {
+      background: rgba(255,204,0,0.1);
+      color: #ffcc00;
+      border-top: 2px solid #ffcc00;
+      top: 115px;
+    }
+    .section-header.consolation {
+      background: rgba(255,153,0,0.1);
+      color: #ff9900;
+      border-top: 2px solid #ff9900;
+      top: 115px;
+    }
+    .section-header.cleared {
+      background: rgba(0,170,255,0.12);
+      color: #33bbff;
+      border-top: 2px solid #33bbff;
+      top: 115px;
+    }
+    .section-header.consolwait {
+      background: rgba(255,153,0,0.06);
+      color: #cc8a33;
+      border-top: 1px dashed #cc8a33;
+      top: 115px;
+    }
+    .section-header.out {
+      background: rgba(255,255,255,0.03);
+      color: #777;
+      border-top: 1px solid #333;
+      top: 115px;
+    }
+    .time-note { font-size: 0.72rem; color: #cc8a33; }
+    /* Gave up the seat: stays in place, red ✗, dimmed. The seat is open. */
+    .player-row.out .name { color: #777; text-decoration: line-through; text-decoration-color: rgba(255,68,68,0.6); }
+    .player-row.out .score { color: #555; }
+    .section-count { font-size: 0.7rem; font-weight: normal; color: #888; }
+
+    /* Doors bar — the one control that decides when held seats become open. */
+    .doors-bar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-bottom: 1px solid #222;
+      background: #0d0d0d;
+    }
+    .doors-state { flex: 1; font-size: 0.78rem; line-height: 1.35; color: #888; }
+    .doors-state b { display: block; font-size: 0.9rem; margin-bottom: 2px; }
+    .doors-state.open b { color: #ffcc00; }
+    .doors-state.closed b { color: #ff4444; }
+    .doors-btn {
+      flex: none; padding: 10px 14px; border-radius: 10px; border: 2px solid #ffcc00;
+      background: rgba(255,204,0,0.12); color: #ffcc00;
+      font-weight: 800; font-size: 0.78rem; text-transform: uppercase; cursor: pointer;
+    }
+    .doors-btn.reopen { border-color: #555; background: #1a1a1a; color: #aaa; }
+    .doors-btn:active { transform: scale(0.96); }
+
+    /* A row placed by hand rather than by the rules. */
+    .player-row.manual { border-left: 3px solid #33bbff; }
+    .badge-manual {
+      font-size: 0.55rem; font-weight: 800; letter-spacing: 0.5px;
+      color: #33bbff; border: 1px solid rgba(51,187,255,0.5);
+      border-radius: 4px; padding: 1px 4px; margin-left: 6px; vertical-align: middle;
+    }
+    .move-btn.reset { border-color: #555; color: #888; font-size: 0.7rem; }
+    .move-btn.out { width: auto; padding: 0 8px; border-color: #ff4444; color: #ff6666; font-size: 0.72rem; white-space: nowrap; }
+    .move-btn.seat { width: auto; padding: 0 12px; background: #44dd44; border-color: #44dd44; color: #000; font-weight: 800; font-size: 0.74rem; white-space: nowrap; }
+    /* Seat number: outlined until set, solid gold once a seat is assigned. */
+    .move-btn.seatnum { width: auto; padding: 0 9px; border-color: #d4af37; color: #d4af37; font-size: 0.72rem; font-weight: 700; white-space: nowrap; }
+    .move-btn.seatnum.set { background: #d4af37; color: #000; }
+    .seat-chip { display: inline-block; margin-left: 6px; padding: 0 6px; border-radius: 4px; background: #d4af37; color: #000; font-size: 0.66rem; font-weight: 800; letter-spacing: 0.04em; line-height: 1.6; vertical-align: middle; white-space: nowrap; }
+    .seat-chip::before { content: 'SEAT '; font-size: 0.8em; opacity: 0.8; }
+    .seat-chip.red { color: #9b0016; }
+    .move-btn.unseat { width: auto; padding: 0 10px; border-color: #33bbff; color: #33bbff; font-size: 0.72rem; white-space: nowrap; }
+    .move-btn.to-ondeck { width: auto; padding: 0 8px; border-color: #ffcc00; color: #ffcc00; font-size: 0.72rem; white-space: nowrap; }
+    .move-btn.to-consol { width: auto; padding: 0 8px; border-color: #ff9900; color: #ff9900; font-size: 0.72rem; white-space: nowrap; }
+    .move-btn.back-in { width: auto; padding: 0 8px; border-color: #44dd44; color: #44dd44; font-size: 0.72rem; white-space: nowrap; }
+
+    /* Player rows */
+    .player-row {
+      display: flex;
+      flex-wrap: wrap;            /* buttons may drop to their own line on a phone */
+      align-items: center;
+      padding: 8px 12px;
+      border-bottom: 1px solid #1a1a1a;
+      min-height: 42px;
+      transition: background 0.15s;
+    }
+    .player-row:active { background: rgba(255,255,255,0.1); }
+
+    .player-row .status-icon {
+      width: 20px;
+      text-align: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .status-icon.ci { color: #44dd44; }
+    .status-icon.rsvp { color: #ffcc00; }
+    .status-icon.declined { color: #ff4444; }
+
+    .player-row .rank {
+      width: 28px;
+      text-align: right;
+      margin-right: 8px;
+      color: #666;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .player-row .name {
+      flex: 1;
+      font-size: 0.95rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .player-row .score {
+      min-width: 35px;
+      text-align: right;
+      color: #888;
+      font-size: 0.85rem;
+      font-family: monospace;
+      flex-shrink: 0;
+      margin-right: 8px;
+    }
+
+    .player-row .move-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    /* Phones: the buttons get their own full-width line under the name, so
+       every one is visible with room around it. Cramming Seated / Clear / Consol
+       side by side next to a truncated name is how a fat finger demoted an
+       alternate on 2026-09-10 and hid the Seat button from the director. */
+    @media (max-width: 520px) {
+      .player-row .move-btns { width: 100%; justify-content: flex-end; padding-top: 6px; }
+      .move-btn { height: 36px; min-width: 36px; }
+    }
+    .move-btn {
+      width: 32px;
+      height: 32px;
+      border: 1px solid #444;
+      border-radius: 6px;
+      background: #222;
+      color: #ccc;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .move-btn:active { background: #555; }
+    .move-btn.up { border-color: #44dd44; color: #44dd44; }
+    .move-btn.down { border-color: #ff6644; color: #ff6644; }
+    .move-btn.uncheck { border-color: #ffaa00; color: #ffaa00; font-size: 0.65rem; }
+    .move-btn:disabled { opacity: 0.2; pointer-events: none; }
+
+    /* Tier colors for playing section */
+    .player-row.tier-1 { background: rgba(160,32,240,0.12); }
+    .player-row.tier-1 .name { color: #d4a0ff; }
+    .player-row.tier-2 { background: rgba(96,165,250,0.12); }
+    .player-row.tier-2 .name { color: #96c8ff; }
+    .player-row.tier-3 { background: rgba(40,167,69,0.12); }
+    .player-row.tier-3 .name { color: #5fd97f; }
+
+    /* Suggested promotion — checked-in On Deck player with open Playing spot */
+    .player-row.suggested {
+      border-left: 3px solid #ffcc00;
+      background: rgba(255,204,0,0.08);
+    }
+
+    .loading { text-align: center; color: #555; padding: 30px; }
+
+    .refresh-btn {
+      position: fixed;
+      bottom: 12px;
+      right: 12px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid #d4af37;
+      background: #222;
+      color: #d4af37;
+      font-size: 1.3rem;
+      cursor: pointer;
+      z-index: 200;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+    .refresh-btn:active { background: #444; }
+
+    .venue-toggle {
+      position: fixed;
+      bottom: 12px;
+      left: 12px;
+      padding: 8px 14px;
+      border-radius: 20px;
+      border: 2px solid #555;
+      background: #222;
+      color: #ccc;
+      font-size: 0.75rem;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 200;
+    }
+    .venue-toggle:active { background: #444; }
+    html.back-nav-on .header { padding-left: 60px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🏆 Championship Director</h1>
+    <div class="subtitle" id="dateDisplay">Loading...</div>
+  </div>
+
+  <div class="game-tabs">
+    <button class="game-tab bounty active" id="tabBounty" onclick="switchGame(1)">🎯 Bounty</button>
+    <button class="game-tab champ" id="tabChamp" onclick="switchGame(2)">🏆 Championship</button>
+  </div>
+
+  <div class="stats-bar" id="statsBar">
+    <div class="stat"><div class="num green" id="statCI">0</div>Checked In</div>
+    <div class="stat"><div class="num yellow" id="statRSVP">0</div>RSVP'd</div>
+    <div class="stat"><div class="num red" id="statDeclined">0</div>Declined</div>
+    <div class="stat"><div class="num" id="statNoResponse" style="color:#666;">0</div>No Response</div>
+  </div>
+
+  <div class="doors-bar">
+    <div class="doors-state open" id="doorsState"><b>Doors open</b>Seats are held for players who have not arrived.</div>
+    <button class="doors-btn" id="doorsBtn" onclick="toggleDoors()">Close doors</button>
+  </div>
+
+  <div id="gameContent">
+    <div class="loading">Loading...</div>
+  </div>
+
+  <button class="refresh-btn" onclick="loadAll()" title="Refresh">↻</button>
+  <button class="venue-toggle" id="venueBtn" onclick="toggleVenue()">Tight End</button>
+
+  <script type="module">
+    import { PokerAPI, functions } from './firebase-api.js?v=6';
+    import { httpsCallable } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js";
+    import { requireStaff } from './staff-auth.js';
+    // Seating rules live in ONE place, shared with champ-night.html (the
+    // read-only dashboard) and exercised by scripts/championship-seating-test.js.
+    import { buildSeating, buildChampionshipRanking, rankByBounties, loadAttendance as fetchAttendance, splitOverrides, fmtTime, seatKey, normalizeSeat, formatSeat, seatChipHtml, SECTIONS, DOORS_KEY, ROSTER_SIZE } from './champ-seating.js?v=13';
+
+    await requireStaff();
+
+    const PROJECT = 'demo-poker';
+    const KEY = 'demo-api-key';
+    const VENUES = {
+      te: { name: 'Tight End', apiVenue: 'Tight End' },
+      wc: { name: 'Wild Corgi', apiVenue: 'Wild Corgi' }
+    };
+
+    let currentVenue = 'te';
+    let currentGame = 1; // 1 = Bounty, 2 = Championship
+    let leagueData = [];
+    let bountyData = [];
+    let championshipDate = null;
+    let attendance = { 1: {}, 2: {} };
+    let checkinTime = { 1: {}, 2: {} };   // name -> epoch ms of the check-in
+    let currentDateStr = null;
+
+    // Manual overrides: { 1: { "jamie smith": "playing" }, 2: {} }
+    // Keyed by lowercase player name → target section
+    let manualOverrides = { 1: {}, 2: {} };
+    let overridesLoaded = false;
+
+    const emptyState = () => ({ playing: [], cleared: [], ondeck: [], consolation: [], consolWait: [], out: [] });
+    let gameState = { 1: emptyState(), 2: emptyState() };
+
+    // Doors: while open, a top-20 player who has not arrived KEEPS their seat.
+    // Closing the doors converts every unconfirmed seat into an open one, which
+    // is what lets On Deck players move up. Per game, persisted alongside the
+    // overrides (reserved key DOORS_KEY) so the phone and the dashboard agree.
+    let doorsClosed = { 1: false, 2: false };
+
+    // Seat assignments: { 1: { "jeff ginsburg": "7" }, 2: {} }. Typed by the
+    // director for anyone holding a main-game seat — mostly berth holders who
+    // have not arrived yet, so the TV shows where they sit instead of a paper
+    // note. Persisted in the same overrides doc under reserved __seat__ keys.
+    let seatNums = { 1: {}, 2: {} };
+
+    window.switchGame = function(g) {
+      currentGame = g;
+      document.getElementById('tabBounty').classList.toggle('active', g === 1);
+      document.getElementById('tabChamp').classList.toggle('active', g === 2);
+      renderCurrentGame();
+    };
+
+    window.toggleVenue = function() {
+      currentVenue = currentVenue === 'te' ? 'wc' : 'te';
+      document.getElementById('venueBtn').textContent = VENUES[currentVenue].name;
+      overridesLoaded = false; // Reset so overrides reload for the new venue
+      manualOverrides = { 1: {}, 2: {} };
+      loadAll();
+    };
+
+    // Build championship ranking: qualifiers bumped into top 20, sorted by points
+    // Matches leaderboard.html and timer.html logic exactly
+    async function loadAll() {
+      try {
+        const venue = VENUES[currentVenue];
+        const lbResult = await PokerAPI.getLeaderboard({ venue: venue.apiVenue });
+        leagueData = buildChampionshipRanking(lbResult.standings || []);
+        // resolveSeasonForVenue returns the STRING 'TBD' when a season has no
+        // championshipDate, and 'TBD' is truthy. Before this guard it flowed
+        // straight into currentDateStr, so the page queried checkins for a date
+        // literally called "TBD" (always empty — the director saw nobody
+        // checked in on championship night) and wrote seating overrides to
+        // champ_overrides/<Venue>_TBD. Treat anything that is not a real
+        // M/D/YYYY date as missing.
+        const looksLikeDate = (v) => /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(String(v || '').trim());
+        championshipDate = looksLikeDate(lbResult.championshipDate) ? lbResult.championshipDate : null;
+        bountyData = rankByBounties(leagueData);
+
+        const today = new Date();
+        const dateStr = championshipDate || `${today.getMonth()+1}/${today.getDate()}/${today.getFullYear()}`;
+        currentDateStr = dateStr;
+        const dateNote = championshipDate ? '' : ' (no championship date set — showing today)';
+        document.getElementById('dateDisplay').textContent = `${venue.name} — ${dateStr}${dateNote}`;
+
+        await loadAttendance(venue.apiVenue, dateStr);
+
+        // Load overrides from Firestore only once at startup
+        if (!overridesLoaded) {
+          await loadOverrides(venue.apiVenue, dateStr);
+          overridesLoaded = true;
+        }
+
+        buildGameState(1, bountyData, 'bounties');
+        buildGameState(2, leagueData, 'points');
+        renderCurrentGame();
+      } catch (err) {
+        console.error('Error:', err);
+        document.getElementById('gameContent').innerHTML = '<div class="loading">Error loading data</div>';
+      }
+    }
+
+    // Load manual overrides via Cloud Function (direct httpsCallable — no caching issues)
+    async function loadOverrides(venueStr, dateStr) {
+      try {
+        const fn = httpsCallable(functions, 'getChampOverrides');
+        const res = await fn({ venue: venueStr, date: dateStr });
+        const split = splitOverrides(res.data.overrides || { 1: {}, 2: {} });
+        manualOverrides = split.overrides;
+        doorsClosed = split.doors;
+        seatNums = split.seats || { 1: {}, 2: {} };
+        console.log('Loaded overrides:', JSON.stringify(manualOverrides), 'doors:', JSON.stringify(doorsClosed), 'seats:', JSON.stringify(seatNums));
+      } catch(e) {
+        console.error('loadOverrides failed:', e);
+        manualOverrides = { 1: {}, 2: {} };
+      }
+    }
+
+    // Save a single override via Cloud Function (direct httpsCallable — no caching issues)
+    async function saveOverride(gameNum, playerName, section) {
+      const venue = VENUES[currentVenue];
+      console.log('Saving override:', gameNum, playerName, section, 'date:', currentDateStr);
+      try {
+        const fn = httpsCallable(functions, 'saveChampOverride');
+        const res = await fn({
+          venue: venue.apiVenue,
+          date: currentDateStr,
+          gameNum,
+          player: playerName,
+          section
+        });
+        console.log('Override saved:', res.data);
+      } catch(e) {
+        console.error('saveOverride failed:', e);
+        alert('Failed to save move: ' + e.message);
+      }
+    }
+
+    async function loadAttendance(apiVenue, dateStr) {
+      const r = await fetchAttendance({ project: PROJECT, apiKey: KEY, venue: apiVenue, date: dateStr });
+      attendance = r.attendance;
+      checkinTime = r.checkinTime;
+    }
+
+    function buildGameState(gameNum, rankedData, scoreField) {
+      gameState[gameNum] = buildSeating({
+        ranked: rankedData,
+        attendance: attendance[gameNum],
+        checkinTime: checkinTime[gameNum],
+        overrides: manualOverrides[gameNum] || {},
+        seats: seatNums[gameNum] || {},
+        doorsClosed: doorsClosed[gameNum],
+        scoreField
+      });
+    }
+
+    function renderCurrentGame() {
+      const state = gameState[currentGame];
+      const m = state.meta || { seats: ROSTER_SIZE, filled: 0, openNow: 0, unconfirmed: 0, closed: false };
+      const content = document.getElementById('gameContent');
+
+      const allPlayers = SECTIONS.reduce((acc, sec) => acc.concat(state[sec]), []);
+      document.getElementById('statCI').textContent = allPlayers.filter(p => p.status === 'ci').length;
+      document.getElementById('statRSVP').textContent = allPlayers.filter(p => p.status === 'rsvp').length;
+      document.getElementById('statDeclined').textContent = allPlayers.filter(p => p.status === 'declined').length;
+      document.getElementById('statNoResponse').textContent = allPlayers.filter(p => !p.status).length;
+
+      renderDoorsBar(m);
+
+      let html = '';
+
+      // PLAYING - the top 20 who still hold their seat.
+      const playParts = [m.filled + ' of ' + m.seats + ' seats'];
+      if (m.openNow > 0) playParts.push(m.openNow + ' open now');
+      if (m.unconfirmed > 0) playParts.push(m.unconfirmed + ' unconfirmed');
+      const gname = currentGame === 1 ? 'Bounty' : 'Championship';
+      html += sectionHeader('playing', '\u{1F3AE} Playing · ' + gname + '', playParts.join(' · '));
+      state.playing.forEach((p, i) => {
+        const r = p.origRank || i + 1;
+        const tier = r <= 5 ? 'tier-1' : r <= 10 ? 'tier-2' : r <= 20 ? 'tier-3' : '';
+        html += playerRow(p, i, 'playing', tier, r);
+      });
+
+      // CLEARED TO SEAT - alternates who have been given one of those seats.
+      html += sectionHeader('cleared', '✅ Cleared to Seat · ' + gname,
+        state.cleared.length ? state.cleared.length + ' moved up' : 'nobody moved up yet');
+      if (!state.cleared.length) {
+        html += emptyNote(m.openNow > 0
+          ? 'Seats are open — tap Seat next to whoever is here and ready.'
+          : 'Nobody has been moved up. Seats open when a player declines, or when you close the doors.');
+      }
+      state.cleared.forEach((p, i) => html += playerRow(p, i, 'cleared', '', p.origRank || i + 1));
+
+      // ON DECK - waiting, in ranking order.
+      const odNote = m.closed
+        ? 'doors closed'
+        : state.ondeck.length ? m.unconfirmed + ' seat' + (m.unconfirmed === 1 ? '' : 's') + ' could still open' : '';
+      html += sectionHeader('ondeck', '▲ On Deck · ' + gname, state.ondeck.length + ' waiting' + (odNote ? ' · ' + odNote : ''));
+      if (!state.ondeck.length) {
+        html += emptyNote(m.closed
+          ? 'Doors are closed, so nobody is waiting on a seat.'
+          : 'No alternates waiting.');
+      }
+      state.ondeck.forEach((p, i) => html += playerRow(p, i, 'ondeck', '', i + 1));
+
+      // CONSOLATION — capped; past the cap it is a waitlist in arrival order.
+      const consolLabel = currentGame === 1 ? 'Consolation A' : 'Consolation B';
+      html += sectionHeader('consolation', '♠ ' + consolLabel,
+        m.consolFilled + ' of ' + m.consolSeats + ' seats · arrival order' + (m.consolWaiting ? ' · ' + m.consolWaiting + ' waiting' : ''));
+      if (!state.consolation.length) html += emptyNote('No consolation players yet.');
+      state.consolation.forEach((p, i) => html += playerRow(p, i, 'consolation', '', i + 1));
+
+      if (state.consolWait.length) {
+        html += sectionHeader('consolwait', '⏳ Consolation waitlist', state.consolWait.length + ' waiting · next up first (arrival order)');
+        // Sorted by check-in time; the time itself is not shown, the score is (the owner, 2026-09-11).
+        state.consolWait.forEach((p, i) => html += playerRow(p, i, 'consolwait', '', i + 1));
+      }
+
+
+      html += '<div style="height:70px;"></div>';
+      content.innerHTML = html;
+    }
+
+    function sectionHeader(cls, title, count) {
+      return '<div class="section-header ' + cls + '">' + title +
+        ' <span class="section-count">' + escapeHtml(count) + '</span></div>';
+    }
+    function emptyNote(text) {
+      return '<div style="padding:12px;color:#555;font-size:0.82rem;line-height:1.4;">' + escapeHtml(text) + '</div>';
+    }
+
+    function renderDoorsBar(m) {
+      const stateEl = document.getElementById('doorsState');
+      const btn = document.getElementById('doorsBtn');
+      if (!stateEl || !btn) return;
+      if (m.closed) {
+        stateEl.className = 'doors-state closed';
+        stateEl.innerHTML = '<b>Doors closed</b>No-shows have given up their seats. On Deck players were moved up automatically.';
+        btn.textContent = 'Reopen doors';
+        btn.className = 'doors-btn reopen';
+      } else {
+        stateEl.className = 'doors-state open';
+        stateEl.innerHTML = '<b>Doors open</b>' + m.unconfirmed + ' seat' + (m.unconfirmed === 1 ? '' : 's') +
+          ' still held for players who have not arrived. Close the doors when the break is nearly over.';
+        btn.textContent = 'Close doors';
+        btn.className = 'doors-btn';
+      }
+    }
+
+    function playerRow(p, idx, zone, tierClass, displayRank, note) {
+      const statusIcon = p.status === 'ci' ? '<span class="status-icon ci">✓</span>'
+        : (p.out || p.status === 'declined') ? '<span class="status-icon declined">✗</span>'
+        : p.status === 'rsvp' ? '<span class="status-icon rsvp">●</span>'
+        : '<span class="status-icon"></span>';
+
+      // 'out' is a reference list, not a movable section: from there the only
+      // move is up into consolation (they turned up after all).
+      const at = zone === 'out' ? SECTIONS.length : SECTIONS.indexOf(zone);
+      const upTo = at > 0 ? SECTIONS[at - 1] : null;
+      const downTo = at < SECTIONS.length - 1 ? SECTIONS[at + 1] : null;
+      const safeName = escapeHtml(p.name).replace(/'/g, "\\'");
+
+      const uncheckBtn = p.status === 'ci'
+        ? '<button class="move-btn uncheck" onclick="uncheckIn(' + currentGame + ',\'' + safeName + '\')">✕CI</button>'
+        : '';
+      // "Not coming" for anyone who is not here yet. Writes a declined RSVP for
+      // THIS game, which is what opens their seat. Declined rows get the undo.
+      const outBtn = p.status === 'ci' ? ''
+        : (p.status === 'declined')
+          ? '<button class="move-btn back-in" title="They can make it after all" onclick="setAttending(' + currentGame + ',\'' + safeName + '\', true)">↩ In</button>'
+          : '<button class="move-btn out" title="Mark as not coming" onclick="setAttending(' + currentGame + ',\'' + safeName + '\', false)">✗ Out</button>';
+      // Only offered on rows the director actually placed, so it reads as
+      // "undo what I did" rather than a fourth mystery button on every row.
+      const resetBtn = p.manual
+        ? '<button class="move-btn reset" title="Back to automatic" onclick="resetPlayer(' + currentGame + ',\'' + safeName + '\')">↺</button>'
+        : '';
+
+      // Labelled moves instead of arrows. Every button names the section the
+      // player lands in; nobody's rank ever changes, only their section.
+      const mv = (label, target, cls, title) =>
+        '<button class="move-btn ' + cls + '" title="' + title + '" onclick="moveTo(' + currentGame + ',\'' + safeName + '\',\'' + target + '\',\'' + zone + '\')">' + label + '</button>';
+      // Seat number for anyone holding a main-game seat. Tap to type it (or
+      // change / clear it); it shows as a gold chip here, on the TV and on the
+      // dashboard, so an unarrived berth holder's seat is not on a paper note.
+      // Seat assignment on EVERY row (the owner, 2026-09-11: "assign a seat to whoever I
+      // want"), not just Playing/Cleared. It sits first in the button group so
+      // it is the same place on every row.
+      const seatBtn = true
+        ? '<button class="move-btn seatnum' + (p.seat ? ' set' : '') + '" title="Assign a seat (suit + card, e.g. S7 or HA)" onclick="setSeat(' + currentGame + ',\'' + safeName + '\')">' + (p.seat ? 'Seat ' + escapeHtml(formatSeat(p.seat)) : 'Seat') + '</button>'
+        : '';
+      let zoneBtns = '';
+      if (zone === 'playing') {
+        zoneBtns = mv('↓ Consol', 'consolation', 'to-consol', 'Move to consolation');
+      } else if (zone === 'cleared') {
+        // Cleared = has a seat, not yet in it. Seated = they sat down; they move
+        // up into the Playing list (the top box on the TV) as a MOVED row.
+        zoneBtns = mv('Seated ✓', 'playing', 'seat', 'They sat down — move up into Playing')
+                 + mv('Unseat', 'ondeck', 'unseat', 'Back to On Deck (still next in line)');
+      } else if (zone === 'ondeck') {
+        // One tap straight to the table, or stage them in Cleared first.
+        zoneBtns = mv('Seated ✓', 'playing', 'seat', 'They are at the table — move straight into Playing')
+                 + mv('Clear', 'cleared', 'unseat', 'Give them the seat, not sat down yet')
+                 + mv('↓ Consol', 'consolation', 'to-consol', 'Move to consolation');
+      } else if (zone === 'consolation') {
+        zoneBtns = mv('Seated ✓', 'playing', 'seat', 'Main-game seat — move straight into Playing')
+                 + mv('▲ On Deck', 'ondeck', 'to-ondeck', 'Put in the waiting line');
+      } else if (zone === 'consolwait') {
+        // Waitlist for the consolation table, in arrival order. Seat Consol gives
+        // them a consolation seat (hand-placed players take priority in the cap).
+        zoneBtns = mv('Seat Consol', 'consolation', 'seat', 'Give this player a consolation seat')
+                 + mv('Seated ✓', 'playing', 'unseat', 'MAIN-game seat — move straight into Playing');
+      }
+
+      return '<div class="player-row ' + tierClass + ' ' + (p.manual ? 'manual' : '') + (p.out ? ' out' : '') + '">' +
+        statusIcon +
+        '<span class="rank">' + (zone === 'playing' ? (p.tied ? 'T' : '') + (p.dispRank || displayRank) : displayRank) + '</span>' +
+        '<span class="name">' + escapeHtml(p.name) + (p.manual ? '<span class="badge-manual">MOVED</span>' : '') + seatChipHtml(p.seat) + '</span>' +
+        '<span class="score">' + (note ? '<span class="time-note">' + escapeHtml(note) + '</span>' : (p.score ?? '')) + '</span>' +
+        '<span class="move-btns">' + resetBtn + seatBtn + outBtn + uncheckBtn + zoneBtns + '</span>' +
+        '</div>';
+    }
+
+    // One move handler for every direction. Records the director's intent, then
+    // rebuilds from that intent - so what is on screen after a move is exactly
+    // what will be on screen after a refresh.
+    window.moveTo = async function(gameNum, playerName, section, fromZone) {
+      // Consolation → main game should never happen; it only does after a bad
+      // miscommunication. Require an explicit confirmation for that one path.
+      const fromConsol = fromZone === 'consolation' || fromZone === 'consolwait';
+      const toMain = section === 'playing' || section === 'cleared';
+      if (fromConsol && toMain) {
+        const gname = gameNum === 1 ? 'Bounty' : 'Championship';
+        if (!confirm('Move ' + playerName + ' OUT of the consolation table and INTO the ' + gname + ' main game?\n\nThis takes a main-game seat away from the alternates in line. Only do this to fix a miscommunication.')) return;
+      }
+      // The reverse is just as consequential and used to fire silently: on Wild
+      // Corgi championship night 2026-09-10 a stray tap on "↓ Consol" sent the
+      // #22 alternate to Consolation at 8:53 PM, and the TV showed #23 ahead of
+      // him "for no reason". A demotion out of the main game always confirms.
+      const fromMain = fromZone === 'playing' || fromZone === 'cleared' || fromZone === 'ondeck';
+      if (fromMain && section === 'consolation') {
+        const gname = gameNum === 1 ? 'Bounty' : 'Championship';
+        const where = fromZone === 'ondeck' ? 'the On Deck line' : fromZone === 'cleared' ? 'their cleared seat' : 'the ' + gname + ' table';
+        if (!confirm('Move ' + playerName + ' DOWN to the consolation table?\n\nThey leave ' + where + ' and everyone below them moves up one spot. Only do this if they are actually giving up their ' + gname + ' spot.')) return;
+      }
+      manualOverrides[gameNum][playerName.toLowerCase()] = section;
+      rebuild();
+      try { await saveOverride(gameNum, playerName, section); }
+      catch (e) { alert('Move not saved: ' + e.message); }
+    };
+
+    // Hand a player back to the automatic rules. The backend merges rather than
+    // deletes, so 'auto' is the stored way of saying "no override"; loadOverrides
+    // drops those on the way back in.
+    window.resetPlayer = async function(gameNum, playerName) {
+      delete manualOverrides[gameNum][playerName.toLowerCase()];
+      rebuild();
+      try { await saveOverride(gameNum, playerName, 'auto'); }
+      catch (e) { alert('Reset not saved: ' + e.message); }
+    };
+
+    // Assign (or clear) a seat number for a player holding a main-game seat.
+    // Stored in the same overrides doc under a reserved __seat__<name> key —
+    // 'auto' clears it, mirroring how section overrides are cleared — so the
+    // TV and the dashboard pick it up on their next refresh with no server change.
+    window.setSeat = async function(gameNum, playerName) {
+      const key = playerName.toLowerCase();
+      const current = (seatNums[gameNum] || {})[key] || '';
+      const label = gameNum === 1 ? 'Bounty' : 'Championship';
+      const raw = prompt('Seat for ' + playerName + ' (' + label + ')\n\nTable suit + card, either order: S7 or 7S, HA or AH, H10 or 10H\n(S = spades, H = hearts). Leave blank to clear.', current);
+      if (raw === null) return;
+      let seat = String(raw).trim();
+      if (seat) {
+        const norm = normalizeSeat(seat);
+        if (!norm) {
+          alert('Seat format is suit + card, like S7, HA, SK or H10.\nS = spades, H = hearts; card is 2-10, J, Q, K or A.');
+          return window.setSeat(gameNum, playerName);
+        }
+        seat = norm;
+      }
+      if (!seatNums[gameNum]) seatNums[gameNum] = {};
+      if (seat) seatNums[gameNum][key] = seat; else delete seatNums[gameNum][key];
+      rebuild();
+      try { await saveOverride(gameNum, seatKey(playerName), seat || 'auto'); }
+      catch (e) { alert('Seat not saved: ' + e.message); }
+    };
+
+    window.toggleDoors = async function() {
+      const g = currentGame;
+      const next = !doorsClosed[g];
+      const label = g === 1 ? 'Bounty' : 'Championship';
+      if (next && !confirm('Close the doors for ' + label + '?\n\nEvery seat still held by a player who has not arrived becomes open, and On Deck players move up to fill them.')) return;
+      doorsClosed[g] = next;
+      rebuild();
+      try { await saveOverride(g, DOORS_KEY, next ? 'closed' : 'open'); }
+      catch (e) { alert('Doors state not saved: ' + e.message); }
+    };
+
+    function rebuild() {
+      buildGameState(1, bountyData, 'bounties');
+      buildGameState(2, leagueData, 'points');
+      renderCurrentGame();
+    }
+
+    // Mark a player as not coming (declined RSVP for this game) or back in.
+    // A declined seat is an OPEN seat under the shared rules, so On Deck fills
+    // it automatically; "In" flips the RSVP back to active and the seat is held again.
+    window.setAttending = async function(gameNum, playerName, attending) {
+      const label = gameNum === 1 ? 'the Bounty game' : 'the Championship';
+      if (!attending && !confirm('Mark ' + playerName + ' as NOT coming to ' + label + '?\n\nTheir seat opens and the next On Deck player moves up.')) return;
+      try {
+        await PokerAPI.rsvp({ player: playerName, date: currentDateStr, gameNum, venue: VENUES[currentVenue].apiVenue, status: attending ? 'active' : 'declined' });
+        await loadAttendance(VENUES[currentVenue].apiVenue, currentDateStr);
+        rebuild();
+      } catch (e) { alert('Could not update: ' + e.message); }
+    };
+
+    // Remove check-in for a specific game only — does NOT affect the other game
+    window.uncheckIn = async function(gameNum, playerName) {
+      if (!confirm(`Remove ${playerName} from Game ${gameNum} check-in? They will be moved to consolation.`)) return;
+      try {
+        await PokerAPI.removeCheckin({
+          player: playerName,
+          date: currentDateStr,
+          gameNum: gameNum,
+          venue: VENUES[currentVenue].apiVenue
+        });
+        // Do NOT pin them to consolation. Removing a check-in is a statement
+        // about attendance, not about seating: the rules re-sort them from the
+        // new attendance on their own. Pinning it here meant that if the player
+        // turned out to be present after all and checked back in, they stayed
+        // stuck in consolation with no way to undo it from this screen.
+        await loadAttendance(VENUES[currentVenue].apiVenue, currentDateStr);
+        rebuild();
+      } catch(e) {
+        alert('Failed to remove check-in: ' + e.message);
+      }
+    };
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // Auto-refresh every 60 seconds (longer interval to not wipe manual changes as often)
+    setInterval(loadAll, 60000);
+    loadAll();
+  </script>
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="/clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/gameday.html"></script>
+</body>
+</html>

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <title>All-In Poker Clock</title>
+  <style>
+    /* Player phone view of the shared venue clock.
+       Design: docs/timer-prd/07-synced-clock.md, Part 2. Dark by default to
+       save battery; bright only when something is about to happen. */
+    :root {
+      --dim: #5b626d; --dim-soft: #3a4049; --bright: #ffffff;
+      --gold: #f2c94c; --blue: #4fb0ff; --red: #ff5a4a; --amber: #ffcc00;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: #000; }
+    body {
+      color: var(--dim);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none; user-select: none;
+    }
+    .app {
+      position: fixed; inset: 0;
+      display: grid; grid-template-rows: auto 1fr;
+      padding: max(8px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    }
+    .top { display: flex; align-items: center; gap: 6px; min-height: 40px; }
+    .name { font-weight: 700; font-size: clamp(14px, 3.6vmin, 22px); white-space: nowrap; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+    .icon.hidden { display: none; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); display: none; }
+    .dot.show { display: inline-block; }
+    .spacer { flex: 1; }
+    .seg { display: none; border: 1px solid #22262c; border-radius: 10px; padding: 2px; gap: 2px; }
+    .seg.show { display: flex; }
+    .seg button { border: 0; background: transparent; color: var(--dim); font: inherit; font-weight: 700; font-size: 13px; padding: 6px 10px; border-radius: 8px; }
+    .seg button.on { background: #1b1f25; color: #c9d0d9; }
+    .icon { border: 0; background: transparent; color: var(--dim-soft); width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; padding: 0; }
+    .icon.on { color: #c9d0d9; background: #14171c; }
+    .icon svg { width: 22px; height: 22px; }
+
+    .center { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 0; text-align: center; }
+    /* Landscape (the usual way, phone on its side or on a stand). Sized so
+       everything fits in about 330 px of height: a phone browser's own bars
+       take part of the 375 px a sideways phone has. */
+    .level { font-weight: 700; font-size: min(5vw, 5.5vh); min-height: 1.2em; }
+    .time {
+      font-weight: 800; line-height: .95; letter-spacing: -.02em;
+      font-variant-numeric: tabular-nums;
+      font-size: min(30vw, 44vh);
+    }
+    .blinds { font-weight: 800; font-size: min(10vw, 14vh); line-height: 1.05; min-height: 1.05em; }
+    .sub { font-size: min(4vw, 4.5vh); min-height: 1.2em; margin-top: 2px; }
+    .banner { font-weight: 800; letter-spacing: .08em; font-size: min(6vw, 7vh); min-height: 1.2em; margin-top: 4px; }
+    .message { font-size: min(5vw, 6vh); font-weight: 700; padding: 0 8px; }
+    .toast { position: fixed; left: 50%; bottom: max(14px, env(safe-area-inset-bottom)); transform: translateX(-50%);
+      background: #15181d; color: #c9d0d9; border: 1px solid #262b33; border-radius: 12px; padding: 8px 14px; font-size: 13px;
+      max-width: calc(100vw - 32px); text-align: center; opacity: 0; transition: opacity .3s; pointer-events: none; }
+    .toast.show { opacity: 1; }
+
+    /* Bright: the screen "wakes up" for the moments that matter. */
+    body { transition: color .5s; }
+    body.bright { color: var(--bright); }
+    body.bright .blinds { color: var(--gold); }
+    body.bright .blinds.break { color: var(--blue); }
+    body.bright .banner { color: var(--amber); }
+    body.bright.final .time { color: var(--red); }
+
+    @media (orientation: portrait) {
+      /* Upright there is no room for the game switch beside the buttons:
+         it gets its own centred line under them. */
+      .top { flex-wrap: wrap; }
+      .seg.show { order: 99; flex-basis: 100%; justify-content: center; border: 0; margin-top: 2px; }
+      .time { font-size: min(34vw, 30vh); }
+      .blinds { font-size: min(11vw, 9vh); }
+      .level, .sub { font-size: min(5vw, 3.4vh); }
+      .banner { font-size: min(7vw, 4.5vh); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="top">
+      <button class="icon hidden" id="closeBtn" data-back-nav aria-label="Back to the app">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <span class="name" id="gameName">Game 1</span>
+      <span class="dot" id="dot" title="Reconnecting"></span>
+      <span class="spacer"></span>
+      <div class="seg" id="toggle">
+        <button data-game="1">Game 1</button>
+        <button data-game="2">Game 2</button>
+      </div>
+      <button class="icon hidden" id="controlBtn" aria-label="Control this clock" title="Control this clock (staff)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg>
+      </button>
+      <button class="icon" id="soundBtn" aria-label="Sound">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path id="soundWave1" d="M15.5 8.5a5 5 0 0 1 0 7"/><path id="soundWave2" d="M19 5a10 10 0 0 1 0 14"/><path id="soundX" d="m16 9 6 6m0-6-6 6"/></svg>
+      </button>
+      <button class="icon" id="awakeBtn" aria-label="Keep screen on">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+      <button class="icon" id="dimBtn" aria-label="Dim between moments">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <button class="icon hidden" id="fullBtn" aria-label="Full screen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+      </button>
+    </div>
+    <div class="center" id="center">
+      <div class="message" id="message">Connecting...</div>
+      <div class="level" id="level"></div>
+      <div class="time" id="time"></div>
+      <div class="blinds" id="blinds"></div>
+      <div class="sub" id="sub"></div>
+      <div class="banner" id="banner"></div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+<script type="module">
+  // Read-only view of timerClocks/{venue}. Each phone counts down on its own
+  // from the shared anchor (clock-engine.js), so it matches the TV without a
+  // constant connection; pauses and level changes arrive within about a second.
+  import * as fb from './firebase-api.js?v=13';
+  import { clockAt, normalizeGame, levelDurationMs } from './clock-engine.js?v=2';
+  import { serverNow, measureServerOffset, createClockSync } from './clock-sync.js?v=3';
+  import { clockIdFromUrl, clockName, isVenueClock, formatClock, levelLabel, blindsLine } from './clock-view.js?v=2';
+
+  // A venue clock (?venue=tight|corgi) or a named clock (?clock=<id>, a home game).
+  const venue = clockIdFromUrl();
+  let displayName = clockName(venue, null);
+  const GAME_KEYS = ['1', '2'];
+  const STALE_MS = 12 * 3600 * 1000;
+  const $ = (id) => document.getElementById(id);
+  document.title = `${displayName} Clock`;
+
+  function load(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+  function save(key, value) { try { localStorage.setItem(key, value); } catch (e) { /* not remembered */ } }
+
+  let toastTimer = null;
+  function toast(text, ms = 3500) {
+    const t = $('toast');
+    t.textContent = text;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), ms);
+  }
+
+  // ---- Shared clock -------------------------------------------------------
+  let levels = null;
+  const games = { '1': null, '2': null };
+  let received = false;
+  let clockStyle = 'voice';   // set on Clock Control for the whole clock: 'voice' | 'chime'
+  let syncStatus = 'connecting';
+  let notLiveSince = Date.now();
+  // ?game= (from the app's timer button) wins over the remembered choice.
+  const gameParam = new URLSearchParams(location.search).get('game');
+  let current = (gameParam === '1' || gameParam === '2') ? gameParam : (load('clockViewGame') === '2' ? '2' : '1');
+
+  measureServerOffset();
+  setInterval(measureServerOffset, 10 * 60 * 1000);
+  window.addEventListener('online', () => measureServerOffset());
+
+  createClockSync({
+    fb, venue, device: 'phone',
+    onStatus: (s) => {
+      if (s !== 'live' && syncStatus === 'live') notLiveSince = Date.now();
+      syncStatus = s;
+    },
+    onData: (data) => {
+      received = true;
+      if (data) { displayName = clockName(venue, data); document.title = `${displayName} Clock`; }
+      levels = data && data.structure && Array.isArray(data.structure.levels) && data.structure.levels.length
+        ? data.structure.levels : null;
+      clockStyle = data && data.sound === 'chime' ? 'chime' : 'voice';
+      const now = serverNow();
+      for (const k of GAME_KEYS) {
+        const g = levels ? normalizeGame(data.games && data.games[k], levels) : null;
+        games[k] = g && now - g.changedAt <= STALE_MS ? g : null;
+      }
+      frame();
+    }
+  }).start();
+
+  function game2Active() {
+    return !!(games['2'] && games['2'].startedTonight);
+  }
+
+  // ---- Sound ---------------------------------------------------------------
+  // The director picks Voice (their own recorded calls) or Chime (soft bell
+  // tunes) for the whole clock on Clock Control; each phone only turns sound
+  // on or off (the owner, 2026-10-15). Recordings live in sounds/calls/ (cut from one
+  // take, 2026-10-15). A moment with no recording, and 1:00 left in a level,
+  // plays its chime tune instead (the owner: a small tune, not a grating beep).
+  // Chime notes: [frequency Hz, start s, ring s, volume].
+  const CHIMES = {
+    levelWarning: [[523, 0, 0.9, 0.12], [659, 0.18, 0.9, 0.12], [784, 0.36, 1.3, 0.12]],   // 1:00 left in a level
+    levelChange:  [[784, 0, 1.0, 0.13], [587, 0.32, 1.4, 0.13]],                           // next level
+    breakStart:   [[784, 0, 0.9, 0.14], [659, 0.22, 0.9, 0.14], [523, 0.44, 0.9, 0.14], [392, 0.66, 1.6, 0.14]],
+    breakTwoMin:  [[659, 0, 0.9, 0.12], [659, 0.4, 1.2, 0.12]],
+    breakOneMin:  [[659, 0, 0.8, 0.13], [784, 0.2, 0.8, 0.13], [988, 0.4, 1.3, 0.13]],
+    cardsInAir:   [[523, 0, 0.7, 0.13], [659, 0.14, 0.7, 0.13], [784, 0.28, 0.7, 0.13], [1047, 0.42, 1.4, 0.13]]
+  };
+  const CLIP_BASE = 'sounds/calls/';
+  const CLIP_VERSION = 1;
+  // Which call for the level the clock just reached (standard structure).
+  // Levels that follow a break start with "shuffle up and deal" when the
+  // director presses Play, so they need no blinds call of their own.
+  const BLIND_CLIPS = {
+    '25/50': 'shuffle-up-and-deal',
+    '50/100': 'blinds-50-100', '200/400': 'blinds-200-400',
+    '1000/2000': 'blinds-1000-2000', '2000/4000': 'blinds-2000-4000',
+    '10000/20000': 'blinds-2-4-chip', '20000/40000': 'blinds-4-8-chip',
+    '40000/80000': 'blinds-8-16-chip', '80000/160000': 'blinds-16-32-chip'
+  };
+  const BREAK_CLIPS = { B1: 'break', B2: 'break-chip-up', B3: 'quick-chip-up' };
+  const CLIP_NAMES = [...new Set([...Object.values(BLIND_CLIPS), ...Object.values(BREAK_CLIPS), 'break-two-minutes', 'break-one-minute'])];
+
+  function clipFor(name, level) {
+    if (name === 'cardsInAir') return 'shuffle-up-and-deal';
+    if (name === 'breakTwoMin') return 'break-two-minutes';
+    if (name === 'breakOneMin') return 'break-one-minute';
+    if (name === 'breakStart' && level) return BREAK_CLIPS[level.level] || null;
+    if (name === 'levelChange' && level && !level.isPreGame) return BLIND_CLIPS[`${level.small}/${level.big}`] || null;
+    return null;   // 1:00 left in a level, or nothing recorded: chime
+  }
+
+  // Sound on or off for this phone. Phones that turned sound on under an
+  // earlier version of this page (clockSoundMode, clockSound) keep it on.
+  const savedOn = load('clockSoundOn');
+  const oldMode = load('clockSoundMode');
+  let soundOn = savedOn !== null ? savedOn === '1'
+    : oldMode !== null ? (oldMode === 'voice' || oldMode === 'chime')
+    : load('clockSound') === '1';
+  let audio = null;   // one AudioContext for the page (Chrome caps a page at six)
+  let playingClip = null;   // the call being played, so Sound off can cut it short
+  const clipBuffers = {};
+  let clipsLoading = null;
+
+  // Recordings are decoded into the AudioContext once (about 280 KB in all),
+  // so later calls play without another tap, including on iPhones. Clips
+  // that failed to download (no signal) are tried again on the next tap.
+  function loadClips() {
+    if (!audio) return Promise.resolve();
+    if (!clipsLoading) {
+      clipsLoading = Promise.all(CLIP_NAMES.map(async (n) => {
+        if (clipBuffers[n]) return;
+        try {
+          const res = await fetch(`${CLIP_BASE}${n}.mp3?v=${CLIP_VERSION}`);
+          if (!res.ok) return;
+          const data = await res.arrayBuffer();
+          clipBuffers[n] = await new Promise((ok, fail) => audio.decodeAudioData(data, ok, fail));
+        } catch (e) { /* that moment chimes until a later tap loads it */ }
+      })).then(() => {
+        if (CLIP_NAMES.some((n) => !clipBuffers[n])) clipsLoading = null;
+      });
+    }
+    return clipsLoading;
+  }
+
+  function unlockAudio() {
+    try {
+      // iOS: play through the silent switch, like a media player.
+      if (navigator.audioSession) navigator.audioSession.type = 'playback';
+      if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)();
+      if (audio.state === 'suspended') audio.resume();
+      const buf = audio.createBuffer(1, 1, 22050);
+      const src = audio.createBufferSource();
+      src.buffer = buf; src.connect(audio.destination); src.start(0);
+      loadClips();   // ready even if the director switches to voice later
+    } catch (e) { /* no Web Audio */ }
+  }
+
+  // A soft bell: a sine plus a quiet octave, quick attack, long fade.
+  function playChime(name) {
+    const notes = CHIMES[name];
+    if (!notes || !audio) return;
+    const t0 = audio.currentTime + 0.02;
+    for (const [freq, at, ring, vol] of notes) {
+      for (const [mult, v] of [[1, vol], [2, vol * 0.25]]) {
+        const osc = audio.createOscillator();
+        const gain = audio.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq * mult;
+        gain.gain.setValueAtTime(0.0001, t0 + at);
+        gain.gain.exponentialRampToValueAtTime(v, t0 + at + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + at + ring);
+        osc.connect(gain); gain.connect(audio.destination);
+        osc.start(t0 + at); osc.stop(t0 + at + ring + 0.05);
+      }
+    }
+  }
+
+  function playSound(name, level) {
+    if (!soundOn || !audio) return;
+    if (audio.state === 'suspended') audio.resume();
+    const clip = clockStyle === 'voice' ? clipFor(name, level) : null;
+    const buffer = clip && clipBuffers[clip];
+    if (buffer) {
+      const src = audio.createBufferSource();
+      src.buffer = buffer;
+      src.connect(audio.destination);
+      src.onended = () => { if (playingClip === src) playingClip = null; };
+      playingClip = src;
+      src.start();
+      return;
+    }
+    playChime(name);
+  }
+
+  // Sound needs one tap on this page before the phone allows it.
+  document.addEventListener('pointerdown', () => { if (soundOn) unlockAudio(); }, { capture: true });
+
+  $('soundBtn').addEventListener('click', () => {
+    soundOn = !soundOn;
+    save('clockSoundOn', soundOn ? '1' : '0');
+    if (soundOn) {
+      unlockAudio();
+      playChime('levelWarning');   // a soft sample so the player knows sound works
+      toast('Sound on. Keep this page open and the phone unmuted.');
+    } else {
+      if (playingClip) { try { playingClip.stop(); } catch (e) { /* already ended */ } playingClip = null; }
+      toast('Sound off.');
+    }
+    renderIcons();
+  });
+
+  // ---- Keep the screen on (Screen Wake Lock) ------------------------------
+  let awakeWanted = load('clockAwake') === '1';
+  let wakeLock = null;
+
+  async function acquireWakeLock() {
+    if (!('wakeLock' in navigator)) {
+      awakeWanted = false;
+      save('clockAwake', '0');
+      toast("This phone can't keep the screen on from a web page. Set Auto-Lock to Never while you watch.", 6000);
+      renderIcons();
+      return;
+    }
+    try {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null; renderIcons(); });
+    } catch (e) {
+      wakeLock = null;
+    }
+    renderIcons();
+  }
+
+  $('awakeBtn').addEventListener('click', async () => {
+    awakeWanted = !awakeWanted;
+    save('clockAwake', awakeWanted ? '1' : '0');
+    if (awakeWanted) {
+      await acquireWakeLock();
+      if (wakeLock) toast('Screen stays on while this page is open.');
+    } else {
+      if (wakeLock) await wakeLock.release().catch(() => {});
+      wakeLock = null;
+      toast('Screen can sleep again.');
+    }
+    renderIcons();
+  });
+
+  // The phone drops the lock when the page is hidden; take it back on return.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && awakeWanted && !wakeLock) acquireWakeLock();
+  });
+  if (awakeWanted) acquireWakeLock();
+
+  function renderIcons() {
+    $('soundBtn').classList.toggle('on', soundOn);
+    $('soundWave1').style.display = soundOn ? '' : 'none';
+    $('soundWave2').style.display = soundOn ? '' : 'none';
+    $('soundX').style.display = soundOn ? 'none' : '';
+    $('soundBtn').setAttribute('aria-label', soundOn ? 'Sound on' : 'Sound off');
+    $('soundBtn').title = soundOn ? 'Sound on (tap to turn off)' : 'Sound off (tap to turn on)';
+    $('awakeBtn').classList.toggle('on', awakeWanted && !!wakeLock);
+  }
+  renderIcons();
+
+  // ---- Dim mode on/off ----------------------------------------------------
+  // On (the default): dark between moments to save battery. Off: always bright.
+  let dimOn = load('clockDimOff') !== '1';
+  $('dimBtn').addEventListener('click', () => {
+    dimOn = !dimOn;
+    save('clockDimOff', dimOn ? '0' : '1');
+    toast(dimOn ? 'Dim mode on: bright only when it matters.' : 'Dim mode off: the screen stays bright.');
+    $('dimBtn').classList.toggle('on', dimOn);
+    frame();
+  });
+  $('dimBtn').classList.toggle('on', dimOn);
+
+  // ---- Full screen (Android and computers; iPhones don't allow it) -------
+  // Hidden when the clock already runs without browser bars (installed app).
+  const installed = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  if (document.fullscreenEnabled && !installed) {
+    $('fullBtn').classList.remove('hidden');
+    $('fullBtn').addEventListener('click', () => {
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+      else document.documentElement.requestFullscreen().catch(() => toast('Full screen is not available here.'));
+    });
+    document.addEventListener('fullscreenchange', () => {
+      $('fullBtn').classList.toggle('on', !!document.fullscreenElement);
+    });
+  }
+
+  // ---- Staff: jump to this clock's controller ----------------------------
+  // Shown only to signed-in staff (same test as staff-auth.js requireStaff);
+  // players never see it. The database rules still decide who can change
+  // the clock (the owner, 2026-10-15).
+  fb.onAuthStateChanged(fb.auth, async (user) => {
+    let staff = false;
+    if (user && !user.isAnonymous) {
+      try {
+        const snap = await fb.getDoc(fb.doc(fb.db, 'userProfiles', user.uid));
+        const p = snap.exists() ? (snap.data() || {}) : {};
+        staff = p.role === 'staff' || p.role === 'admin' || p.isStaff === true || p.isAdmin === true;
+      } catch (e) { staff = false; }
+    }
+    $('controlBtn').classList.toggle('hidden', !staff);
+  });
+  $('controlBtn').addEventListener('click', () => {
+    const which = isVenueClock(venue) ? `venue=${venue}` : `clock=${encodeURIComponent(venue)}`;
+    location.href = `/staff/clock-control.html?${which}`;
+  });
+
+  // ---- Back to the app (opened from the app's timer button) --------------
+  if (new URLSearchParams(location.search).get('from') === 'app' || window.navigator.standalone === true) {
+    $('closeBtn').classList.remove('hidden');
+    $('closeBtn').addEventListener('click', () => {
+      const cameFromApp = document.referrer && new URL(document.referrer).origin === location.origin;
+      if (cameFromApp && history.length > 1) history.back();
+      else location.href = '/';
+    });
+  }
+
+  // ---- Game toggle --------------------------------------------------------
+  document.querySelectorAll('[data-game]').forEach((b) => b.addEventListener('click', () => {
+    current = b.dataset.game;
+    save('clockViewGame', current);
+    prevView = null;        // no sounds for the switch itself
+    frame();
+  }));
+
+  // ---- Tap to peek --------------------------------------------------------
+  // A tap anywhere (except the buttons) lights a dim screen for 10 seconds.
+  let peekUntil = 0;
+  document.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('button')) return;
+    peekUntil = Date.now() + 10000;
+    frame();
+  });
+
+  // ---- Rendering and sound events -----------------------------------------
+  let prevView = null;
+  let prevKey = null;
+  let lastFrameAt = 0;
+  const shown = {};
+  function setText(id, text) {
+    if (shown[id] !== text) { $(id).textContent = text; shown[id] = text; }
+  }
+
+  // Sounds only for moments that just happened while this page was watching:
+  // a phone that wakes up or reopens the page gets no burst of old sounds.
+  function soundFor(prev, cur, game) {
+    if (!prev || !cur.level) return null;
+    if (prev.phase === 'holding' && cur.phase === 'running') {
+      return serverNow() - game.changedAt < 5000 ? 'cardsInAir' : null;
+    }
+    if (prev.phase !== 'running' || cur.phase !== 'running') return null;
+    if (cur.levelIndex > prev.levelIndex && prev.remainingMs < 3000) {
+      return cur.level.isBreak ? 'breakStart' : 'levelChange';
+    }
+    if (cur.levelIndex !== prev.levelIndex) return null;
+    if (cur.level.isBreak) {
+      if (prev.remainingMs > 120000 && cur.remainingMs <= 120000) return 'breakTwoMin';
+      if (prev.remainingMs > 60000 && cur.remainingMs <= 60000) return 'breakOneMin';
+      return null;
+    }
+    if (prev.remainingMs > 60000 && cur.remainingMs <= 60000) return 'levelWarning';
+    return null;
+  }
+
+  function frame() {
+    const nowLocal = Date.now();
+    const gap = nowLocal - lastFrameAt;
+    lastFrameAt = nowLocal;
+
+    $('dot').classList.toggle('show', syncStatus !== 'live' && nowLocal - notLiveSince > 5000);
+
+    // Show Game 1 while Game 2 isn't running, but keep the player's choice
+    // (or the app's ?game=2): when Game 2's data arrives, possibly after
+    // reconnecting, the view goes back to it (review findings 2026-10-15).
+    const shownGame = (current === '2' && !game2Active()) ? '1' : current;
+    const showToggle = game2Active();
+    $('toggle').classList.toggle('show', showToggle);
+    document.querySelectorAll('[data-game]').forEach((b) => b.classList.toggle('on', b.dataset.game === shownGame));
+    setText('gameName', showToggle ? displayName : `${displayName} · Game 1`);
+
+    const game = levels && games[shownGame];
+    if (!game) {
+      document.body.classList.remove('bright', 'final');
+      setText('message', received ? 'No clock running right now' : 'Connecting...');
+      for (const id of ['level', 'time', 'blinds', 'sub', 'banner']) setText(id, '');
+      prevView = null;
+      return;
+    }
+    setText('message', '');
+
+    const v = clockAt(game, levels, serverNow());
+
+    // Sound events compare with the previous frame of the same game.
+    if (prevKey !== shownGame) prevView = null;
+    if (gap <= 3000) {
+      const sound = soundFor(prevView, v, game);
+      if (sound) playSound(sound, v.level);
+    }
+    prevView = v;
+    prevKey = shownGame;
+
+    const line = blindsLine(v.level);
+    setText('level', levelLabel(v.level));
+    setText('time', formatClock(v.remainingMs));
+    setText('blinds', line.kind === 'pregame' ? '' : line.main);
+    $('blinds').classList.toggle('break', line.kind === 'break');
+    setText('sub', line.sub || '');
+
+    let banner = '';
+    if (v.phase === 'paused') banner = game.startedTonight ? 'PAUSED' : 'WAITING TO START';
+    else if (v.phase === 'holding') banner = 'TAKE YOUR SEATS';
+    else if (v.phase === 'finished') banner = 'FINAL LEVEL';
+    setText('banner', banner);
+
+    // Bright for the moments that matter, dim the rest of the time.
+    const intoLevel = levelDurationMs(levels, v.levelIndex) - v.remainingMs;
+    const finalMinute = v.phase === 'running' && v.remainingMs <= 60000;
+    // intoLevel goes negative after +1 min; that is not a fresh level.
+    const justStarted = v.phase === 'running' && intoLevel >= 0 && intoLevel < 10000;
+    const bright = !dimOn || v.phase === 'holding' || finalMinute || justStarted || nowLocal < peekUntil;
+    document.body.classList.toggle('bright', bright);
+    document.body.classList.toggle('final', finalMinute);
+  }
+
+  setInterval(frame, 250);
+  frame();
+</script>
+  <script src="/back-nav.js?v=1" data-home="/"></script>
+</body>
+</html>

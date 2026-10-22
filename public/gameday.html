@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>♠ Game Day - All-In Poker Club ♠</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Game Day">
+  <link rel="icon" type="image/svg+xml" href="/img/favicon-staff.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
+  <link rel="apple-touch-icon" href="/img/gameday-apple-icon.png">
+  <link rel="manifest" href="/manifest-gameday.json">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #050505;
+      --card-bg: rgba(20, 20, 20, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-gold: #d4af37;
+      --accent-blue: #00aaff;
+      --accent-green: #00ff88;
+      --accent-orange: #ff9900;
+      --accent-purple: #cc66ff;
+      --accent-red: #ff4444;
+      --text-main: #ffffff;
+      --text-dim: #888888;
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+    
+    body {
+      background: var(--bg-color);
+      background: radial-gradient(circle at top right, #001a33 0%, #050505 60%);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    .header {
+      text-align: center;
+      padding: 40px 20px 30px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .profile-btn {
+      position: absolute;
+      left: 20px;
+      top: 40px;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      color: var(--accent-blue);
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .profile-btn:active { transform: scale(0.92); background: rgba(255,255,255,0.05); }
+    html.back-nav-on .profile-btn { left: 56px; }
+
+    h1 {
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      color: var(--text-main);
+      font-size: 1.8rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+      background: linear-gradient(to bottom, #fff, #888);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .sub { 
+      color: var(--accent-blue);
+      font-size: 0.85rem; 
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      opacity: 0.8;
+    }
+
+    .main-content { 
+      padding: 0 20px 60px; 
+      flex: 1; 
+      max-width: 500px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin: 32px 0 16px 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--card-border);
+    }
+
+    /* Unfinalized-game alert. Deliberately loud: it means players are
+       currently missing points, and the only fix is a human opening Director
+       Mode. It sits above the menu so it cannot be scrolled past. */
+    .alert-card {
+      background: rgba(255, 68, 68, 0.08);
+      border: 1px solid rgba(255, 68, 68, 0.35);
+      border-radius: 20px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+    }
+    .alert-head {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; color: var(--accent-red);
+      text-transform: uppercase; letter-spacing: 1px; font-size: 0.85rem;
+    }
+    .alert-sub { color: var(--text-dim); font-size: 0.85rem; margin: 6px 0 14px; line-height: 1.45; }
+    .alert-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 11px 0; border-top: 1px solid rgba(255, 68, 68, 0.18);
+    }
+    .alert-game { font-weight: 700; font-size: 0.92rem; }
+    .alert-detail { color: var(--text-dim); font-size: 0.78rem; margin-top: 3px; line-height: 1.4; }
+    .alert-fix {
+      flex: none; background: var(--accent-red); color: #fff; text-decoration: none;
+      font-weight: 800; font-size: 0.78rem; padding: 9px 18px; border-radius: 10px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .alert-fix:active { transform: scale(0.96); }
+
+    .menu-btn {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      width: 100%;
+      padding: 24px 20px;
+      margin-bottom: 16px;
+      text-decoration: none;
+      color: #fff;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      box-shadow: var(--glass-shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .menu-btn::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: var(--accent);
+      opacity: 0.8;
+    }
+
+    .menu-btn:active { 
+      transform: scale(0.97) translateX(4px); 
+      background: rgba(40, 40, 40, 0.8);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .menu-btn .icon { 
+      font-size: 1.8rem; 
+      width: 50px;
+      height: 50px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0; 
+    }
+
+    .menu-btn .text { display: flex; flex-direction: column; gap: 4px; }
+    .menu-btn .text .label { font-weight: 700; font-size: 1.1rem; letter-spacing: -0.01em; }
+    .menu-btn .text .desc { font-size: 0.85rem; color: var(--text-dim); font-weight: 500; }
+
+    .btn-checkin   { --accent: var(--accent-green); }
+    .btn-dashboard { --accent: var(--accent-blue); }
+    .btn-director  { --accent: var(--accent-orange); }
+    .btn-champ     { --accent: var(--accent-purple); }
+    .btn-timer     { --accent: var(--accent-red); }
+
+    /* Modals with Glassmorphism */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none; justify-content: center; align-items: flex-end;
+      padding: 20px; overscroll-behavior: contain;
+    }
+    .modal-content {
+      background: #121212; 
+      border: 1px solid var(--card-border); 
+      border-radius: 30px 30px 20px 20px;
+      width: 100%; max-width: 450px; padding: 32px 24px;
+      text-align: center; position: relative;
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+    .modal-title { 
+      color: var(--text-main); 
+      font-size: 1.4rem; 
+      font-weight: 800; 
+      margin-bottom: 8px; 
+      text-transform: uppercase; 
+      letter-spacing: 1px; 
+    }
+    .modal-close { 
+      position: absolute; top: 20px; right: 20px; 
+      background: rgba(255,255,255,0.05); border: none; 
+      color: var(--text-dim); width: 32px; height: 32px;
+      border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    
+    .auth-btn {
+      background: #fff; color: #000; border: none; border-radius: 14px;
+      padding: 16px; width: 100%; font-size: 1rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      cursor: pointer; margin-top: 20px;
+      transition: transform 0.2s;
+    }
+    .auth-btn:active { transform: scale(0.96); }
+
+    #pwaInstallBanner {
+      display: none;
+      background: linear-gradient(to right, #001a33, #00aaff);
+      color: #fff;
+      text-align: center;
+      padding: 14px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      margin: 10px;
+      border-radius: 12px;
+    }
+
+    .player-input { 
+      width: 100%; background: #000; 
+      border: 2px solid var(--card-border); 
+      border-radius: 14px; color: #fff; 
+      font-size: 1.1rem; padding: 16px; 
+      outline: none; transition: border-color 0.2s;
+    }
+    .player-input:focus { border-color: var(--accent-blue); }
+
+    .player-suggestions {
+      background: #111; border: 1px solid var(--card-border); border-radius: 14px;
+      margin-top: 8px; max-height: 250px; overflow-y: auto; text-align: left;
+      box-shadow: var(--glass-shadow);
+    }
+    .suggestion-item { padding: 16px 20px; border-bottom: 1px solid var(--card-border); cursor: pointer; color: #fff; font-size: 1rem; }
+    .suggestion-item:active { background: #1a1a1a; }
+  </style>
+</head>
+<body>
+
+  <div id="pwaInstallBanner" onclick="handleInstallClick()">
+    <span>✨ Best viewed as app — Click to Install</span>
+  </div>
+
+  <div class="header">
+    <button class="profile-btn" onclick="openProfileModal()" aria-label="Account Profile">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+    </button>
+    <h1>Game Day</h1>
+    <div class="sub">Staff & Director Portal</div>
+  </div>
+
+  <div class="main-content">
+    <div id="unfinalizedAlert"></div>
+
+    <div class="section-label">Player Management</div>
+
+    <a href="checkin.html" class="menu-btn btn-checkin">
+      <span class="icon">✅</span>
+      <div class="text">
+        <div class="label">Check-In Kiosk</div>
+        <div class="desc">Venue tablet registration mode</div>
+      </div>
+    </a>
+
+    <a href="tonight.html" class="menu-btn btn-dashboard">
+      <span class="icon">📋</span>
+      <div class="text">
+        <div class="label">Tonight</div>
+        <div class="desc">Who's coming, who's here, late credits, shots</div>
+      </div>
+    </a>
+
+    <a href="new-players.html" class="menu-btn" style="--accent: var(--accent-gold); border-color: rgba(212,175,55,0.2);">
+      <span class="icon">👋</span>
+      <div class="text">
+        <div class="label">New Players</div>
+        <div class="desc">First-timers from the last 2 months</div>
+      </div>
+    </a>
+
+    <div class="section-label">Scoring & Operations</div>
+
+    <a href="director.html" class="menu-btn btn-director">
+      <span class="icon">👑</span>
+      <div class="text">
+        <div class="label">Director Mode</div>
+        <div class="desc">Record eliminations & bounties</div>
+      </div>
+    </a>
+
+    <a href="champ-night.html" class="menu-btn btn-champ">
+      <span class="icon">🏆</span>
+      <div class="text">
+        <div class="label">Championship Night</div>
+        <div class="desc">Both games at a glance: seats, on deck, consolation</div>
+      </div>
+    </a>
+
+    <a href="championship-director.html" class="menu-btn btn-champ">
+      <span class="icon">🎛️</span>
+      <div class="text">
+        <div class="label">Championship Seating</div>
+        <div class="desc">Move players, close the doors, fix mistakes</div>
+      </div>
+    </a>
+
+    <a href="auto-qualifiers.html" class="menu-btn" style="--accent: var(--accent-gold); border-color: rgba(212,175,55,0.2);">
+      <span class="icon">🎟️</span>
+      <div class="text">
+        <div class="label">Auto-Qualifiers</div>
+        <div class="desc">Grant championship berths by season</div>
+      </div>
+    </a>
+
+    <div class="section-label">Streaming & Display</div>
+
+    <a href="timer.html" class="menu-btn btn-timer">
+      <span class="icon">⏱</span>
+      <div class="text">
+        <div class="label">Live Display</div>
+        <div class="desc">Championship timer & leaderboards</div>
+      </div>
+    </a>
+
+    <a href="staff/clock-control.html?venue=tight" class="menu-btn btn-timer">
+      <span class="icon">⏯</span>
+      <div class="text">
+        <div class="label">Clock Control · Tight End</div>
+        <div class="desc">Run the TV timer from your phone</div>
+      </div>
+    </a>
+
+    <a href="staff/clock-control.html?venue=corgi" class="menu-btn btn-timer">
+      <span class="icon">⏯</span>
+      <div class="text">
+        <div class="label">Clock Control · Wild Corgi</div>
+        <div class="desc">Run the TV timer from your phone</div>
+      </div>
+    </a>
+
+    <a href="staff/clock-control.html?new=1" class="menu-btn btn-timer">
+      <span class="icon">➕</span>
+      <div class="text">
+        <div class="label">New Clock</div>
+        <div class="desc">Home game or side game: phones only, share a link</div>
+      </div>
+    </a>
+
+    <div class="section-label">Bar &amp; Service</div>
+
+    <a href="shots.html?new=1" class="menu-btn" style="--accent: #ff6b35; border-color: rgba(255,107,53,0.2);">
+      <span class="icon">🥃</span>
+      <div class="text">
+        <div class="label">Shot Round</div>
+        <div class="desc">Build &amp; send a table's drink order</div>
+      </div>
+    </a>
+
+    <a href="bar.html" class="menu-btn" style="--accent: var(--accent-purple); border-color: rgba(204,102,255,0.2);">
+      <span class="icon">🍸</span>
+      <div class="text">
+        <div class="label">Bar Orders</div>
+        <div class="desc">Live incoming orders by table</div>
+      </div>
+    </a>
+
+    <a href="bar-qr.html" class="menu-btn" style="--accent: var(--accent-green); border-color: rgba(0,255,136,0.2);">
+      <span class="icon">📱</span>
+      <div class="text">
+        <div class="label">Bartender QR</div>
+        <div class="desc">Scannable code → live orders</div>
+      </div>
+    </a>
+
+    <div class="section-label">League Engagement</div>
+
+    <button onclick="openHighHandModal()" class="menu-btn" style="--accent: var(--accent-gold); border-color: rgba(212, 175, 55, 0.2);">
+      <span class="icon">💎</span>
+      <div class="text">
+        <div class="label">High Hand Jackpot</div>
+        <div class="desc">Update current leaders & pots</div>
+      </div>
+    </button>
+
+    <button onclick="openAnnouncementModal()" class="menu-btn" style="--accent: var(--accent-blue); border-color: rgba(0, 170, 255, 0.2);">
+      <span class="icon">📢</span>
+      <div class="text">
+        <div class="label">Create Announcement</div>
+        <div class="desc">Post news to the player feed</div>
+      </div>
+    </button>
+
+    <button onclick="openAnnouncementManager()" class="menu-btn" style="--accent: var(--accent-purple); border-color: rgba(204, 102, 255, 0.2);">
+      <span class="icon">&#128451;</span>
+      <div class="text">
+        <div class="label">Manage Announcements</div>
+        <div class="desc">Edit or delete recent posts</div>
+      </div>
+    </button>
+  </div>
+
+  <!-- iOS Install Modal -->
+  <div id="iosInstallModal" class="modal-overlay" onclick="if(event.target===this)closeIosModal()" style="overflow-y:auto; -webkit-overflow-scrolling:touch;">
+    <div class="modal-content" style="max-height:none; margin:20px auto; position:relative; padding:30px 20px;">
+      <button class="modal-close" onclick="closeIosModal()">&times;</button>
+      <div style="font-size:1.2rem; font-weight:bold; margin-bottom:15px; color:#00aaff; text-transform:uppercase; letter-spacing:1px;">Install Game Day App</div>
+      <div style="font-size:0.95rem; color:#ccc; line-height:1.6; text-align:left;">
+        <p style="margin-bottom:15px;">To install the Game Day Staff app on your iPhone or iPad:</p>
+        <ol style="padding-left:20px; margin-bottom:20px;">
+          <li style="margin-bottom:10px;">Tap the <b>Share</b> icon <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin:0 2px;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg> at the bottom of Safari.</li>
+          <li>Scroll down and tap <b>Add to Home Screen</b> <span style="display:inline-block; border:1px solid #666; padding:0 4px; border-radius:4px; font-weight:bold; font-size:1.1rem; line-height:1; vertical-align:middle; color:#fff;">+</span></li>
+        </ol>
+        <button class="menu-btn btn-dashboard" style="display:block; text-align:center; padding:12px;" onclick="closeIosModal()">Got It!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- High Hand Modal -->
+  <div id="highHandModal" class="modal-overlay" onclick="if(event.target===this)closeHighHandModal()">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeHighHandModal()">&times;</button>
+      <div class="modal-title">Update High Hand</div>
+      
+      <div style="text-align:left;">
+        <label class="section-label" style="margin:20px 0 8px; color:#fff;">Venue</label>
+        <select id="hhVenue" class="player-input" style="appearance:none;" onchange="refreshHhPot()">
+          <option value="Tight End">Tight End</option>
+          <option value="Wild Corgi">Wild Corgi</option>
+        </select>
+
+        <label class="section-label" style="margin:20px 0 8px; color:#fff;">Leader Name</label>
+        <div style="position:relative;">
+          <input type="text" id="hhPlayer" class="player-input" placeholder="Search name..." oninput="onHhNameInput()" autocomplete="off">
+          <div id="hhSugg" class="player-suggestions" style="display:none; position:absolute; width:100%; z-index:1100;"></div>
+        </div>
+
+        <label class="section-label" style="margin:20px 0 8px; color:#fff;">Winning Hand</label>
+        <input type="text" id="hhHand" class="player-input" placeholder="e.g. Quads, Jacks">
+
+        <label class="section-label" style="margin:20px 0 8px; color:#fff;">Current Pot ($) - Auto-Calculated</label>
+        <input type="number" id="hhPot" class="player-input" placeholder="0" readonly style="background: rgba(255,255,255,0.05); color: var(--accent-gold); border: 1px dashed rgba(212, 175, 55, 0.3); cursor: not-allowed;">
+      </div>
+
+      <button class="auth-btn" style="background:var(--accent-green); color:#000;" onclick="saveHighHand()">Save High Hand</button>
+    </div>
+  </div>
+
+  <!-- Announcement Modal -->
+  <div id="announcementModal" class="modal-overlay" onclick="if(event.target===this)closeAnnouncementModal()">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeAnnouncementModal()">&times;</button>
+      <div id="announcementModalTitle" class="modal-title">Create News Post</div>
+
+      <div style="text-align:left;">
+        <label class="section-label" style="margin:20px 0 8px; color:#fff;">Headline</label>
+        <input type="text" id="annTitle" class="player-input" placeholder="Catchy title...">
+
+        <label class="section-label" style="margin:20px 0 8px; color:#fff;">Content</label>
+        <textarea id="annContent" class="player-input" style="height:120px; resize:none; font-family:inherit;" placeholder="What's happening in the league?"></textarea>
+
+        <label class="section-label" style="margin:20px 0 8px; color:#fff;">Category</label>
+        <select id="annType" class="player-input" style="appearance:none;">
+          <option value="info">General Update</option>
+          <option value="success">Tournament Result</option>
+          <option value="warning">Schedule Alert</option>
+          <option value="error">Canceled Game</option>
+        </select>
+
+        <label class="section-label" style="margin:20px 0 8px; color:#fff;">Facebook or Event Link</label>
+        <input type="url" id="annSourceUrl" class="player-input" placeholder="https://www.facebook.com/events/...">
+        <div style="font-size:0.8rem; color:#9aa0aa; line-height:1.5; margin-top:8px;">
+          We'll try to pull a preview automatically. If the site blocks metadata, the announcement will still post with a plain link.
+        </div>
+
+        <label class="section-label" style="margin:20px 0 8px; color:#fff;">Image</label>
+        <label for="annImage" style="display:flex; align-items:center; justify-content:center; gap:10px; border:1px dashed rgba(255,255,255,0.18); border-radius:12px; padding:14px 16px; color:#bbb; cursor:pointer; background:rgba(255,255,255,0.03);">
+          <span style="font-size:1.1rem;">&#128247;</span>
+          <span>Choose optional announcement image</span>
+        </label>
+        <input id="annImage" type="file" accept="image/*" style="display:none" onchange="previewAnnouncementImage(this)">
+        <img id="annImagePreview" alt="Announcement image preview" style="display:none; width:100%; margin-top:14px; border-radius:12px; max-height:220px; object-fit:cover; border:1px solid rgba(255,255,255,0.08);">
+        <label id="annRemoveImageWrap" style="display:none; align-items:center; gap:10px; margin-top:12px; color:#bbb; font-size:0.9rem;">
+          <input type="checkbox" id="annRemoveImage" style="width:18px; height:18px;" onchange="toggleAnnouncementImageRemoval(this)">
+          <span>Remove current image</span>
+        </label>
+      </div>
+
+      <button id="announcementSubmitBtn" class="auth-btn" style="background:var(--accent-blue); color:#fff;" onclick="submitAnnouncement()">Post to Feed</button>
+    </div>
+  </div>
+
+  <div id="announcementManagerModal" class="modal-overlay" onclick="if(event.target===this)closeAnnouncementManager()">
+    <div class="modal-content" style="max-height:85vh; overflow-y:auto;">
+      <button class="modal-close" onclick="closeAnnouncementManager()">&times;</button>
+      <div class="modal-title">Manage Announcements</div>
+      <div id="announcementManagerList" style="margin-top:20px; text-align:left;"></div>
+    </div>
+  </div>
+
+  <!-- Auth / Profile Modal -->
+  <div id="profileModal" class="modal-overlay">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeProfileModal()">&times;</button>
+      
+      <div id="profileLoggedOut">
+        <div class="modal-title">Staff Access</div>
+        <p style="font-size:0.9rem; color:#aaa; margin-bottom:20px;">Sign in with Google to access staff tools and link your identity.</p>
+        <button class="auth-btn" onclick="signInWithGoogle()">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/ext/google.svg" width="18" height="18" alt="Google">
+          Sign In with Google
+        </button>
+      </div>
+
+      <div id="profileClaimName" style="display:none;">
+        <div class="modal-title">Link Your Identity</div>
+        <p style="font-size:0.9rem; color:#aaa; margin-bottom:15px;">Search for your name to link your Google account.</p>
+        <div class="player-input-wrap" style="position:relative;">
+          <input type="text" id="claimNameInput" class="player-input" placeholder="Start typing your name..." autocomplete="off" oninput="onClaimNameInput()">
+          <div id="claimNameSugg" class="player-suggestions" style="display:none; position:absolute; width:100%; z-index:1100; max-height:200px;"></div>
+        </div>
+        <button class="menu-btn btn-checkin" style="display:block; text-align:center; padding:12px; margin-top:20px;" onclick="claimProfileName()">Link My Profile</button>
+      </div>
+
+      <div id="profileLoggedIn" style="display:none;">
+        <div class="modal-title">Staff Profile</div>
+        <div style="background:#222; padding:12px; border-radius:8px; margin-bottom:15px; text-align:left;">
+          <div style="font-size:0.75rem; color:#888; text-transform:uppercase;">Identified As</div>
+          <div style="font-size:1.1rem; color:#00aaff; font-weight:bold; margin-top:2px;" id="profileLinkedNameDisp">Loading...</div>
+        </div>
+        <button class="auth-btn" style="background:#2a1111; color:#ff5555; margin-top:25px; border:1px solid #552222;" onclick="logOut()">Log Out</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { PokerAPI, PlayerSearch, functions, db, auth, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, GoogleAuthProvider, setDoc, doc, collection, httpsCallable } from './firebase-api.js?v=9';
+    import { getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    let currentUser = null;
+    let currentProfile = null;
+    let playerList = [];
+    let recentAnnouncements = [];
+    let editingAnnouncementId = null;
+    let editingAnnouncementImageUrl = '';
+
+    // ── PWA Install Logic ──
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (!isPWA()) document.getElementById('pwaInstallBanner').style.display = 'block';
+    });
+
+    function isIos() {
+      return /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+    }
+
+    function isPWA() {
+      return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+       if (isIos() && !isPWA()) {
+          document.getElementById('pwaInstallBanner').style.display = 'block';
+       }
+       // Register SW
+       if ('serviceWorker' in navigator) {
+         window.addEventListener('load', () => {
+           navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));
+         });
+       }
+    });
+
+    window.handleInstallClick = function() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') document.getElementById('pwaInstallBanner').style.display = 'none';
+          deferredPrompt = null;
+        });
+      } else if (isIos()) {
+        document.getElementById('iosInstallModal').style.display = 'flex';
+      } else {
+        alert("To install, tap your browser menu and select 'Add to Home Screen'.");
+      }
+    }
+
+    window.closeIosModal = function() { document.getElementById('iosInstallModal').style.display = 'none'; }
+
+    // ── Auth Logic ──
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        try {
+          const snap = await getDoc(doc(db, 'userProfiles', user.uid));
+          currentProfile = snap.exists() ? snap.data() : null;
+        } catch(e) { currentProfile = null; }
+        updateProfileIcon(true);
+        loadUnfinalizedAlert();
+        if (document.getElementById('profileModal').style.display === 'flex') renderProfileState();
+      } else {
+        currentUser = null;
+        currentProfile = null;
+        updateProfileIcon(false);
+        const alertHost = document.getElementById('unfinalizedAlert');
+        if (alertHost) alertHost.innerHTML = '';
+        if (document.getElementById('profileModal').style.display === 'flex') renderProfileState();
+      }
+    });
+
+    // ── Unfinalized game alert ──
+    // A game with check-ins but no finalized results awards nobody their
+    // attendance points, and nothing else in the app complains about it.
+    // Tight End 8/11/2026 G2 sat that way for two weeks. This is the fix.
+    async function loadUnfinalizedAlert() {
+      const host = document.getElementById('unfinalizedAlert');
+      if (!host) return;
+      try {
+        const res = await PokerAPI.getUnfinalizedGames();
+        const games = (res && res.games) || [];
+        if (!games.length) { host.innerHTML = ''; return; }
+
+        const plural = games.length > 1;
+        const rows = games.map(g => {
+          const what = g.issue === 'NEVER_SCORED'
+            ? 'no results entered at all'
+            : `${g.eliminations} places entered, never submitted`;
+          return `
+              <div class="alert-row">
+                <div>
+                  <div class="alert-game">${escapeHtml(g.venue)} &middot; ${escapeHtml(g.date)} &middot; Game ${g.gameNum}</div>
+                  <div class="alert-detail">${g.checkins} checked in &middot; ${what} &middot; ${g.daysLate} days ago</div>
+                </div>
+                <a class="alert-fix" href="director.html">Fix</a>
+              </div>`;
+        }).join('');
+
+        host.innerHTML = `
+          <div class="alert-card">
+            <div class="alert-head"><span>&#9888;</span><span>${games.length} game${plural ? 's' : ''} not finalized</span></div>
+            <div class="alert-sub">Nobody in ${plural ? 'these games' : 'this game'} has been awarded attendance points yet. Open Director Mode, pick the date, and finalize.</div>
+            ${rows}
+          </div>`;
+      } catch (e) {
+        // Staff-only endpoint — a signed-in player just sees nothing here.
+        host.innerHTML = '';
+      }
+    }
+
+    function updateProfileIcon(loggedIn) {
+      const btn = document.querySelector('[aria-label="Account Profile"]');
+      if (btn) btn.style.color = loggedIn ? '#00ff88' : '#00aaff';
+    }
+
+    window.openProfileModal = function() {
+      document.getElementById('profileModal').style.display = 'flex';
+      renderProfileState();
+      if (!playerList.length) PokerAPI.getPlayerList().then(r => playerList = r.players || []);
+    }
+    window.closeProfileModal = function() { 
+      document.getElementById('profileModal').style.display = 'none'; 
+      document.getElementById('claimNameSugg').style.display = 'none';
+    }
+
+    function renderProfileState() {
+      document.getElementById('profileLoggedOut').style.display = 'none';
+      document.getElementById('profileClaimName').style.display = 'none';
+      document.getElementById('profileLoggedIn').style.display = 'none';
+
+      if (!currentUser) {
+        document.getElementById('profileLoggedOut').style.display = 'block';
+      } else if (!currentProfile || !currentProfile.linkedName) {
+        document.getElementById('profileClaimName').style.display = 'block';
+      } else {
+        document.getElementById('profileLoggedIn').style.display = 'block';
+        document.getElementById('profileLinkedNameDisp').innerText = currentProfile.linkedName;
+      }
+    }
+
+    window.signInWithGoogle = async function() {
+      const provider = new GoogleAuthProvider();
+      try { await signInWithPopup(auth, provider); } catch(err) { signInWithRedirect(auth, provider); }
+    }
+    window.logOut = async function() { await signOut(auth); closeProfileModal(); }
+
+    window.onClaimNameInput = function() {
+      const val = document.getElementById('claimNameInput').value.toLowerCase();
+      const sugg = document.getElementById('claimNameSugg');
+      if (!val) { sugg.style.display = 'none'; return; }
+      const matches = PlayerSearch.rank(playerList, val, 5);
+      if (!matches.length) { sugg.style.display = 'none'; return; }
+      sugg.innerHTML = matches.map(p => `<div class="suggestion-item" onclick="selectClaimName('${p}')">${p}</div>`).join('');
+      sugg.style.display = 'block';
+    }
+    window.selectClaimName = function(name) {
+      document.getElementById('claimNameInput').value = name;
+      document.getElementById('claimNameSugg').style.display = 'none';
+    }
+    window.claimProfileName = async function() {
+      const name = document.getElementById('claimNameInput').value.trim();
+      if (!name) return;
+      try {
+        await setDoc(doc(db, 'userProfiles', currentUser.uid), { linkedName: name }, { merge: true });
+        currentProfile = { linkedName: name };
+        renderProfileState();
+      } catch(e) { alert('Claim error: ' + e.message); }
+    }
+
+    // ── League Engagement Logic ──
+    window.openHighHandModal = function() {
+      document.getElementById('highHandModal').style.display = 'flex';
+      if (!playerList.length) PokerAPI.getPlayerList().then(r => playerList = r.players || []);
+      refreshHhPot();
+    }
+    window.closeHighHandModal = function() { document.getElementById('highHandModal').style.display = 'none'; }
+
+    window.refreshHhPot = async function refreshHhPot() {
+      try {
+        const venue = document.getElementById('hhVenue').value;
+        const hands = await PokerAPI.getHighHands();
+        document.getElementById('hhPot').value = (hands[venue] && hands[venue].pot) || '';
+      } catch (e) {
+        // Non-fatal — pot display is informational only.
+      }
+    }
+    
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function setAnnouncementImagePreview(src) {
+      const img = document.getElementById('annImagePreview');
+      if (!src) {
+        img.style.display = 'none';
+        img.removeAttribute('src');
+        return;
+      }
+      img.src = src;
+      img.style.display = 'block';
+    }
+
+    function setAnnouncementComposerMode(mode, announcement = null) {
+      const isEdit = mode === 'edit' && announcement;
+      editingAnnouncementId = isEdit ? announcement.id : null;
+      editingAnnouncementImageUrl = isEdit ? (announcement.imageUrl || '') : '';
+
+      document.getElementById('announcementModalTitle').textContent = isEdit ? 'Edit News Post' : 'Create News Post';
+      document.getElementById('announcementSubmitBtn').textContent = isEdit ? 'Save Changes' : 'Post to Feed';
+      document.getElementById('annTitle').value = isEdit ? (announcement.title || '') : '';
+      document.getElementById('annContent').value = isEdit ? (announcement.content || '') : '';
+      document.getElementById('annType').value = isEdit ? (announcement.type || 'info') : 'info';
+      document.getElementById('annSourceUrl').value = isEdit ? (announcement.sourceUrl || announcement.linkPreview?.sourceUrl || '') : '';
+      document.getElementById('annImage').value = '';
+      document.getElementById('annRemoveImage').checked = false;
+      document.getElementById('annRemoveImageWrap').style.display = editingAnnouncementImageUrl ? 'flex' : 'none';
+      setAnnouncementImagePreview(editingAnnouncementImageUrl);
+    }
+
+    window.openAnnouncementModal = function() {
+      setAnnouncementComposerMode('create');
+      document.getElementById('announcementModal').style.display = 'flex';
+    }
+    window.closeAnnouncementModal = function() {
+      document.getElementById('announcementModal').style.display = 'none';
+      clearAnnouncementComposer();
+    }
+    window.openAnnouncementManager = async function() {
+      document.getElementById('announcementManagerModal').style.display = 'flex';
+      await loadAnnouncementManager();
+    }
+    window.closeAnnouncementManager = function() {
+      document.getElementById('announcementManagerModal').style.display = 'none';
+    }
+    window.previewAnnouncementImage = function(input) {
+      const file = input.files?.[0];
+      if (!file) {
+        setAnnouncementImagePreview(editingAnnouncementImageUrl);
+        return;
+      }
+      document.getElementById('annRemoveImage').checked = false;
+      setAnnouncementImagePreview(URL.createObjectURL(file));
+    }
+    window.toggleAnnouncementImageRemoval = function(input) {
+      if (input.checked) {
+        document.getElementById('annImage').value = '';
+        setAnnouncementImagePreview('');
+      } else {
+        setAnnouncementImagePreview(editingAnnouncementImageUrl);
+      }
+    }
+
+    function clearAnnouncementComposer() {
+      setAnnouncementComposerMode('create');
+    }
+
+    function formatAnnouncementDate(ts) {
+      if (!ts) return '';
+      const date = ts.toDate ? ts.toDate() : (ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts));
+      return isNaN(date.getTime()) ? '' : date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    }
+
+    async function loadAnnouncementManager() {
+      const list = document.getElementById('announcementManagerList');
+      list.innerHTML = '<div style="color:#888; text-align:center; padding:24px 0;">Loading announcements...</div>';
+      try {
+        recentAnnouncements = await PokerAPI.getAnnouncements(20);
+        if (!recentAnnouncements.length) {
+          list.innerHTML = '<div style="color:#888; text-align:center; padding:24px 0;">No announcements found.</div>';
+          return;
+        }
+
+        list.innerHTML = recentAnnouncements.map(post => `
+          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:16px; margin-bottom:12px;">
+            <div style="display:flex; justify-content:space-between; gap:12px; align-items:flex-start;">
+              <div style="flex:1; min-width:0;">
+                <div style="font-weight:700; font-size:1rem; color:#fff;">${escapeHtml(post.title)}</div>
+                <div style="font-size:0.75rem; color:#999; margin-top:4px;">${escapeHtml(formatAnnouncementDate(post.createdAt))}</div>
+              </div>
+              <div style="font-size:0.72rem; color:#d4af37; text-transform:uppercase;">${escapeHtml(post.type || 'info')}</div>
+            </div>
+            <div style="font-size:0.88rem; color:#c8c8c8; line-height:1.5; margin-top:10px;">${escapeHtml((post.content || '').slice(0, 180))}${(post.content || '').length > 180 ? '...' : ''}</div>
+            <div style="display:flex; gap:10px; margin-top:14px;">
+              <button class="auth-btn" style="margin-top:0; padding:12px; font-size:0.92rem; background:var(--accent-blue); color:#fff;" onclick="editAnnouncement('${post.id}')">Edit</button>
+              <button class="auth-btn" style="margin-top:0; padding:12px; font-size:0.92rem; background:#2a1111; color:#ff6666; border:1px solid #552222;" onclick="deleteAnnouncementPrompt('${post.id}')">Delete</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        list.innerHTML = `<div style="color:#ff6666; text-align:center; padding:24px 0;">${escapeHtml(e.message || 'Failed to load announcements.')}</div>`;
+      }
+    }
+
+    window.editAnnouncement = function(id) {
+      const announcement = recentAnnouncements.find(post => post.id === id);
+      if (!announcement) return alert('Announcement not found.');
+      closeAnnouncementManager();
+      setAnnouncementComposerMode('edit', announcement);
+      document.getElementById('announcementModal').style.display = 'flex';
+    }
+
+    window.deleteAnnouncementPrompt = async function(id) {
+      const announcement = recentAnnouncements.find(post => post.id === id);
+      if (!announcement) return alert('Announcement not found.');
+      if (!confirm(`Delete announcement "${announcement.title}"?`)) return;
+      try {
+        await PokerAPI.deleteAnnouncement({ announcementId: id });
+        await loadAnnouncementManager();
+      } catch (e) {
+        alert('Delete failed: ' + e.message);
+      }
+    }
+
+    window.onHhNameInput = function() {
+      const val = document.getElementById('hhPlayer').value.toLowerCase();
+      const sugg = document.getElementById('hhSugg');
+      if (!val) { sugg.style.display = 'none'; return; }
+      const matches = PlayerSearch.rank(playerList, val, 5);
+      if (!matches.length) { sugg.style.display = 'none'; return; }
+      sugg.innerHTML = matches.map(p => `<div class="suggestion-item" onclick="selectHhName('${p}')">${p}</div>`).join('');
+      sugg.style.display = 'block';
+    }
+    window.selectHhName = function(name) {
+      document.getElementById('hhPlayer').value = name;
+      document.getElementById('hhSugg').style.display = 'none';
+    }
+
+    window.saveHighHand = async function() {
+      const venue = document.getElementById('hhVenue').value;
+      const player = document.getElementById('hhPlayer').value.trim();
+      const hand = document.getElementById('hhHand').value.trim();
+
+      if (!player || !hand) return alert('Please fill in all fields.');
+
+      try {
+        await PokerAPI.saveHighHand({ venue, player, hand });
+        alert('High Hand updated successfully!');
+        closeHighHandModal();
+      } catch(e) { alert('Error: ' + e.message); }
+    }
+
+    window.submitAnnouncement = async function() {
+      const title = document.getElementById('annTitle').value.trim();
+      const content = document.getElementById('annContent').value.trim();
+      const type = document.getElementById('annType').value;
+      const sourceUrl = document.getElementById('annSourceUrl').value.trim();
+      const file = document.getElementById('annImage').files[0] || null;
+      const removeImage = document.getElementById('annRemoveImage').checked;
+      const btn = document.getElementById('announcementSubmitBtn');
+
+      if (!title || !content) return alert('Headline and content are required.');
+
+      try {
+        btn.disabled = true;
+        btn.textContent = file ? 'Uploading…' : 'Posting…';
+        let imageUrl = null;
+        if (file) {
+          imageUrl = await PokerAPI.uploadAnnouncementImage(file);
+        }
+        if (editingAnnouncementId) {
+          await PokerAPI.updateAnnouncement({ announcementId: editingAnnouncementId, title, content, type, imageUrl, sourceUrl, removeImage });
+          alert('Announcement updated!');
+        } else {
+          await PokerAPI.createAnnouncement({ title, content, type, imageUrl, sourceUrl });
+          alert('Announcement posted!');
+        }
+        closeAnnouncementModal();
+      } catch(e) { alert('Error: ' + e.message); }
+      finally {
+        btn.disabled = false;
+        btn.textContent = editingAnnouncementId ? 'Save Changes' : 'Post to Feed';
+      }
+    }
+  </script>
+  <script src="/update-check.js"></script>
+
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="/clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/" data-if-history></script>
+</body>
+</html>

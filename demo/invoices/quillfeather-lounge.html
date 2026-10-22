@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sample invoice for Quillfeather Lounge</title>
+  <style>
+    :root { color-scheme: light; font-family: Arial, sans-serif; color: #202938; background: #f3f5f8; }
+    body { margin: 0; padding: 32px 16px; }
+    main { max-width: 760px; margin: 0 auto; padding: 32px; background: #fff; border: 1px solid #d9dee7; border-radius: 12px; }
+    .banner { margin: -32px -32px 28px; padding: 16px 24px; border-radius: 12px 12px 0 0; background: #7b1e2b; color: #fff; font-size: 20px; font-weight: 700; text-align: center; }
+    h1 { margin: 0 0 24px; font-size: 28px; }
+    .parties { display: flex; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
+    .label { color: #5d6878; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+    .value { margin-top: 6px; font-size: 16px; }
+    .meta { margin: 0 0 20px; color: #5d6878; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px 10px; border-bottom: 1px solid #e2e6ed; text-align: left; }
+    th { background: #f6f7f9; font-size: 12px; text-transform: uppercase; }
+    .num { text-align: right; }
+    .rate { margin: 18px 0; color: #4e5a6b; }
+    .total { display: flex; justify-content: space-between; padding-top: 16px; border-top: 2px solid #202938; font-size: 22px; font-weight: 700; }
+    @media print { :root { background: #fff; } body { padding: 0; } main { max-width: none; border: 0; border-radius: 0; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="banner">SAMPLE DATA: not a real invoice</div>
+    <h1>Invoice</h1>
+    <div class="parties">
+      <div><div class="label">From</div><div class="value">All-In Poker Club (sample)</div></div>
+      <div><div class="label">Bill to</div><div class="value">Quillfeather Lounge</div></div>
+    </div>
+    <p class="meta">SAMPLE-2026-09-QL | 2026-09-01 to 2026-09-30</p>
+    <table>
+      <thead><tr><th>Date</th><th class="num">People</th><th class="num">Amount</th></tr></thead>
+      <tbody>
+      <tr><td>2026-09-07</td><td class="num">26</td><td class="num">$156.00</td></tr>
+      <tr><td>2026-09-14</td><td class="num">29</td><td class="num">$174.00</td></tr>
+      <tr><td>2026-09-21</td><td class="num">30</td><td class="num">$180.00</td></tr>
+      <tr><td>2026-09-28</td><td class="num">25</td><td class="num">$150.00</td></tr>
+      </tbody>
+    </table>
+    <p class="rate">$6.00 per person per game night (demo rate)</p>
+    <div class="total"><span>Total</span><span>$660.00</span></div>
+  </main>
+</body>
+</html>

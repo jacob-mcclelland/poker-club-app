@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>League Broadcast · All-In Poker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="robots" content="noindex">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { background: #0a0a0a; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-height: 100vh; }
+
+    .header {
+      background: linear-gradient(135deg, #1a0a00, #0a0a1a);
+      border-bottom: 1px solid #2a2a2a;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header a { color: #555; text-decoration: none; font-size: 1.2rem; }
+    .header a:hover { color: #d4af37; }
+    .header h1 { color: #d4af37; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; }
+    .header .sub { color: #555; font-size: 0.7rem; letter-spacing: 1px; }
+
+    .page { max-width: 600px; margin: 0 auto; padding: 16px; }
+
+    /* Cards */
+    .card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .card-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    /* Stats row */
+    .stat-row { display: flex; gap: 10px; margin-bottom: 14px; }
+    .stat-box {
+      flex: 1;
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 14px 10px;
+      text-align: center;
+    }
+    .stat-num { font-size: 1.8rem; font-weight: 700; color: #d4af37; }
+    .stat-lbl { font-size: 0.7rem; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+    /* Subscriber list */
+    .sub-list { max-height: 280px; overflow-y: auto; }
+    .sub-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 0;
+      border-bottom: 1px solid #1a1a1a;
+      font-size: 0.9rem;
+    }
+    .sub-item:last-child { border-bottom: none; }
+    .sub-name { color: #ddd; }
+    .sub-email { color: #555; font-size: 0.75rem; }
+    .pref-dots { display: flex; gap: 4px; }
+    .pref-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #222;
+    }
+    .pref-dot.on { background: #00ff88; }
+    .pref-dot.orange { background: #d4af37; }
+
+    /* Blast buttons */
+    .blast-btn {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 10px;
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: opacity 0.15s;
+      text-align: left;
+    }
+    .blast-btn:active { opacity: 0.75; }
+    .blast-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .blast-btn-schedule { background: linear-gradient(135deg, #1a3a1a, #1a2a1a); border: 1px solid #2a4a2a; color: #00ff88; }
+    .blast-btn-champ { background: linear-gradient(135deg, #3a2a00, #2a1a00); border: 1px solid #4a3a00; color: #d4af37; }
+    .blast-btn-custom { background: #161616; border: 1px solid #2a2a2a; color: #aaa; }
+    .blast-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .blast-meta { flex: 1; }
+    .blast-meta strong { display: block; font-size: 0.95rem; }
+    .blast-meta span { font-size: 0.75rem; opacity: 0.6; font-weight: 400; }
+
+    /* Custom compose */
+    .compose-area { display: none; margin-top: 12px; }
+    .compose-area.open { display: block; }
+    .compose-input {
+      width: 100%;
+      background: #0a0a0a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.9rem;
+      padding: 10px 12px;
+      outline: none;
+      margin-bottom: 8px;
+    }
+    .compose-input:focus { border-color: #d4af37; }
+    textarea.compose-input { resize: vertical; min-height: 90px; }
+
+    /* Send status */
+    .send-status {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-top: 10px;
+      display: none;
+    }
+    .send-status.success { background: #0a2a0a; border: 1px solid #1a4a1a; color: #00ff88; }
+    .send-status.error { background: #2a0a0a; border: 1px solid #4a1a1a; color: #ff5555; }
+    .send-status.sending { background: #1a1a0a; border: 1px solid #3a3a1a; color: #d4af37; }
+
+    /* History list */
+    .history-item {
+      padding: 10px 0;
+      border-bottom: 1px solid #1a1a1a;
+      font-size: 0.85rem;
+    }
+    .history-item:last-child { border-bottom: none; }
+    .history-type { color: #d4af37; font-weight: 600; font-size: 0.8rem; }
+    .history-to { color: #555; font-size: 0.75rem; margin-top: 2px; }
+    .history-time { color: #333; font-size: 0.7rem; margin-top: 3px; }
+    .history-empty { color: #333; font-size: 0.85rem; text-align: center; padding: 20px 0; }
+
+    .section-empty { color: #333; font-size: 0.85rem; text-align: center; padding: 20px 0; }
+    .spinner { color: #333; font-size: 0.85rem; text-align: center; padding: 20px 0; }
+    .notice {
+      background: #111820;
+      border: 1px solid #1a2a3a;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 0.78rem;
+      color: #4a7a9a;
+      margin-bottom: 14px;
+    }
+    /* Auth guard (markup contract shared with admin-auth.js) */
+    #authGuard { position:fixed; inset:0; background:#0a0a0f; z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:16px; }
+    #authGuard .spinner { width:40px; height:40px; border:3px solid rgba(255,255,255,0.1); border-top-color:#d4af37; border-radius:50%; animation:authspin 1s linear infinite; }
+    @keyframes authspin { to { transform:rotate(360deg); } }
+    #authMsg { color:#d4af37; font-weight:700; font-size:0.9rem; letter-spacing:1px; text-transform:uppercase; }
+    #loginBtn { background:#d4af37; color:#000; border:none; border-radius:8px; padding:11px 28px; font-size:0.95rem; font-weight:700; cursor:pointer; }
+  </style>
+</head>
+<body>
+
+<!-- AUTH GATE -->
+<div id="authGuard">
+  <div class="spinner"></div>
+  <p id="authMsg">Verifying…</p>
+  <button id="loginBtn" onclick="triggerLogin()" style="display:none">Sign in with Google</button>
+</div>
+
+<div id="mainContent" style="display:none;">
+
+  <div class="header">
+    <a data-back-nav href="/admin/">←</a>
+    <div>
+      <h1>📡 League Broadcast</h1>
+      <div class="sub">Email Communications Center</div>
+    </div>
+  </div>
+
+  <div class="page">
+
+    <!-- Subscriber Stats -->
+    <div class="stat-row" id="statRow">
+      <div class="stat-box"><div class="stat-num" id="statTotal">—</div><div class="stat-lbl">Subscribers</div></div>
+      <div class="stat-box"><div class="stat-num" id="statNewsletter">—</div><div class="stat-lbl">Newsletter</div></div>
+      <div class="stat-box"><div class="stat-num" id="statReminders">—</div><div class="stat-lbl">Reminders</div></div>
+    </div>
+
+    <!-- Send Blasts -->
+    <div class="card">
+      <div class="card-title">Send a Blast</div>
+
+      <div class="notice">
+        ℹ️ Blasts are queued to the <strong>mail</strong> collection in Firestore. The Firebase "Trigger Email" extension must be installed and configured to deliver them.
+      </div>
+
+      <button class="blast-btn blast-btn-schedule" onclick="sendBlast('schedule')">
+        <span class="blast-icon">🗓</span>
+        <div class="blast-meta">
+          <strong>Weekly Schedule Blast</strong>
+          <span>Sends to all Newsletter subscribers with upcoming games + their current standings</span>
+        </div>
+      </button>
+
+      <button class="blast-btn blast-btn-champ" onclick="sendBlast('championship')">
+        <span class="blast-icon">🏆</span>
+        <div class="blast-meta">
+          <strong>Championship Qualifier Alert</strong>
+          <span>Sends only to qualified players — RSVP request for championship night</span>
+        </div>
+      </button>
+
+      <button class="blast-btn blast-btn-custom" onclick="toggleCustomCompose()">
+        <span class="blast-icon">✏️</span>
+        <div class="blast-meta">
+          <strong>Custom Message</strong>
+          <span>Write a one-off message to all subscribers</span>
+        </div>
+      </button>
+
+      <div class="compose-area" id="composeArea">
+        <input type="text" class="compose-input" id="customSubject" placeholder="Subject line…">
+        <textarea class="compose-input" id="customBody" placeholder="Message body… (plain text, will be wrapped in the standard email template)"></textarea>
+        <button class="blast-btn blast-btn-custom" style="margin-bottom:0;" onclick="sendBlast('custom')">
+          <span class="blast-icon">📤</span>
+          <div class="blast-meta"><strong>Queue Custom Blast</strong></div>
+        </button>
+      </div>
+
+      <div class="send-status" id="sendStatus"></div>
+    </div>
+
+    <!-- Subscriber List -->
+    <div class="card">
+      <div class="card-title">
+        Subscribers
+        <span style="float:right; font-size:0.65rem; color:#333;">
+          🟢 Newsletter &nbsp; 🟡 Reminders &nbsp; ⚫ Off
+        </span>
+      </div>
+      <div class="sub-list" id="subList"><div class="spinner">Loading…</div></div>
+    </div>
+
+    <!-- Send History -->
+    <div class="card">
+      <div class="card-title">Recent Sends (last 20)</div>
+      <div id="historyList"><div class="spinner">Loading…</div></div>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+  import { db, functions } from '../firebase-api.js?v=6';
+  import { requireAdmin, triggerLogin } from './admin-auth.js';
+  import { collection, getDocs, addDoc, query, orderBy, limit, where, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  import { httpsCallable }
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js";
+
+  let subscribers = [];
+
+  // ── Auth gate (Google sign-in + admin role, same as other admin pages).
+  // getSubscribers requires the admin role server-side, so the old PIN
+  // gate could never authorize the callable anyway.
+  window.triggerLogin = triggerLogin;
+  (async () => {
+    const session = await requireAdmin();
+    if (!session) return;
+    document.getElementById('mainContent').style.display = 'block';
+    loadData();
+  })();
+
+  // ── Load subscribers + history ──
+  async function loadData() {
+    await Promise.all([loadSubscribers(), loadHistory()]);
+  }
+
+  async function loadSubscribers() {
+    try {
+      const getSubscribers = httpsCallable(functions, 'getSubscribers');
+      const res = await getSubscribers();
+      subscribers = res.data?.subscribers || [];
+
+      const withEmail      = subscribers.filter(s => s.email);
+      const newsletterCount = subscribers.filter(s => s.preferences?.newsletter).length;
+      const reminderCount   = subscribers.filter(s => s.preferences?.reminders).length;
+
+      document.getElementById('statTotal').textContent = subscribers.length;
+      document.getElementById('statNewsletter').textContent = newsletterCount;
+      document.getElementById('statReminders').textContent = reminderCount;
+
+      if (!subscribers.length) {
+        document.getElementById('subList').innerHTML = '<div class="section-empty">No linked accounts yet</div>';
+        return;
+      }
+
+      document.getElementById('subList').innerHTML = subscribers.map(s => `
+        <div class="sub-item">
+          <div>
+            <div class="sub-name">${esc(s.linkedName)}</div>
+            <div class="sub-email">${s.email ? esc(s.email) : '<span style="color:#333">no email</span>'}</div>
+          </div>
+          <div class="pref-dots" title="Newsletter / Reminders / Announcements">
+            <div class="pref-dot ${s.preferences?.newsletter ? 'on' : ''}"></div>
+            <div class="pref-dot orange ${s.preferences?.reminders ? 'on' : ''}"></div>
+            <div class="pref-dot ${s.preferences?.announcements ? 'on' : ''}"></div>
+          </div>
+        </div>`).join('');
+    } catch(e) {
+      document.getElementById('subList').innerHTML = `<div class="section-empty">Error: ${e.message}</div>`;
+    }
+  }
+
+  async function loadHistory() {
+    try {
+      const q = query(collection(db, 'mail'), orderBy('createdAt', 'desc'), limit(20));
+      const snap = await getDocs(q);
+      if (snap.empty) {
+        document.getElementById('historyList').innerHTML = '<div class="history-empty">No sends yet</div>';
+        return;
+      }
+      let html = '';
+      snap.forEach(doc => {
+        const d = doc.data();
+        const msg = d.message || d;
+        const subject = msg?.subject || d.subject || '(no subject)';
+        const toCount = Array.isArray(d.to) ? d.to.length : 1;
+        const ts = d.createdAt?.toDate?.();
+        const timeStr = ts ? ts.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '—';
+        const blastType = d.blastType || 'Custom';
+        html += `
+          <div class="history-item">
+            <div class="history-type">${esc(blastType)}</div>
+            <div class="history-to">Subject: ${esc(subject)} · ${toCount} recipient${toCount !== 1 ? 's' : ''}</div>
+            <div class="history-time">${timeStr}</div>
+          </div>`;
+      });
+      document.getElementById('historyList').innerHTML = html;
+    } catch(e) {
+      document.getElementById('historyList').innerHTML = `<div class="history-empty">Error loading history</div>`;
+    }
+  }
+
+  // ── Compose ──
+  window.toggleCustomCompose = function() {
+    const area = document.getElementById('composeArea');
+    area.classList.toggle('open');
+  };
+
+  // ── Send blasts ──
+  window.sendBlast = async function(type) {
+    const statusEl = document.getElementById('sendStatus');
+    statusEl.className = 'send-status sending';
+    statusEl.textContent = '⏳ Building blast…';
+    statusEl.style.display = 'block';
+
+    try {
+      if (type === 'schedule') {
+        await sendScheduleBlast();
+      } else if (type === 'championship') {
+        await sendChampionshipBlast();
+      } else if (type === 'custom') {
+        await sendCustomBlast();
+      }
+    } catch(e) {
+      statusEl.className = 'send-status error';
+      statusEl.textContent = '✗ Error: ' + e.message;
+    }
+  };
+
+  async function sendScheduleBlast() {
+    const statusEl = document.getElementById('sendStatus');
+    const recipients = subscribers.filter(s => s.preferences?.newsletter && s.email);
+    if (!recipients.length) {
+      statusEl.className = 'send-status error';
+      statusEl.textContent = '✗ No newsletter subscribers with linked email addresses.';
+      return;
+    }
+
+    // Fetch schedule via Cloud Function
+    const getSchedule = httpsCallable(functions, 'getSchedule');
+    const schRes = await getSchedule({ historical: false });
+    const upcoming = (schRes.data?.schedule || []).slice(0, 6);
+
+    const scheduleLines = upcoming.map(e => {
+      const d = new Date(e.date);
+      const dayStr = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+      return `• ${dayStr} — ${e.location || 'TBD'}${e.theme ? ` · ${e.theme}` : ''}`;
+    }).join('\n');
+
+    // Fetch standings for both venues
+    const getLeaderboard = httpsCallable(functions, 'getLeaderboard');
+    const [teRes, wcRes] = await Promise.all([
+      getLeaderboard({ venue: 'Tight End' }).catch(() => ({ data: { standings: [] } })),
+      getLeaderboard({ venue: 'Wild Corgi' }).catch(() => ({ data: { standings: [] } }))
+    ]);
+    const teStandings = teRes.data?.standings || [];
+    const wcStandings = wcRes.data?.standings || [];
+
+    const mailDocs = [];
+    for (const sub of recipients) {
+      const name = sub.linkedName;
+      const teEntry = teStandings.find(p => p.name === name);
+      const wcEntry = wcStandings.find(p => p.name === name);
+
+      let standingLines = '';
+      if (teEntry) standingLines += `  Tight End: #${teEntry.rank} with ${teEntry.points} pts\n`;
+      if (wcEntry) standingLines += `  Wild Corgi: #${wcEntry.rank} with ${wcEntry.points} pts\n`;
+
+      const body = `Hey ${name.split(' ')[0]}!\n\nHere's what's coming up at All-In Poker Club:\n\n${scheduleLines}\n\n${standingLines ? `Your current standings:\n${standingLines}\n` : ''}Keep playing and climbing the board — see you at the tables!\n\n— All-In Poker Club`;
+
+      mailDocs.push({ sub, body });
+    }
+
+    for (const { sub, body } of mailDocs) {
+      await addDoc(collection(db, 'mail'), {
+        to: sub.email,
+        blastType: 'Weekly Schedule',
+        subject: '🗓 Upcoming Games — All-In Poker Club',
+        message: {
+          subject: '🗓 Upcoming Games — All-In Poker Club',
+          text: body,
+        },
+        createdAt: serverTimestamp(),
+      });
+    }
+
+    statusEl.className = 'send-status success';
+    statusEl.textContent = `✓ Queued ${mailDocs.length} schedule blast${mailDocs.length !== 1 ? 's' : ''} — the Firebase extension will deliver them.`;
+    loadHistory();
+  }
+
+  async function sendChampionshipBlast() {
+    const statusEl = document.getElementById('sendStatus');
+
+    const getLeaderboard = httpsCallable(functions, 'getLeaderboard');
+    const [teRes, wcRes] = await Promise.all([
+      getLeaderboard({ venue: 'Tight End' }).catch(() => ({ data: { standings: [] } })),
+      getLeaderboard({ venue: 'Wild Corgi' }).catch(() => ({ data: { standings: [] } }))
+    ]);
+
+    const qualifiedNames = new Set([
+      ...(teRes.data?.standings || []).filter(p => p.qualified).map(p => p.name),
+      ...(wcRes.data?.standings || []).filter(p => p.qualified).map(p => p.name),
+    ]);
+
+    const recipients = subscribers.filter(s => s.email && qualifiedNames.has(s.linkedName));
+    if (!recipients.length) {
+      statusEl.className = 'send-status error';
+      statusEl.textContent = '✗ No qualified players have linked email accounts.';
+      return;
+    }
+
+    for (const sub of recipients) {
+      const firstName = sub.linkedName.split(' ')[0];
+      const body = `Hey ${firstName}!\n\nCongratulations — you've qualified for the Championship at All-In Poker Club! 🏆\n\nWe're finalizing the seating matrix and need to know if you'll be attending. Please RSVP at:\nhttps://poker-club.example\n\nIf you can't make it, please let us know so we can open your spot to another player.\n\nGood luck at the tables!\n\n— All-In Poker Club`;
+
+      await addDoc(collection(db, 'mail'), {
+        to: sub.email,
+        blastType: 'Championship Alert',
+        subject: '🏆 You\'ve Qualified for the Championship!',
+        message: {
+          subject: '🏆 You\'ve Qualified for the Championship!',
+          text: body,
+        },
+        createdAt: serverTimestamp(),
+      });
+    }
+
+    statusEl.className = 'send-status success';
+    statusEl.textContent = `✓ Queued championship alerts for ${recipients.length} qualified player${recipients.length !== 1 ? 's' : ''}.`;
+    loadHistory();
+  }
+
+  async function sendCustomBlast() {
+    const statusEl = document.getElementById('sendStatus');
+    const subject = document.getElementById('customSubject').value.trim();
+    const body = document.getElementById('customBody').value.trim();
+    if (!subject || !body) {
+      statusEl.className = 'send-status error';
+      statusEl.textContent = '✗ Please fill in both subject and message.';
+      return;
+    }
+
+    const recipients = subscribers.filter(s => s.email);
+    if (!recipients.length) {
+      statusEl.className = 'send-status error';
+      statusEl.textContent = '✗ No subscribers with linked email addresses.';
+      return;
+    }
+
+    for (const sub of recipients) {
+      const firstName = sub.linkedName.split(' ')[0];
+      const personalizedBody = `Hey ${firstName}!\n\n${body}\n\n— All-In Poker Club`;
+      await addDoc(collection(db, 'mail'), {
+        to: sub.email,
+        blastType: 'Custom Message',
+        subject,
+        message: { subject, text: personalizedBody },
+        createdAt: serverTimestamp(),
+      });
+    }
+
+    statusEl.className = 'send-status success';
+    statusEl.textContent = `✓ Queued custom message for ${recipients.length} subscriber${recipients.length !== 1 ? 's' : ''}.`;
+    document.getElementById('customSubject').value = '';
+    document.getElementById('customBody').value = '';
+    document.getElementById('composeArea').classList.remove('open');
+    loadHistory();
+  }
+
+  function esc(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+</script>
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="/clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/admin/"></script>
+</body>
+</html>

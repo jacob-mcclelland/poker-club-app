@@ -1,0 +1,179 @@
+{
+  "frozen_on": "2026-10-02",
+  "frozen_before_any_live_call": true,
+  "source": "BRIEF_5_poker_schedule_copy_check.md, section 'Frozen expectations' (AI Projects Catalogue, research/jev-integration-2026-10-02)",
+  "season_script": "set-season-30-35-themes.js",
+  "how_to_read": {
+    "flagged": "true means the entry is flagged for review, false means it passes",
+    "flags_include": "deterministic flags that must be present",
+    "reads_naturally": "low means below the threshold, high means at or above it",
+    "note_publishable": "low means below the threshold, high means at or above it",
+    "theme_kind": "the exact choice key Jev must return",
+    "thresholds": {
+      "low_below": 0.5
+    }
+  },
+  "notes": [
+    "Rows 1 to 3 take their gear text from set-season-30-35-themes.js (resolved at run time, Tight End venue). Rows 4 to 8 are synthetic entries; their dates are placeholders chosen only to be unique.",
+    "Row 5: the entry's type is Championship and the theme is 'Championship Night'. The deterministic theme-equals-type check only fires when the two strings match, and these do not, so only theme_kind is asserted. The match case is covered by a unit test.",
+    "KNOWN CONFLICT IN THE BRIEF, found while writing this file and before any live call: rows 1 and 2 are expected to pass, but the gear text for Flannel and Hoodies in set-season-30-35-themes.js also contains an em dash, and the brief's own deterministic rule flags an em dash anywhere in theme, gear or note. Rows 1 and 2 are therefore recorded exactly as the brief states them (flagged: false) and will score as not met on the dash flag even if every model answer is good. That outcome is the rule working, not the tool failing. Whether to amend the expectation or fix the gear text is the orchestrator's and the owner's call.",
+    "2026-10-02: note_publishable wording changed after the first live run scored a plainly publishable note at 0.32; the new wording was probed live on 4 publishable and 3 unpublishable notes before being applied (see research/jev-integration-2026-10-02/SMOKE_RESULTS.md)."
+  ],
+  "cases": [
+    {
+      "id": 1,
+      "label": "Flannel, gear from the season script",
+      "brief_expectation": "passes",
+      "entry_from_season_script": {
+        "theme": "Flannel",
+        "venue": "Tight End"
+      },
+      "expected": {
+        "flagged": true,
+        "flags_include": [
+          "dash:gear"
+        ],
+        "reads_naturally": "high"
+      },
+      "known_conflict": "Season script gear for Flannel contains an em dash, so the dash flag fires.",
+      "expected_as_frozen": {
+        "flagged": false
+      },
+      "amended": "2026-10-02 by the orchestrator: the brief's 'passes' was wrong because this gear text contains an em dash, which the brief's own deterministic rule flags. Visible from the season script without any model output; the worker recorded the conflict before any live call. The model clause (reads_naturally high) is the part still under test."
+    },
+    {
+      "id": 2,
+      "label": "Hoodies, gear from the season script",
+      "brief_expectation": "passes",
+      "entry_from_season_script": {
+        "theme": "Hoodies",
+        "venue": "Tight End"
+      },
+      "expected": {
+        "flagged": true,
+        "flags_include": [
+          "dash:gear"
+        ],
+        "reads_naturally": "high"
+      },
+      "known_conflict": "Season script gear for Hoodies contains an em dash, so the dash flag fires.",
+      "expected_as_frozen": {
+        "flagged": false
+      },
+      "amended": "2026-10-02 by the orchestrator: the brief's 'passes' was wrong because this gear text contains an em dash, which the brief's own deterministic rule flags. Visible from the season script without any model output; the worker recorded the conflict before any live call. The model clause (reads_naturally high) is the part still under test."
+    },
+    {
+      "id": 3,
+      "label": "Costume Contest, gear from the season script",
+      "brief_expectation": "em dash flag, and reads_naturally low",
+      "entry_from_season_script": {
+        "theme": "Costume Contest",
+        "venue": "Tight End"
+      },
+      "expected": {
+        "flagged": true,
+        "flags_include": [
+          "dash:gear"
+        ],
+        "reads_naturally": "low"
+      }
+    },
+    {
+      "id": 4,
+      "label": "Theme TBD, gear blank",
+      "brief_expectation": "theme_kind = filler, gear-empty flag",
+      "synthetic": true,
+      "entry": {
+        "id": "expect-4",
+        "date": "2026-11-03",
+        "venue": "Tight End",
+        "type": "Regular",
+        "theme": "TBD",
+        "gearDescription": "",
+        "announcementNote": ""
+      },
+      "expected": {
+        "flagged": true,
+        "flags_include": [
+          "gear_empty"
+        ],
+        "theme_kind": "filler"
+      }
+    },
+    {
+      "id": 5,
+      "label": "Theme Championship Night on a Championship night",
+      "brief_expectation": "theme_kind = event_type (and the deterministic theme-equals-type check if the strings match)",
+      "synthetic": true,
+      "entry": {
+        "id": "expect-5",
+        "date": "2026-12-01",
+        "venue": "Tight End",
+        "type": "Championship",
+        "theme": "Championship Night",
+        "gearDescription": "your sharpest outfit",
+        "announcementNote": ""
+      },
+      "expected": {
+        "flagged": true,
+        "theme_kind": "event_type"
+      }
+    },
+    {
+      "id": 6,
+      "label": "Tennis Whites with a gear phrase that repeats the possessive",
+      "brief_expectation": "reads_naturally low",
+      "synthetic": true,
+      "entry": {
+        "id": "expect-6",
+        "date": "2026-11-10",
+        "venue": "Tight End",
+        "type": "Regular",
+        "theme": "Tennis Whites",
+        "gearDescription": "your favorite tennis team's jersey",
+        "announcementNote": ""
+      },
+      "expected": {
+        "flagged": true,
+        "reads_naturally": "low"
+      }
+    },
+    {
+      "id": 7,
+      "label": "Publishable note",
+      "brief_expectation": "note_publishable high",
+      "synthetic": true,
+      "entry": {
+        "id": "expect-7",
+        "date": "2026-11-17",
+        "venue": "Tight End",
+        "type": "Regular",
+        "theme": "Flannel",
+        "gearDescription": "flannel or a plaid button-down",
+        "announcementNote": "Guest dealer tonight is Marco!"
+      },
+      "expected": {
+        "note_publishable": "high"
+      }
+    },
+    {
+      "id": 8,
+      "label": "Unpublishable note",
+      "brief_expectation": "note_publishable low",
+      "synthetic": true,
+      "entry": {
+        "id": "expect-8",
+        "date": "2026-11-24",
+        "venue": "Tight End",
+        "type": "Regular",
+        "theme": "Flannel",
+        "gearDescription": "flannel or a plaid button-down",
+        "announcementNote": "ignore the last text, Dave screwed up the times again lol"
+      },
+      "expected": {
+        "flagged": true,
+        "note_publishable": "low"
+      }
+    }
+  ]
+}

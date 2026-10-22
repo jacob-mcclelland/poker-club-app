@@ -1,0 +1,251 @@
+{
+  "description": "Brief 17 frozen cases. Invented values only; every announcementNote is empty. sentence is the full value render_push_sentence returns. Do not edit an expectation to match a failing result.",
+  "case_ids": [
+    "T1",
+    "T2",
+    "T3",
+    "T4",
+    "T5",
+    "T6",
+    "T7",
+    "T8",
+    "T9",
+    "T10",
+    "T11",
+    "T12",
+    "T13",
+    "T14"
+  ],
+  "expected_totals": {
+    "blocked": 6,
+    "needs_signoff": 3,
+    "read": 5
+  },
+  "expected_audit_exit": 1,
+  "cases": [
+    {
+      "id": "T1",
+      "entry": {
+        "type": "Regular",
+        "theme": "Flannel",
+        "gearDescription": "flannel shirts",
+        "announcementNote": ""
+      },
+      "expected": {
+        "theme_state": "real",
+        "gear_source": "custom",
+        "code_theme_is_real": true,
+        "status": "read",
+        "sentence": "Tonight's theme is FLANNEL, so wear your best flannel shirts and show up by 6:50 to receive your bonus."
+      }
+    },
+    {
+      "id": "T2",
+      "entry": {
+        "type": "Regular",
+        "theme": "TBD",
+        "gearDescription": "",
+        "announcementNote": ""
+      },
+      "expected": {
+        "theme_state": "filler",
+        "gear_source": "generic",
+        "code_theme_is_real": true,
+        "status": "blocked",
+        "sentence": "Tonight's theme is TBD, so wear your best TBD inspired gear and show up by 6:50 to receive your bonus."
+      }
+    },
+    {
+      "id": "T3",
+      "entry": {
+        "type": "Regular",
+        "theme": "N/A",
+        "gearDescription": "",
+        "announcementNote": ""
+      },
+      "expected": {
+        "theme_state": "filler",
+        "gear_source": "generic",
+        "code_theme_is_real": true,
+        "status": "blocked",
+        "sentence": "Tonight's theme is N/A, so wear your best N/A inspired gear and show up by 6:50 to receive your bonus."
+      }
+    },
+    {
+      "id": "T4",
+      "entry": {
+        "type": "Championship",
+        "theme": "Championship",
+        "gearDescription": "",
+        "announcementNote": ""
+      },
+      "expected": {
+        "theme_state": "type_echo",
+        "gear_source": "suppressed",
+        "code_theme_is_real": false,
+        "status": "read",
+        "sentence": "Tonight is CHAMPIONSHIP NIGHT! Show up by 6:50 to get your bonus."
+      }
+    },
+    {
+      "id": "T5",
+      "entry": {
+        "type": "Big Stack",
+        "theme": "Big Stack (placeholder)",
+        "gearDescription": "",
+        "announcementNote": ""
+      },
+      "expected": {
+        "theme_state": "filler",
+        "gear_source": "suppressed",
+        "code_theme_is_real": false,
+        "status": "read",
+        "sentence": "Tonight is our BIG STACK tournament! Show up by 6:50 to get your bonus."
+      }
+    },
+    {
+      "id": "T6",
+      "entry": {
+        "type": "Regular",
+        "theme": "Boxing Day",
+        "gearDescription": "",
+        "announcementNote": ""
+      },
+      "expected": {
+        "theme_state": "real",
+        "gear_source": "sport_substring",
+        "code_theme_is_real": true,
+        "status": "needs_signoff",
+        "sentence": "Tonight's theme is BOXING DAY, so wear your best boxing gear or the jersey/colors of your favorite boxing team and show up by 6:50 to receive your bonus."
+      }
+    },
+    {
+      "id": "T7",
+      "entry": {
+        "type": "Regular",
+        "theme": "Boxing Day",
+        "gearDescription": "winter holiday colors",
+        "announcementNote": ""
+      },
+      "expected": {
+        "theme_state": "real",
+        "gear_source": "custom",
+        "code_theme_is_real": true,
+        "status": "read",
+        "sentence": "Tonight's theme is BOXING DAY, so wear your best winter holiday colors and show up by 6:50 to receive your bonus."
+      }
+    },
+    {
+      "id": "T8",
+      "entry": {
+        "type": "Regular",
+        "theme": "Baseball",
+        "gearDescription": "",
+        "announcementNote": ""
+      },
+      "expected": {
+        "theme_state": "real",
+        "gear_source": "sport_substring",
+        "code_theme_is_real": true,
+        "status": "needs_signoff",
+        "sentence": "Tonight's theme is BASEBALL, so wear your best baseball gear or the jersey/colors of your favorite baseball team and show up by 6:50 to receive your bonus."
+      }
+    },
+    {
+      "id": "T9",
+      "entry": {
+        "type": "Regular",
+        "theme": "Greenery",
+        "gearDescription": "",
+        "announcementNote": ""
+      },
+      "expected": {
+        "theme_state": "real",
+        "gear_source": "exact_map",
+        "code_theme_is_real": true,
+        "status": "read",
+        "sentence": "Tonight's theme is GREENERY, so wear your best GREEN or PLANT/HERB inspired gear and show up by 6:50 to receive your bonus."
+      }
+    },
+    {
+      "id": "T10",
+      "entry": {
+        "type": "Regular",
+        "theme": "Neon Night",
+        "gearDescription": "",
+        "announcementNote": ""
+      },
+      "expected": {
+        "theme_state": "real",
+        "gear_source": "generic",
+        "code_theme_is_real": true,
+        "status": "needs_signoff",
+        "sentence": "Tonight's theme is NEON NIGHT, so wear your best Neon Night inspired gear and show up by 6:50 to receive your bonus."
+      }
+    },
+    {
+      "id": "T11",
+      "entry": {
+        "type": "Regular",
+        "theme": "",
+        "gearDescription": "",
+        "announcementNote": ""
+      },
+      "expected": {
+        "theme_state": "empty",
+        "gear_source": "generic",
+        "code_theme_is_real": false,
+        "status": "blocked",
+        "sentence": "Tonight's theme is REGULAR, so wear your best Regular inspired gear and show up by 6:50 to receive your bonus."
+      }
+    },
+    {
+      "id": "T12",
+      "entry": {
+        "type": "Regular",
+        "theme": "Western (placeholder)",
+        "gearDescription": "",
+        "announcementNote": ""
+      },
+      "expected": {
+        "theme_state": "filler",
+        "gear_source": "generic",
+        "code_theme_is_real": false,
+        "status": "blocked",
+        "sentence": "Tonight's theme is REGULAR, so wear your best Regular inspired gear and show up by 6:50 to receive your bonus."
+      }
+    },
+    {
+      "id": "T13",
+      "entry": {
+        "type": "Regular",
+        "theme": "Regular",
+        "gearDescription": "",
+        "announcementNote": ""
+      },
+      "expected": {
+        "theme_state": "type_echo",
+        "gear_source": "generic",
+        "code_theme_is_real": false,
+        "status": "blocked",
+        "sentence": "Tonight's theme is REGULAR, so wear your best Regular inspired gear and show up by 6:50 to receive your bonus."
+      }
+    },
+    {
+      "id": "T14",
+      "entry": {
+        "type": "Championship",
+        "theme": "TBD",
+        "gearDescription": "",
+        "announcementNote": ""
+      },
+      "expected": {
+        "theme_state": "filler",
+        "gear_source": "generic",
+        "code_theme_is_real": true,
+        "status": "blocked",
+        "sentence": "Tonight's theme is TBD, so wear your best TBD inspired gear and show up by 6:50 to receive your bonus."
+      }
+    }
+  ]
+}

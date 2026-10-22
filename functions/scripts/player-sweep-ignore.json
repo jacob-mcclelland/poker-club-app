@@ -1,0 +1,53 @@
+{
+  "_comment": "Pairs the owner has reviewed and declined. player-sweep.js will not propose these again. Order within a pair does not matter; matching is case/whitespace-insensitive.",
+  "pairs": [
+    [
+      "Bailey",
+      "Bailey Sablewood"
+    ],
+    [
+      "Yael Wexmoor",
+      "Yael W"
+    ],
+    [
+      "Remy Hollowmere",
+      "Morgan Hollowmere"
+    ],
+    [
+      "Emery Yarrowdale",
+      "Emery Yarrowdal"
+    ],
+    [
+      "Wren",
+      "Wren Ingleby-Rhys"
+    ],
+    [
+      "Dana Kestrelton",
+      "Dana K"
+    ],
+    [
+      "Alex Quillfeather",
+      "Noel Quillfeather"
+    ],
+    [
+      "Val Fenwhistle",
+      "Val Fenwhistl"
+    ],
+    [
+      "Zion",
+      "Zion Sablewood"
+    ],
+    [
+      "Sage Ingleby-Rhys",
+      "Sage I"
+    ],
+    [
+      "Quinn Corrimore",
+      "Riley Corrimore"
+    ],
+    [
+      "Jordan Galloway-Pike",
+      "Jordan Galloway-Pik"
+    ]
+  ]
+}

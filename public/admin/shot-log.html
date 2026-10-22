@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shot Log - Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/img/favicon-admin.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#050508; --card-bg:rgba(20,20,25,0.7); --border:rgba(255,255,255,0.08); --gold:#d4af37; --amber:#f59e0b; --green:#10b981; --red:#ef4444; --blue:#3b82f6; --purple:#a78bfa; --text:#f8fafc; --muted:#94a3b8; }
+    * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+    body { background:var(--bg); color:var(--text); font-family:'Inter',-apple-system,sans-serif; min-height:100vh; display:flex; flex-direction:column; overflow-x:hidden; }
+    #authGuard { position:fixed; inset:0; background:var(--bg); z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:16px; }
+    .spinner { width:40px; height:40px; border:3px solid rgba(255,255,255,0.1); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    #authMsg { color:var(--gold); font-weight:700; font-size:0.9rem; letter-spacing:1px; text-transform:uppercase; }
+    .login-btn { display:none; background:var(--gold); color:#000; border:none; border-radius:10px; padding:12px 24px; font-weight:700; font-family:inherit; cursor:pointer; }
+    .header { padding:44px 20px 20px; text-align:center; position:relative; }
+    .back-btn { position:absolute; left:16px; top:48px; background:var(--card-bg); border:1px solid var(--border); color:var(--gold); padding:8px 16px; border-radius:10px; cursor:pointer; font-size:0.85rem; font-weight:700; font-family:inherit; }
+    .back-btn:active { transform:scale(0.96); }
+    h1 { font-weight:800; font-size:1.6rem; text-transform:uppercase; letter-spacing:2px; background:linear-gradient(to bottom,#fff 30%,#888); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .sub { margin-top:4px; color:var(--purple); font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:3px; }
+    .main-content { padding:0 20px 80px; flex:1; max-width:640px; margin:0 auto; width:100%; }
+    .section-label { font-size:0.72rem; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:2px; margin:26px 0 12px 2px; display:flex; align-items:center; gap:10px; }
+    .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+    /* Range selector */
+    .range-row { display:flex; gap:8px; }
+    .range-btn { flex:1; background:var(--card-bg); border:1px solid var(--border); color:var(--muted); border-radius:10px; padding:10px; font-family:inherit; font-size:0.78rem; font-weight:700; cursor:pointer; transition:all 0.15s; }
+    .range-btn.active { background:rgba(167,139,250,0.18); border-color:var(--purple); color:var(--purple); }
+
+    /* Stat cards */
+    .stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .stat-card { background:var(--card-bg); border:1px solid var(--border); border-radius:16px; padding:18px; }
+    .stat-num { font-size:2rem; font-weight:800; color:var(--text); line-height:1; }
+    .stat-lbl { margin-top:6px; font-size:0.72rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
+    .stat-card.accent .stat-num { color:var(--gold); }
+
+    .card { background:var(--card-bg); border:1px solid var(--border); border-radius:16px; padding:8px 16px; }
+    .row { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); }
+    .row:last-child { border-bottom:none; }
+    .row-main { display:flex; flex-direction:column; gap:3px; min-width:0; }
+    .row-title { font-weight:700; font-size:0.95rem; }
+    .row-sub { font-size:0.75rem; color:var(--muted); }
+    .row-val { font-weight:800; font-size:0.95rem; color:var(--gold); text-align:right; flex-shrink:0; }
+    .row-val small { display:block; font-size:0.68rem; color:var(--muted); font-weight:600; }
+
+    .bar-track { height:6px; background:rgba(255,255,255,0.06); border-radius:4px; overflow:hidden; margin-top:6px; }
+    .bar-fill { height:100%; background:var(--purple); border-radius:4px; }
+
+    .pay-split { display:flex; gap:12px; }
+    .pay-split .stat-card { flex:1; }
+    .pay-split .card-num { color:var(--blue); }
+    .pay-split .cash-num { color:var(--green); }
+
+    .empty { text-align:center; color:var(--muted); padding:40px 20px; font-size:0.9rem; }
+    .muted-note { color:var(--muted); font-size:0.72rem; text-align:center; margin-top:18px; }
+  </style>
+</head>
+<body>
+
+  <div id="authGuard">
+    <div class="spinner"></div>
+    <p id="authMsg">Verifying...</p>
+    <button id="loginBtn" class="login-btn" onclick="window.doLogin()">Sign in with Google</button>
+  </div>
+
+  <div class="header">
+    <button class="back-btn" data-back-nav onclick="window.BackNav ? BackNav.go() : history.back()">&#8592; Back</button>
+    <h1>Shot Log</h1>
+    <div class="sub">Shot-Round Orders &amp; Trends</div>
+  </div>
+
+  <div class="main-content" id="content" style="display:none;">
+
+    <div class="section-label">Range</div>
+    <div class="range-row" id="range-row">
+      <button class="range-btn active" data-range="7">7 days</button>
+      <button class="range-btn" data-range="30">30 days</button>
+      <button class="range-btn" data-range="90">90 days</button>
+      <button class="range-btn" data-range="all">All</button>
+    </div>
+
+    <div class="section-label">Summary</div>
+    <div class="stat-grid">
+      <div class="stat-card accent"><div class="stat-num" id="s-rounds">0</div><div class="stat-lbl">Rounds ordered</div></div>
+      <div class="stat-card accent"><div class="stat-num" id="s-shots">0</div><div class="stat-lbl">Shots poured</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-people">0</div><div class="stat-lbl">People served</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-orderers">0</div><div class="stat-lbl">Different orderers</div></div>
+    </div>
+
+    <div class="section-label">Card vs Cash</div>
+    <div class="pay-split">
+      <div class="stat-card"><div class="stat-num card-num" id="s-card">0</div><div class="stat-lbl">On card</div></div>
+      <div class="stat-card"><div class="stat-num cash-num" id="s-cash">0</div><div class="stat-lbl">Cash</div></div>
+    </div>
+
+    <div class="section-label">By Night</div>
+    <div class="card" id="by-night"></div>
+
+    <div class="section-label">Popular Shots</div>
+    <div class="card" id="popular-shots"></div>
+
+    <div class="section-label">Top Orderers</div>
+    <div class="card" id="top-orderers"></div>
+
+    <div class="muted-note" id="cap-note"></div>
+
+  </div>
+
+  <script type="module">
+    // NOTE: import the SAME firebase-api URL (?v=6) as admin-auth.js so both
+    // resolve to ONE module instance (a second URL re-runs initializeApp →
+    // "Firebase App already exists").
+    import { db, collection, getDocs, query, orderBy, limit } from '../firebase-api.js?v=6';
+    import { requireAdmin, triggerLogin } from './admin-auth.js';
+
+    const READ_CAP = 2000;
+    let allRounds = [];   // normalized rounds (newest first)
+    let activeRange = 7;
+
+    window.doLogin = triggerLogin;
+
+    async function init() {
+      const session = await requireAdmin();
+      if (!session) return;
+      document.getElementById('content').style.display = 'block';
+      bindRange();
+      await loadRounds();
+      render();
+    }
+
+    async function loadRounds() {
+      try {
+        const snap = await getDocs(query(collection(db, 'shotRounds'), orderBy('timestamp', 'desc'), limit(READ_CAP)));
+        // Skip in-progress 'draft' cards (and any abandoned ones) — only count
+        // orders that were actually sent to the bar.
+        allRounds = snap.docs
+          .filter(d => (d.data().status || 'pending') !== 'draft')
+          .map(d => normalize(d.data()));
+      } catch (e) {
+        console.error('Shot log load failed:', e);
+        allRounds = [];
+      }
+    }
+
+    function normalize(d) {
+      const ts = d.timestamp && d.timestamp.toDate ? d.timestamp.toDate() : null;
+      const players = Array.isArray(d.players) ? d.players : [];
+      // Totals derived from players — the source of truth. The stored `total`
+      // map was deep-merged on write and can carry phantom keys, so we ignore it.
+      const total = {};
+      players.forEach(p => (p.shots || []).forEach(s => {
+        const type = String(s.type || '').trim();
+        if (!type) return;
+        total[type] = (total[type] || 0) + (Number(s.qty) || 0);
+      }));
+      const shotCount = Object.values(total).reduce((a, n) => a + n, 0);
+      // Attribute each player's full shot quantity to their payment method, so
+      // the Card/Cash split is in SHOTS (reconciles with "Shots poured") rather
+      // than a head-count. Payment is stored per-player, not per-shot.
+      let card = 0, cash = 0;
+      players.forEach(p => {
+        const q = (p.shots || []).reduce((a, s) => a + (Number(s.qty) || 0), 0);
+        if (p.payment === 'cash') cash += q; else card += q;
+      });
+      return {
+        date: d.sessionDate || (ts ? ts.toLocaleDateString() : ''),
+        ts,
+        venue: d.venue || '',
+        gameLabel: d.gameLabel || '',
+        submitter: (d.submitter && d.submitter.name) || 'Unknown',
+        players,
+        shotCount,
+        total,
+        card, cash
+      };
+    }
+
+    function bindRange() {
+      document.querySelectorAll('.range-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          activeRange = btn.dataset.range === 'all' ? 'all' : Number(btn.dataset.range);
+          render();
+        });
+      });
+    }
+
+    function inRange(r) {
+      if (activeRange === 'all') return true;
+      if (!r.ts) return false;
+      const cutoff = new Date();
+      cutoff.setHours(0, 0, 0, 0);
+      cutoff.setDate(cutoff.getDate() - (activeRange - 1));
+      return r.ts >= cutoff;
+    }
+
+    function render() {
+      const rounds = allRounds.filter(inRange);
+
+      // Totals
+      let shots = 0, card = 0, cash = 0;
+      const people = new Set(), orderers = new Set();
+      const byNight = new Map();     // date -> {rounds, shots, people:Set, venues:Set, ts}
+      const byType = new Map();      // type -> qty
+      const byOrderer = new Map();   // name -> rounds
+
+      rounds.forEach(r => {
+        shots += r.shotCount; card += r.card; cash += r.cash;
+        r.players.forEach(p => { if (p && p.name) people.add(p.name); });
+        if (r.submitter) { orderers.add(r.submitter); byOrderer.set(r.submitter, (byOrderer.get(r.submitter) || 0) + 1); }
+
+        const key = r.date || '—';
+        if (!byNight.has(key)) byNight.set(key, { rounds: 0, shots: 0, people: new Set(), venues: new Set(), ts: r.ts });
+        const n = byNight.get(key);
+        n.rounds++; n.shots += r.shotCount;
+        r.players.forEach(p => { if (p && p.name) n.people.add(p.name); });
+        if (r.venue) n.venues.add(r.venue);
+        if (r.ts && (!n.ts || r.ts > n.ts)) n.ts = r.ts;
+
+        Object.entries(r.total).forEach(([type, qty]) => byType.set(type, (byType.get(type) || 0) + (Number(qty) || 0)));
+      });
+
+      setNum('s-rounds', rounds.length);
+      setNum('s-shots', shots);
+      setNum('s-people', people.size);
+      setNum('s-orderers', orderers.size);
+      setNum('s-card', card);
+      setNum('s-cash', cash);
+
+      renderByNight(byNight);
+      renderRanked('popular-shots', byType, 'shot', shots);
+      renderTopOrderers(byOrderer);
+
+      const note = document.getElementById('cap-note');
+      note.textContent = allRounds.length >= READ_CAP
+        ? `Showing the most recent ${READ_CAP} rounds.`
+        : `${allRounds.length} total rounds logged.`;
+    }
+
+    function setNum(id, n) { document.getElementById(id).textContent = n.toLocaleString(); }
+
+    function renderByNight(byNight) {
+      const box = document.getElementById('by-night');
+      const nights = [...byNight.entries()].sort((a, b) => {
+        const ta = a[1].ts ? a[1].ts.getTime() : 0;
+        const tb = b[1].ts ? b[1].ts.getTime() : 0;
+        return tb - ta;
+      });
+      if (!nights.length) { box.innerHTML = '<div class="empty">No shot rounds in this range.</div>'; return; }
+      box.innerHTML = '';
+      nights.forEach(([date, n]) => {
+        const row = document.createElement('div');
+        row.className = 'row';
+        const venues = [...n.venues].join(', ');
+        row.innerHTML =
+          `<div class="row-main">
+             <div class="row-title">${esc(date)}</div>
+             <div class="row-sub">${esc(venues || '—')} · ${n.people.size} ${n.people.size === 1 ? 'person' : 'people'}</div>
+           </div>
+           <div class="row-val">${n.rounds} <small>rounds</small></div>
+           <div class="row-val">${n.shots} <small>shots</small></div>`;
+        box.appendChild(row);
+      });
+    }
+
+    function renderRanked(id, map, unit, grandTotal) {
+      const box = document.getElementById(id);
+      const items = [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12);
+      if (!items.length) { box.innerHTML = '<div class="empty">No data in this range.</div>'; return; }
+      const max = items[0][1] || 1;
+      box.innerHTML = '';
+      items.forEach(([name, qty]) => {
+        const row = document.createElement('div');
+        row.className = 'row';
+        const pct = Math.round((qty / max) * 100);
+        const share = grandTotal ? ` · ${Math.round((qty / grandTotal) * 100)}%` : '';
+        row.innerHTML =
+          `<div class="row-main" style="flex:1">
+             <div class="row-title">${esc(name)}</div>
+             <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+           </div>
+           <div class="row-val">${qty}<small>${esc(unit)}s${share}</small></div>`;
+        box.appendChild(row);
+      });
+    }
+
+    function renderTopOrderers(map) {
+      const box = document.getElementById('top-orderers');
+      const items = [...map.entries()].sort((a, b) => b[1] - a[1]).slice(0, 12);
+      if (!items.length) { box.innerHTML = '<div class="empty">No data in this range.</div>'; return; }
+      box.innerHTML = '';
+      items.forEach(([name, rounds]) => {
+        const row = document.createElement('div');
+        row.className = 'row';
+        row.innerHTML =
+          `<div class="row-main"><div class="row-title">${esc(name)}</div></div>
+           <div class="row-val">${rounds} <small>${rounds === 1 ? 'round' : 'rounds'}</small></div>`;
+        box.appendChild(row);
+      });
+    }
+
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    }
+
+    init();
+  </script>
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="/clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/admin/"></script>
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Player Hub — Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/img/favicon-admin.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#050508; --card-bg:rgba(20,20,25,0.7); --border:rgba(255,255,255,0.08); --gold:#d4af37; --green:#10b981; --red:#ef4444; --blue:#3b82f6; --text:#f8fafc; --muted:#94a3b8; }
+    * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+    body { background:var(--bg); color:var(--text); font-family:'Inter',-apple-system,sans-serif; min-height:100vh; display:flex; flex-direction:column; overflow-x:hidden; }
+    #authGuard { position:fixed; inset:0; background:var(--bg); z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:16px; }
+    .spinner { width:40px; height:40px; border:3px solid rgba(255,255,255,0.1); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    #authMsg { color:var(--gold); font-weight:700; font-size:0.9rem; letter-spacing:1px; text-transform:uppercase; }
+    .header { padding:44px 20px 20px; text-align:center; position:relative; }
+    .back-btn { position:absolute; left:16px; top:48px; background:var(--card-bg); border:1px solid var(--border); color:var(--gold); padding:8px 16px; border-radius:10px; cursor:pointer; font-size:0.85rem; font-weight:700; font-family:inherit; }
+    .back-btn:active { transform:scale(0.96); }
+    h1 { font-weight:800; font-size:1.6rem; text-transform:uppercase; letter-spacing:2px; background:linear-gradient(to bottom,#fff 30%,#888); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .sub { margin-top:4px; color:var(--green); font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:3px; }
+    .main-content { padding:0 20px 80px; flex:1; max-width:600px; margin:0 auto; width:100%; }
+    .section-label { font-size:0.72rem; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:2px; margin:24px 0 12px 2px; display:flex; align-items:center; gap:10px; }
+    .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+    .card { background:var(--card-bg); border:1px solid var(--border); border-radius:16px; padding:20px; margin-bottom:12px; }
+    .lbl { font-size:0.72rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+    .input { width:100%; background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:1rem; padding:12px 14px; outline:none; font-family:inherit; transition:border-color 0.2s; appearance:none; -webkit-appearance:none; }
+    .input:focus { border-color:var(--green); }
+    .btn { padding:12px 20px; border-radius:10px; border:none; font-size:0.9rem; font-weight:700; cursor:pointer; transition:all 0.2s; font-family:inherit; }
+    .btn:active { transform:scale(0.97); }
+    .btn-green { background:var(--green); color:#000; }
+    .btn-red   { background:var(--red); color:#fff; }
+    .btn-gold  { background:var(--gold); color:#000; }
+    .btn-full  { width:100%; margin-top:12px; }
+    .btn-sm    { padding:5px 12px; font-size:0.75rem; border-radius:7px; background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3); color:var(--blue); cursor:pointer; font-family:inherit; font-weight:700; white-space:nowrap; }
+
+
+    /* User list */
+    .user-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:12px; margin-bottom:8px; }
+    .user-info { flex:1; min-width:0; }
+    .user-name { font-weight:700; color:var(--gold); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .user-email { font-size:0.78rem; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .role-badge { font-size:0.68rem; font-weight:800; padding:3px 8px; border-radius:5px; white-space:nowrap; text-transform:uppercase; letter-spacing:1px; }
+    .role-admin  { background:rgba(239,68,68,0.2);  color:var(--red); }
+    .role-staff  { background:rgba(16,185,129,0.2); color:var(--green); }
+    .role-player { background:rgba(148,163,184,0.1); color:var(--muted); }
+
+    /* Edit modal */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); z-index:1000; display:none; justify-content:center; align-items:flex-end; padding:20px; }
+    .modal-content { background:#111; border:1px solid var(--border); border-radius:24px 24px 16px 16px; width:100%; max-width:460px; padding:28px 22px; position:relative; animation:slideUp 0.3s cubic-bezier(0.16,1,0.3,1); }
+    @keyframes slideUp { from { transform:translateY(100%); } to { transform:translateY(0); } }
+    .modal-title { font-size:1.1rem; font-weight:800; color:var(--text); margin-bottom:20px; text-transform:uppercase; letter-spacing:1px; }
+    .modal-close { position:absolute; top:18px; right:18px; background:rgba(255,255,255,0.05); border:none; color:var(--muted); width:30px; height:30px; border-radius:50%; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
+    .toggle-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border); }
+    .toggle-row:last-of-type { border-bottom:none; }
+    .toggle-lbl { font-size:0.88rem; font-weight:600; }
+    .toggle { width:42px; height:24px; background:rgba(255,255,255,0.1); border-radius:12px; position:relative; cursor:pointer; border:none; transition:background 0.2s; flex-shrink:0; }
+    .toggle.on { background:var(--green); }
+    .toggle::after { content:''; position:absolute; width:18px; height:18px; background:#fff; border-radius:50%; top:3px; left:3px; transition:transform 0.2s; }
+    .toggle.on::after { transform:translateX(18px); }
+
+    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); padding:10px 22px; border-radius:10px; font-weight:700; font-size:0.9rem; z-index:2000; display:none; white-space:nowrap; }
+    .toast.success { background:var(--green); color:#000; }
+    .toast.error   { background:var(--red);   color:#fff; }
+    @media (max-width:480px) { .input { font-size:16px; } }
+  </style>
+</head>
+<body>
+
+  <div id="authGuard">
+    <div class="spinner"></div>
+    <p id="authMsg">Verifying…</p>
+    <button id="loginBtn" onclick="triggerLogin()" style="display:none;background:var(--gold);color:#000;border:none;border-radius:8px;padding:11px 28px;font-size:0.95rem;font-weight:700;cursor:pointer;">Sign in with Google</button>
+  </div>
+
+  <div class="header">
+    <button class="back-btn" data-back-nav onclick="window.BackNav ? BackNav.go() : history.back()">&#8592; Back</button>
+    <h1>Player Hub</h1>
+    <div class="sub">Roles &amp; Identity</div>
+  </div>
+
+  <div class="main-content">
+
+    <!-- Secure content (hidden until admin auth verifies) -->
+    <div id="secureContent" style="display:none;">
+
+      <div class="section-label">User Profiles</div>
+      <input id="userSearch" type="text" class="input" placeholder="Search by name or email…" oninput="filterUsers()" style="margin-bottom:14px;">
+      <div id="userList"><div style="color:var(--muted)">Loading…</div></div>
+
+      <div class="section-label">Merge Duplicate Players</div>
+      <div class="card">
+        <div class="lbl">Keep (canonical name)</div>
+        <input id="mergeMaster" type="text" class="input" placeholder="Correct name" style="margin-bottom:12px;">
+        <div class="lbl">Remove (duplicate)</div>
+        <input id="mergeDupe" type="text" class="input" placeholder="Duplicate name" style="margin-bottom:12px;">
+        <button class="btn btn-red btn-full" onclick="executeMerge()" style="margin-top:4px;">Merge &amp; Delete Duplicate</button>
+      </div>
+
+      <div class="section-label">Player Aliases</div>
+      <div class="card">
+        <div style="color:var(--muted);font-size:0.8rem;margin-bottom:12px;">
+          Let one person be found by multiple names in check-in/RSVP search
+          (e.g. <strong>JW</strong> and <strong>Jordy</strong> both find
+          <strong>Jordan Wexmoor</strong>). The canonical name is unchanged.
+        </div>
+        <div class="lbl">Player (canonical name)</div>
+        <input id="aliasPlayer" type="text" class="input" placeholder="e.g. Jordan Wexmoor" style="margin-bottom:12px;">
+        <div class="lbl">Aliases (comma-separated)</div>
+        <input id="aliasList" type="text" class="input" placeholder="e.g. JW, Jordy" style="margin-bottom:12px;">
+        <button class="btn btn-green btn-full" onclick="executeSetAliases()" style="margin-top:4px;">Save Aliases</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Edit User Modal -->
+  <div class="modal-overlay" id="editModal" onclick="if(event.target===this)closeEdit()">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeEdit()">&#10005;</button>
+      <div class="modal-title" id="editTitle">Edit User</div>
+
+      <div class="lbl" style="margin-bottom:8px;">Role</div>
+      <select id="editRole" class="input" style="margin-bottom:20px;">
+        <option value="player">Player</option>
+        <option value="staff">Staff</option>
+        <option value="admin">Admin</option>
+      </select>
+
+      <div class="lbl" style="margin-bottom:4px;">Notification Preferences</div>
+      <div class="toggle-row">
+        <span class="toggle-lbl">Newsletter</span>
+        <button class="toggle" id="togNews" onclick="togglePref(this)"></button>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-lbl">Game Reminders</span>
+        <button class="toggle" id="togRem" onclick="togglePref(this)"></button>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-lbl">Announcements</span>
+        <button class="toggle" id="togAnn" onclick="togglePref(this)"></button>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-lbl">Push Notifications</span>
+        <button class="toggle" id="togPush" onclick="togglePref(this)"></button>
+      </div>
+
+      <button class="btn btn-green btn-full" onclick="saveUser()">Save Changes</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { db, functions } from '../firebase-api.js?v=6';
+    import { requireAdmin, triggerLogin } from './admin-auth.js';
+    import { collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { httpsCallable } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js";
+
+    let allUsers = [];
+    let editingId = null;
+
+    function toast(msg, type='success') {
+      const el = document.getElementById('toast');
+      el.textContent = msg; el.className = 'toast ' + type; el.style.display = 'block';
+      clearTimeout(el._t); el._t = setTimeout(() => el.style.display = 'none', 2800);
+    }
+    function esc(s) { const d = document.createElement('div'); d.textContent = String(s); return d.innerHTML; }
+
+    async function loadUsers() {
+      try {
+        const snap = await getDocs(collection(db, 'userProfiles'));
+        allUsers = [];
+        snap.forEach(d => allUsers.push({ id: d.id, ...d.data() }));
+        allUsers.sort((a,b) => (a.linkedName||a.email||'').localeCompare(b.linkedName||b.email||''));
+        renderUsers();
+      } catch(e) { toast('Load error: ' + e.message, 'error'); }
+    }
+
+    function renderUsers(filter = '') {
+      const term = filter.toLowerCase();
+      const list = document.getElementById('userList');
+      const filtered = allUsers.filter(u =>
+        !term ||
+        (u.linkedName||'').toLowerCase().includes(term) ||
+        (u.email||'').toLowerCase().includes(term)
+      );
+      if (!filtered.length) { list.innerHTML = '<div style="color:var(--muted)">No users found.</div>'; return; }
+
+      list.innerHTML = filtered.map(u => {
+        const name  = u.linkedName || 'Unlinked Profile';
+        const email = u.email || 'No email';
+        let badge, cls;
+        if (u.role === 'admin' || u.isAdmin)       { badge = 'Admin';  cls = 'role-admin'; }
+        else if (u.role === 'staff' || u.isStaff)  { badge = 'Staff';  cls = 'role-staff'; }
+        else                                        { badge = 'Player'; cls = 'role-player'; }
+        return `<div class="user-row">
+          <div class="user-info">
+            <div class="user-name">${esc(name)}</div>
+            <div class="user-email">${esc(email)}</div>
+          </div>
+          <span class="role-badge ${cls}">${badge}</span>
+          <button class="btn-sm" onclick="openEdit('${u.id}')">Edit</button>
+        </div>`;
+      }).join('');
+    }
+
+    window.filterUsers = function() {
+      renderUsers(document.getElementById('userSearch').value);
+    };
+
+    window.openEdit = function(id) {
+      const u = allUsers.find(x => x.id === id);
+      if (!u) return;
+      editingId = id;
+      document.getElementById('editTitle').textContent = 'Edit: ' + (u.linkedName || u.email || 'User');
+      document.getElementById('editRole').value = ['admin','staff'].includes(u.role) ? u.role : (u.isAdmin ? 'admin' : (u.isStaff ? 'staff' : 'player'));
+      setToggle('togNews',  u.preferences?.newsletter    || false);
+      setToggle('togRem',   u.preferences?.reminders     || false);
+      setToggle('togAnn',   u.preferences?.announcements || false);
+      setToggle('togPush',  u.preferences?.push          || false);
+      document.getElementById('editModal').style.display = 'flex';
+    };
+
+    window.closeEdit = function() {
+      document.getElementById('editModal').style.display = 'none';
+      editingId = null;
+    };
+
+    function setToggle(id, val) {
+      const el = document.getElementById(id);
+      el.classList.toggle('on', val);
+      el.dataset.val = val ? '1' : '0';
+    }
+
+    window.togglePref = function(el) {
+      const on = el.dataset.val !== '1';
+      el.classList.toggle('on', on);
+      el.dataset.val = on ? '1' : '0';
+    };
+
+    window.saveUser = async function() {
+      if (!editingId) return;
+      const role    = document.getElementById('editRole').value;
+      const prefs   = {
+        newsletter:    document.getElementById('togNews').dataset.val === '1',
+        reminders:     document.getElementById('togRem').dataset.val  === '1',
+        announcements: document.getElementById('togAnn').dataset.val  === '1',
+        push:          document.getElementById('togPush').dataset.val === '1',
+      };
+      try {
+        await updateDoc(doc(db, 'userProfiles', editingId), {
+          role, isAdmin: role === 'admin', isStaff: role === 'admin' || role === 'staff', preferences: prefs
+        });
+        const u = allUsers.find(x => x.id === editingId);
+        if (u) { u.role = role; u.isAdmin = role==='admin'; u.isStaff = role==='admin'||role==='staff'; u.preferences = prefs; }
+        closeEdit();
+        renderUsers(document.getElementById('userSearch').value);
+        toast('User updated');
+      } catch(e) { toast(e.message, 'error'); }
+    };
+
+    window.executeMerge = async function() {
+      const master = document.getElementById('mergeMaster').value.trim();
+      const dupe   = document.getElementById('mergeDupe').value.trim();
+      if (!master || !dupe) return toast('Both names required', 'error');
+      if (!confirm(`Merge "${dupe}" into "${master}"? This cannot be undone.`)) return;
+      try {
+        const fn  = httpsCallable(functions, 'mergePlayers');
+        const res = await fn({ canonicalName: master, duplicateIds: [dupe] });
+        toast(res.data.message || 'Merge complete');
+        document.getElementById('mergeMaster').value = '';
+        document.getElementById('mergeDupe').value   = '';
+      } catch(e) { toast(e.message, 'error'); }
+    };
+
+    window.executeSetAliases = async function() {
+      const name = document.getElementById('aliasPlayer').value.trim();
+      const aliases = document.getElementById('aliasList').value
+        .split(',').map(s => s.trim()).filter(Boolean);
+      if (!name) return toast('Player name required', 'error');
+      try {
+        const fn  = httpsCallable(functions, 'setPlayerAliases');
+        const res = await fn({ name, aliases });
+        toast(`Saved ${res.data.aliases.length} alias(es) for ${res.data.name}`);
+      } catch(e) { toast(e.message, 'error'); }
+    };
+
+    window.triggerLogin = triggerLogin;
+
+    async function init() {
+      const session = await requireAdmin();
+      if (!session) return;
+      document.getElementById('secureContent').style.display = 'block';
+      loadUsers();
+    }
+
+    init();
+  </script>
+
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="/clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/admin/"></script>
+</body>
+</html>

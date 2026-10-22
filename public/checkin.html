@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Check-In Kiosk</title>
+<style>
+  :root {
+    --line: #243041;
+    --text: #ecf2fb;
+    --muted: #8d9bb0;
+    --gold: #d8b15a;
+    --gold-soft: rgba(216,177,90,0.18);
+    --green: #57e39b;
+    --green-soft: rgba(87,227,155,0.16);
+    --red: #ff6c76;
+    --shadow: 0 20px 50px rgba(0,0,0,0.3);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+  html { height: 100%; }
+  body {
+    height: 100vh; overflow: hidden;
+    background: radial-gradient(circle at top left,rgba(87,227,155,0.08),transparent 30%),
+                radial-gradient(circle at top right,rgba(216,177,90,0.12),transparent 28%),
+                linear-gradient(180deg,#09111a 0%,#06090f 100%);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .app-shell { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+/* HEADER */
+  .header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 16px 8px; flex-shrink: 0;
+  }
+  .brand-title { color: var(--gold); font-size: 1.15rem; font-weight: 800; letter-spacing: 0.18em; white-space: nowrap; }
+  .today-event {
+    flex: 1; padding: 8px 12px; border-radius: 12px;
+    border: 1px solid rgba(216,177,90,0.22);
+    background: linear-gradient(180deg,rgba(18,25,37,0.98),rgba(13,19,28,0.98));
+  }
+  .today-event-label { color: var(--muted); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.12em; }
+  .today-event-value { color: var(--text); font-size: 0.9rem; font-weight: 800; }
+  /* Finger-sized: this lives on a tablet staff tap with their hands, so it gets
+     a real 36px target rather than the 11px text link it started as. */
+  .event-change-btn {
+    margin-top: 5px; min-height: 36px; padding: 8px 14px;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.16);
+    border-radius: 8px; color: var(--muted); font-size: 0.66rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer;
+  }
+  .event-change-btn:hover { color: var(--gold); border-color: rgba(216,177,90,0.6); }
+  /* Loud on purpose: a kiosk pinned to the wrong night must never look normal. */
+  .event-pinned-badge {
+    display: none; margin-left: 6px; padding: 1px 6px; border-radius: 5px;
+    background: rgba(255,170,40,0.15); border: 1px solid rgba(255,170,40,0.55);
+    color: #ffbb44; font-size: 0.55rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.08em; vertical-align: middle;
+  }
+  .event-pinned-badge.show { display: inline-block; }
+  .event-picker-list { max-height: 46vh; overflow-y: auto; margin: 10px 0; display: flex; flex-direction: column; gap: 6px; }
+  .event-pick-row {
+    padding: 10px 12px; border-radius: 9px; cursor: pointer; text-align: left;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
+    color: var(--text); font-size: 0.85rem; font-weight: 700;
+  }
+  .event-pick-row:hover { border-color: rgba(216,177,90,0.6); }
+  .event-pick-row.is-today { border-color: rgba(90,200,140,0.6); background: rgba(90,200,140,0.09); }
+  .event-pick-row.is-active { border-color: rgba(216,177,90,0.9); background: rgba(216,177,90,0.13); }
+  .event-pick-sub { display: block; margin-top: 2px; color: var(--muted); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.02em; }
+  .mode-badge {
+    padding: 8px 14px; border-radius: 10px; border: 1px solid var(--line);
+    background: rgba(12,17,25,0.92); color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.14em; font-size: 0.66rem; font-weight: 800; white-space: nowrap;
+  }
+  .mode-badge.champ { color: #ffe4a2; background: linear-gradient(135deg,rgba(78,59,21,0.85),rgba(31,24,10,0.9)); border-color: rgba(216,177,90,0.42); }
+  .mode-badge.bigstack { color: #a0c8ff; background: linear-gradient(135deg,rgba(21,40,78,0.85),rgba(10,20,40,0.9)); border-color: rgba(100,160,255,0.42); }
+
+  /* STATUS STRIP */
+  .status-strip { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 10px; padding: 0 16px 8px; flex-shrink: 0; }
+  .status-card {
+    background: linear-gradient(180deg,rgba(19,28,39,0.95),rgba(13,19,28,0.95));
+    border: 1px solid var(--line); border-radius: 14px; padding: 9px 11px; box-shadow: var(--shadow);
+  }
+  .status-card.live { border-color: rgba(87,227,155,0.4); background: linear-gradient(180deg,rgba(20,42,34,0.9),rgba(11,24,20,0.94)); }
+  .status-card.live .status-main { color: var(--green); }
+  .status-card.live-gold { border-color: rgba(216,177,90,0.4); background: linear-gradient(180deg,rgba(42,34,14,0.9),rgba(24,20,9,0.94)); }
+  .status-card.live-gold .status-main { color: var(--gold); }
+  .status-card.locked { opacity: 0.55; }
+  .status-card.locked .status-main { color: var(--muted); }
+  .status-label { color: var(--muted); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 3px; }
+  .status-main { font-size: 0.95rem; font-weight: 800; line-height: 1.2; }
+  .status-note { margin-top: 2px; color: var(--muted); font-size: 0.72rem; }
+
+  /* MAIN LAYOUT */
+  .main {
+    flex: 1; min-height: 0; display: grid;
+    grid-template-columns: minmax(0,2.2fr) minmax(230px,0.7fr);
+    gap: 10px; padding: 0 16px 14px;
+  }
+
+  /* LEFT PANEL */
+  .left-panel {
+    display: flex; flex-direction: column; overflow: hidden;
+    background: linear-gradient(180deg,rgba(16,23,34,0.96),rgba(10,15,23,0.96));
+    border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow);
+  }
+  .search-row {
+    padding: 10px 10px 8px; border-bottom: 1px solid rgba(255,255,255,0.06);
+    background: rgba(6,10,15,0.2); flex-shrink: 0; display: flex; gap: 8px; align-items: center;
+  }
+  .search-field-wrap {
+    flex: 1; padding: 4px;
+    border-radius: 16px;
+    background: linear-gradient(135deg,rgba(216,177,90,0.35),rgba(87,227,155,0.18));
+    box-shadow: 0 0 22px rgba(216,177,90,0.12);
+  }
+  .search-input {
+    width: 100%; padding: 14px 16px; border-radius: 12px;
+    border: 2px solid rgba(216,177,90,0.7);
+    background: rgba(8,12,19,0.98); color: var(--text);
+    font-size: 1.35rem; font-weight: 700;
+  }
+  .search-input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(216,177,90,0.14); }
+  .search-input::placeholder { color: #607080; }
+  .new-player-btn {
+    padding: 10px 12px; white-space: nowrap; flex-shrink: 0;
+    background: transparent; border: 2px dashed rgba(87,227,155,0.45); color: var(--green);
+    border-radius: 12px; font-size: 0.75rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer;
+  }
+
+  .grid-area { flex: 1; min-height: 0; display: grid; grid-template-columns: 36px minmax(0,1fr); }
+  .alpha-bar {
+    overflow-y: auto; border-right: 1px solid rgba(255,255,255,0.05);
+    padding: 6px 3px; display: flex; flex-direction: column; gap: 3px; align-items: center;
+  }
+  .alpha-bar::-webkit-scrollbar { display: none; }
+  .alpha-btn { width: 26px; height: 22px; border: none; background: transparent; border-radius: 6px; color: #60748a; font-size: 0.7rem; font-weight: 800; cursor: pointer; }
+  .alpha-btn.active { background: var(--gold); color: #101722; }
+  .alpha-btn.clear { color: var(--gold); font-size: 0.75rem; }
+
+  .player-grid {
+    overflow-y: auto; padding: 8px;
+    display: grid; gap: 7px; align-content: start;
+  }
+  .player-grid::-webkit-scrollbar { width: 5px; }
+  .player-grid::-webkit-scrollbar-thumb { background: #2c394d; border-radius: 999px; }
+
+  /* Grid column modes */
+  .player-grid.cols-4 { grid-template-columns: repeat(4,minmax(0,1fr)); }
+  .player-grid.cols-3 { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .player-grid.cols-2 { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .player-grid.cols-1 { grid-template-columns: 1fr; }
+
+  /* Tile sizing per mode */
+  .p-tile {
+    background: linear-gradient(180deg,#162131,#121b28);
+    border: 1px solid #29384d; border-radius: 13px;
+    display: flex; align-items: center;
+    cursor: pointer; transition: transform 0.08s ease, border-color 0.12s; user-select: none;
+  }
+  .p-tile:active { transform: scale(0.97); }
+  .p-tile.checked { border-color: rgba(87,227,155,0.35); background: linear-gradient(180deg,rgba(23,51,40,0.92),rgba(14,30,24,0.95)); }
+  .p-tile.paused { border-color: rgba(216,177,90,0.3); opacity: 0.6; cursor: default; }
+  .p-tile-inner { width: 100%; display: flex; flex-direction: column; gap: 2px; }
+  .p-name { color: var(--text); font-weight: 700; line-height: 1.18; }
+  .p-check { font-weight: 700; letter-spacing: 0.02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .p-tile.checked .p-check { color: var(--green); }
+  .p-tile.paused .p-check { color: var(--gold); }
+  .p-check:not(.p-tile.checked .p-check):not(.p-tile.paused .p-check) { color: var(--muted); }
+
+  /* Small (cols-4 or cols-3) */
+  .cols-4 .p-tile, .cols-3 .p-tile { padding: 10px 9px; min-height: 58px; }
+  .cols-4 .p-name, .cols-3 .p-name { font-size: 0.88rem; }
+  .cols-4 .p-check, .cols-3 .p-check { font-size: 0.62rem; }
+
+  /* Medium (cols-2) */
+  .cols-2 .p-tile { padding: 14px 14px; min-height: 76px; border-radius: 15px; }
+  .cols-2 .p-name { font-size: 1.12rem; }
+  .cols-2 .p-check { font-size: 0.74rem; }
+
+  /* Large (cols-1) */
+  .cols-1 .p-tile { padding: 20px 18px; min-height: 88px; border-radius: 16px; border-width: 2px; }
+  .cols-1 .p-name { font-size: 1.4rem; }
+  .cols-1 .p-check { font-size: 0.85rem; white-space: normal; }
+
+  /* RIGHT PANEL */
+  .right-panel {
+    display: flex; flex-direction: column; overflow: hidden;
+    background: linear-gradient(180deg,rgba(16,23,34,0.96),rgba(10,15,23,0.96));
+    border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow);
+  }
+  .bucket-tabs { display: grid; grid-template-columns: repeat(2,1fr); gap: 6px; padding: 10px 10px 6px; flex-shrink: 0; }
+  .bucket-tab {
+    border: 1px solid var(--line); background: rgba(10,15,23,0.82); color: var(--muted);
+    padding: 9px 6px; border-radius: 11px; font-size: 0.66rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer; text-align: center;
+  }
+  .bucket-tab.active { color: var(--gold); border-color: rgba(216,177,90,0.42); background: rgba(216,177,90,0.1); }
+  .bucket-list {
+    flex: 1; min-height: 0; overflow-y: auto; padding: 4px 10px 10px;
+    display: flex; flex-wrap: wrap; gap: 5px; align-content: flex-start;
+  }
+  .bucket-list::-webkit-scrollbar { width: 4px; }
+  .bucket-list::-webkit-scrollbar-thumb { background: #2c394d; border-radius: 999px; }
+  .tag {
+    border-radius: 999px; border: 1px solid #2b3850; background: rgba(18,27,40,0.95);
+    color: var(--text); padding: 5px 9px; font-size: 0.7rem; font-weight: 700; cursor: pointer;
+  }
+  .tag.tag-new { border-color: rgba(87,227,155,0.45); color: var(--green); background: var(--green-soft); }
+  .bucket-empty { color: #506070; font-size: 0.85rem; font-style: italic; padding: 8px 2px; }
+
+  /* OVERLAYS */
+  .overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(2,4,8,0.82); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+  }
+  .overlay.show { display: flex; }
+  .modal {
+    width: min(480px,100%);
+    background: linear-gradient(180deg,#162131,#101722);
+    border: 1px solid #314258; border-radius: 22px; padding: 22px; box-shadow: var(--shadow);
+  }
+  .modal.game-modal { border-color: rgba(216,177,90,0.45); }
+  .modal.remove-modal { border-color: rgba(255,108,118,0.45); }
+  .modal.new-modal { border-color: rgba(87,227,155,0.45); }
+  .modal h3 { font-size: 1.3rem; margin-bottom: 5px; }
+  .modal .sub { color: var(--muted); font-size: 0.9rem; line-height: 1.45; margin-bottom: 16px; }
+  .modal input {
+    width: 100%; padding: 12px 13px; border-radius: 11px;
+    border: 1px solid #314258; background: rgba(8,12,19,0.96); color: var(--text); font-size: 1rem;
+  }
+  .modal input:focus { outline: none; border-color: var(--green); }
+  .modal input::placeholder { color: #506070; }
+  .name-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .email-wrap { margin-bottom: 10px; }
+  .match-warn {
+    display: none; color: #ffcb78; border: 1px solid rgba(255,203,120,0.4);
+    background: rgba(255,203,120,0.08); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px;
+    font-size: 0.86rem; line-height: 1.45;
+  }
+  .match-warn span { display: block; padding-top: 3px; cursor: pointer; }
+  .sheet-note {
+    color: #ffe4a2; border: 1px solid rgba(216,177,90,0.35); background: rgba(216,177,90,0.08);
+    border-radius: 12px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.86rem; line-height: 1.4;
+  }
+  .modal-btns { display: flex; gap: 10px; }
+  .btn-cancel { flex:1; padding:13px; background:#2b3544; color:var(--text); border:none; border-radius:13px; font-size:0.96rem; font-weight:800; cursor:pointer; }
+  .btn-add { flex:1; padding:13px; background:var(--green); color:#082114; border:none; border-radius:13px; font-size:0.96rem; font-weight:800; cursor:pointer; }
+  .btn-add:disabled { opacity:0.4; cursor:not-allowed; }
+  .btn-remove { flex:1; padding:13px; background:var(--red); color:#fff; border:none; border-radius:13px; font-size:0.96rem; font-weight:800; cursor:pointer; }
+  .game-btns { display:flex; flex-direction:column; gap:9px; margin-bottom:14px; }
+  .game-btn {
+    width:100%; border-radius:16px; border:1px solid #384963; padding:14px 15px;
+    background:rgba(10,15,23,0.92); color:var(--text);
+    display:flex; justify-content:space-between; align-items:center; text-align:left; cursor:pointer;
+  }
+  .game-btn .gname { font-size:1rem; font-weight:800; display:block; }
+  .game-btn .gcopy { font-size:0.8rem; color:var(--muted); display:block; margin-top:2px; }
+  .game-btn.g-green { border-color:rgba(87,227,155,0.42); background:var(--green-soft); color:var(--green); }
+  .game-btn.g-green .gcopy { color:rgba(87,227,155,0.7); }
+  .game-btn.g-gold  { border-color:rgba(216,177,90,0.42); background:var(--gold-soft); color:#ffe4a2; }
+  .game-btn.g-gold .gcopy { color:rgba(216,177,90,0.7); }
+  .game-btn.g-blue  { border-color:rgba(100,160,255,0.42); background:rgba(100,160,255,0.1); color:#a0c8ff; }
+  .game-btn.g-blue .gcopy { color:rgba(100,160,255,0.7); }
+  .game-btn.g-both  { border-color:rgba(255,255,255,0.14); }
+
+  @media (max-width:900px) {
+    .status-strip { grid-template-columns:1fr 1fr 1fr; }
+    .main { grid-template-columns:minmax(0,1.6fr) minmax(210px,0.8fr); }
+    .player-grid.cols-4 { grid-template-columns:repeat(3,1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+<!-- HEADER -->
+  <div class="header">
+    <div class="brand-title"><span style="cursor:pointer" role="button" tabindex="0" aria-label="Open alternate kiosk skin" onclick="openSkinSwitcher()">♠</span> ALL-IN POKER</div>
+    <div class="today-event">
+      <div class="today-event-label">Tonight's Event</div>
+      <div class="today-event-value"><span id="todayEventValue">Loading today's event…</span><span class="event-pinned-badge" id="eventPinnedBadge">Manually set</span></div>
+      <button class="event-change-btn" id="eventChangeBtn" onclick="openEventPicker()">Change date</button>
+    </div>
+    <div class="mode-badge" id="modeBadge">Loading…</div>
+  </div>
+
+  <!-- STATUS STRIP -->
+  <div class="status-strip">
+    <div class="status-card live" id="windowCard">
+      <div class="status-label">Check-In Window</div>
+      <div class="status-main" id="windowMain">Game 1 check-in is open</div>
+      <div class="status-note" id="windowNote">Open until 7:45 PM</div>
+    </div>
+    <div class="status-card live" id="counter1Card">
+      <div class="status-label" id="counter1Label">Game 1</div>
+      <div class="status-main"><span id="c1seated">6</span> / <span id="c1total">18</span></div>
+      <div class="status-note" id="c1sub">3 on the way</div>
+    </div>
+    <div class="status-card locked" id="counter2Card">
+      <div class="status-label" id="counter2Label">Game 2</div>
+      <div class="status-main"><span id="c2seated">0</span> / <span id="c2total">0</span></div>
+      <div class="status-note" id="c2sub">Opens at 8:30 PM</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="left-panel">
+      <div class="search-row">
+        <div class="search-field-wrap">
+          <input class="search-input" id="searchInput" type="text" placeholder="Type your name to find yourself…" oninput="filterGrid(this.value)" autocomplete="off">
+        </div>
+        <button class="new-player-btn" onclick="openNewPlayer()">+ New Player</button>
+      </div>
+      <div class="grid-area">
+        <div class="alpha-bar" id="alphaBar"></div>
+        <div class="player-grid cols-4" id="playerGrid"></div>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="bucket-tabs">
+        <button class="bucket-tab active" id="tab1" onclick="setBucketTab(1)">Game 1</button>
+        <button class="bucket-tab" id="tab2" onclick="setBucketTab(2)">Game 2</button>
+      </div>
+      <div class="bucket-list" id="bucketList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CHOICE MODAL (Championship / Big Stack overlap window) -->
+<div class="overlay" id="skinOverlay">
+<div class="modal remove-modal">
+<h3>Switch Kiosk Skin?</h3>
+<p class="sub">Open the legacy check-in layout for emergency fallback.</p>
+<div class="modal-btns">
+<button class="btn-cancel" onclick="closeSkinSwitcher()">Stay Here</button>
+<button class="btn-add" onclick="openLegacySkin()">Legacy Kiosk</button>
+</div>
+</div>
+</div>
+<div id="flashMessage" role="status" aria-live="polite" style="display:none;position:fixed;left:16px;right:16px;bottom:16px;z-index:100;color:#ecf2fb;background:rgba(10,16,24,.96);border:1px solid rgba(216,177,90,.5);border-radius:12px;padding:12px 14px;text-align:center;font-weight:700;box-shadow:0 12px 30px rgba(0,0,0,.35);"></div>
+<!-- EVENT PICKER — escape hatch when the kiosk lands on the wrong night -->
+<div class="overlay" id="eventPickerOverlay">
+  <div class="modal remove-modal">
+    <h3>Which Event?</h3>
+    <p class="sub">This picks tonight's event automatically. Only change it if the kiosk is showing the wrong date.</p>
+    <div class="event-picker-list" id="eventPickerList"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeEventPicker()">Cancel</button>
+      <button class="btn-add" onclick="resetEventToTonight()">Use Tonight's</button>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="choiceOverlay">
+  <div class="modal game-modal">
+    <h3 id="choiceName">Choose check-in</h3>
+    <p class="sub" id="choiceSub">Select which game(s) to register for.</p>
+    <div class="game-btns" id="choiceActions"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeChoiceModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- NEW PLAYER MODAL -->
+<div class="overlay" id="newPlayerOverlay">
+  <div class="modal new-modal">
+    <h3>New Player Registration</h3>
+    <p class="sub">Enter your first and last name to check in.</p>
+    <div class="name-fields">
+      <input type="text" id="newFirst" placeholder="First" oninput="validateNew()">
+      <input type="text" id="newLast" placeholder="Last" oninput="validateNew()">
+    </div>
+    <div class="email-wrap">
+      <input type="email" id="newEmail" placeholder="Email (optional — weekly announcements)">
+    </div>
+    <div class="match-warn" id="matchWarn">
+      <strong>Did you mean one of these?</strong>
+      <span id="matchList"></span>
+    </div>
+    <div class="sheet-note">Please also write your full name on the sign-in sheet at the table so staff can verify your record.</div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeNewPlayer()">Cancel</button>
+      <button class="btn-add" id="btnAdd" disabled onclick="confirmNew()">Check In</button>
+    </div>
+  </div>
+</div>
+
+<!-- REMOVE MODAL -->
+<div class="overlay" id="removeOverlay">
+  <div class="modal remove-modal">
+    <h3>Remove Check-In?</h3>
+    <p class="sub" id="removeText">Remove this player?</p>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeRemove()">Cancel</button>
+      <button class="btn-remove" onclick="confirmRemovePlayer()">Remove</button>
+    </div>
+  </div>
+</div>
+<script type="module">
+  import { PokerAPI, PlayerSearch } from './firebase-api.js?v=8';
+
+  const MODES = {
+    regular: { g1: 'Game 1', g2: 'Game 2', g1Color: 'green', g2Color: 'green' },
+    champ: { g1: 'Bounty', g2: 'Championship', g1Color: 'green', g2Color: 'gold' },
+    bigstack: { g1: 'Big Stack', g2: 'Consolation', g1Color: 'blue', g2Color: 'green' }
+  };
+  const BUCKET_RESET_MS = 25000;
+  const SYNC_INTERVAL_MS = 30000;
+
+  let masterList = [];
+  let playerDirectory = [];
+  let game1 = emptyGame();
+  let game2 = emptyGame();
+  let currentDate = '';
+  let currentLocation = '';
+  let currentTheme = '';
+  let currentEventType = 'Regular';
+  let eventMode = 'regular';
+  let scheduleLoadedDay = '';
+  // Every event staff can switch to (recent past + upcoming), and the one they
+  // pinned by hand. manualEventKey empty === follow the clock, which is the
+  // normal case; it only fills in when someone overrides via the picker.
+  let scheduleCache = [];
+  let manualEventKey = '';
+  let activeLetter = null;
+  let activeBucketTab = 1;
+  let searchVal = '';
+  let removeTarget = null;
+  let removeGame = null;
+  let choicePlayer = null;
+  let bucketResetTimer = null;
+  let flashTimer = null;
+
+  function emptyGame() {
+    return { checkedIn: [], rsvpList: [], checkedInCount: 0, rsvpPending: 0, total: 0 };
+  }
+
+  window.openNewPlayer = openNewPlayer;
+  window.closeNewPlayer = closeNewPlayer;
+  window.validateNew = validateNew;
+  window.confirmNew = confirmNew;
+  window.pickExisting = pickExisting;
+  window.closeChoiceModal = closeChoiceModal;
+  window.doChoice = doChoice;
+  window.closeRemove = closeRemove;
+  window.confirmRemovePlayer = confirmRemovePlayer;
+  window.setLetter = setLetter;
+  window.filterGrid = filterGrid;
+  window.tapPlayer = tapPlayer;
+  window.setBucketTab = setBucketTab;
+  window.promptRemove = promptRemove;
+  window.openSkinSwitcher = openSkinSwitcher;
+  window.closeSkinSwitcher = closeSkinSwitcher;
+  window.openLegacySkin = openLegacySkin;
+  window.openEventPicker = openEventPicker;
+  window.closeEventPicker = closeEventPicker;
+  window.pickEvent = pickEvent;
+  window.resetEventToTonight = resetEventToTonight;
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible') loadSchedule();
+  });
+
+  init();
+
+  async function init() {
+    renderAlpha();
+    renderGrid();
+    renderBucket();
+    refreshStatusStrip();
+    await Promise.all([loadSchedule(), loadMasterList()]);
+    await refreshStats();
+    renderGrid();
+    renderBucket();
+  }
+
+  setInterval(async function () {
+    const defaultTab = getDefaultBucketTab();
+    if (!bucketResetTimer && activeBucketTab !== defaultTab) syncBucketTabToDefault();
+    refreshStatusStrip();
+    await refreshStats();
+  }, SYNC_INTERVAL_MS);
+
+  setInterval(function () {
+    const today = localDateKey();
+    if (scheduleLoadedDay && today !== scheduleLoadedDay) loadSchedule();
+  }, 60000);
+
+  function localDateKey(date) {
+    const value = date || new Date();
+    return value.getFullYear() + '-' + String(value.getMonth() + 1).padStart(2, '0') + '-' + String(value.getDate()).padStart(2, '0');
+  }
+
+  function scheduleDateKey(value) {
+    if (!value) return '';
+    const raw = String(value).trim();
+    let match = raw.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+    if (match) return match[1] + '-' + match[2].padStart(2, '0') + '-' + match[3].padStart(2, '0');
+    match = raw.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+    if (match) return match[3] + '-' + match[1].padStart(2, '0') + '-' + match[2].padStart(2, '0');
+    const parsed = new Date(raw);
+    return Number.isNaN(parsed.getTime()) ? '' : localDateKey(parsed);
+  }
+
+  function datesMatch(value) {
+    return scheduleDateKey(value) === localDateKey();
+  }
+
+  function inferEventMode(game) {
+    const text = [game && game.type, game && game.eventType, game && game.title, game && game.theme, game && game.description]
+      .filter(Boolean).join(' ').toLowerCase();
+    if (text.includes('championship')) return 'champ';
+    if (/big\s*stack|super\s*stack/.test(text)) return 'bigstack';
+    return 'regular';
+  }
+
+  function gameLabel(gameNum) {
+    return MODES[eventMode][gameNum === 1 ? 'g1' : 'g2'];
+  }
+
+  function nowMinutes() {
+    const now = new Date();
+    return now.getHours() * 60 + now.getMinutes();
+  }
+
+  function getWindowState() {
+    const t = nowMinutes();
+    const cfg = MODES[eventMode];
+
+    if (eventMode === 'regular') {
+      if (t <= 19 * 60 + 45) return { g1Open: true, g2Open: false, highlight: 1, wText: cfg.g1 + ' check-in is open', wNote: 'Open until 7:45 PM' };
+      if (t < 20 * 60 + 30) return { g1Open: false, g2Open: false, highlight: 0, wText: 'Check-in paused between games', wNote: 'Game 2 opens at 8:30 PM' };
+      return { g1Open: false, g2Open: true, highlight: 2, wText: cfg.g2 + ' check-in is open', wNote: 'Open now' };
+    }
+
+    if (eventMode === 'champ') {
+      const highlight = t < 21 * 60 + 15 ? 1 : 2;
+      return { g1Open: true, g2Open: true, highlight, wText: gameLabel(highlight) + ' is currently running', wNote: 'Check-in for both games is open all night' };
+    }
+
+    const g1Open = t <= 21 * 60 + 30;
+    const g2Open = t >= 20 * 60 + 30;
+    if (g1Open && !g2Open) return { g1Open, g2Open, highlight: 1, wText: cfg.g1 + ' check-in is open', wNote: 'Consolation opens at 8:30 PM' };
+    if (g1Open && g2Open) return { g1Open, g2Open, highlight: 0, wText: cfg.g1 + ' + ' + cfg.g2 + ' both open', wNote: 'Tap your name to choose' };
+    return { g1Open, g2Open, highlight: 2, wText: cfg.g2 + ' check-in is open', wNote: cfg.g1 + ' registration closed at 9:30 PM' };
+  }
+
+  function eventKey(game) {
+    return scheduleDateKey(game && game.date) + '|' + ((game && (game.location || game.venue)) || '');
+  }
+
+  async function loadSchedule() {
+    try {
+      // Pull recent past as well as upcoming: the picker exists for the night
+      // the kiosk lands on the wrong date, and "wrong" is usually yesterday.
+      const [future, past] = await Promise.all([
+        PokerAPI.getSchedule().then(function (r) { return r.schedule || []; }),
+        PokerAPI.getSchedule({ historical: true })
+          .then(function (r) { return r.schedule || []; })
+          .catch(function () { return []; })
+      ]);
+
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - 14);
+      const cutoffKey = localDateKey(cutoff);
+      const seen = new Set();
+      scheduleCache = past
+        .filter(function (e) { return scheduleDateKey(e.date) >= cutoffKey; })
+        .concat(future)
+        .filter(function (e) {
+          const k = eventKey(e);
+          if (!scheduleDateKey(e.date) || seen.has(k)) return false;
+          seen.add(k);
+          return true;
+        })
+        .sort(function (a, b) { return scheduleDateKey(a.date).localeCompare(scheduleDateKey(b.date)); });
+
+      scheduleLoadedDay = localDateKey();
+      applySelectedEvent();
+    } catch (error) {
+      console.error('Schedule load failed:', error);
+      clearCurrentEvent('Schedule unavailable');
+      logClientError('checkin schedule load', error);
+    }
+  }
+
+  // Single place that decides which event the kiosk is running. Honours a
+  // manual pin if one is set, otherwise follows the clock.
+  function applySelectedEvent() {
+    const target = manualEventKey
+      ? scheduleCache.find(function (e) { return eventKey(e) === manualEventKey; })
+      : scheduleCache.find(function (e) { return datesMatch(e.date); });
+
+    if (!target) {
+      clearCurrentEvent(manualEventKey ? 'Selected event unavailable' : 'No event scheduled today');
+      return;
+    }
+
+    currentDate = target.date;
+    currentLocation = target.location || target.venue || '';
+    currentTheme = target.theme || target.name || '';
+    currentEventType = target.type || target.eventType || '';
+    eventMode = inferEventMode(target);
+    updateEventHeader(target);
+    syncBucketTabToDefault();
+    refreshStatusStrip();
+    renderGrid();
+    renderBucket();
+  }
+
+  function renderEventPicker() {
+    const list = document.getElementById('eventPickerList');
+    if (!scheduleCache.length) {
+      list.innerHTML = '<div class="bucket-empty">No events available.</div>';
+      return;
+    }
+    const activeKey = manualEventKey || (currentDate ? scheduleDateKey(currentDate) + '|' + currentLocation : '');
+    list.innerHTML = scheduleCache.map(function (e) {
+      const key = eventKey(e);
+      const isToday = datesMatch(e.date);
+      const venue = e.location || e.venue || '';
+      const label = e.theme || e.name || e.type || 'Regular';
+      const cls = 'event-pick-row' + (isToday ? ' is-today' : '') + (key === activeKey ? ' is-active' : '');
+      return '<button class="' + cls + '" onclick="pickEvent(' + escapeAttr(JSON.stringify(key)) + ')">' +
+        escapeHtml(String(e.date)) + ' — ' + escapeHtml(venue) +
+        '<span class="event-pick-sub">' + escapeHtml(label) + (isToday ? ' · tonight' : '') + '</span></button>';
+    }).join('');
+  }
+
+  function openEventPicker() {
+    renderEventPicker();
+    document.getElementById('eventPickerOverlay').style.display = 'flex';
+  }
+
+  function closeEventPicker() {
+    document.getElementById('eventPickerOverlay').style.display = 'none';
+  }
+
+  async function pickEvent(key) {
+    manualEventKey = key;
+    closeEventPicker();
+    applySelectedEvent();
+    await refreshStats();
+  }
+
+  async function resetEventToTonight() {
+    manualEventKey = '';
+    closeEventPicker();
+    applySelectedEvent();
+    await refreshStats();
+  }
+
+  function clearCurrentEvent(message) {
+    currentDate = '';
+    currentLocation = '';
+    currentTheme = '';
+    currentEventType = 'Regular';
+    eventMode = 'regular';
+    document.getElementById('todayEventValue').textContent = message;
+    document.getElementById('eventPinnedBadge').classList.toggle('show', !!manualEventKey);
+    document.getElementById('modeBadge').textContent = 'Unavailable';
+    document.getElementById('modeBadge').className = 'mode-badge';
+    refreshStatusStrip();
+    renderGrid();
+    renderBucket();
+  }
+
+  function updateEventHeader(game) {
+    const label = currentTheme || game.location || 'Regular Event';
+    const typeLabel = eventMode === 'champ' ? ' · Championship' : eventMode === 'bigstack' ? ' · Big Stack' : '';
+    document.getElementById('todayEventValue').textContent = String(game.date) + ' — ' + label + typeLabel;
+    document.getElementById('eventPinnedBadge').classList.toggle('show', !!manualEventKey);
+    const badge = document.getElementById('modeBadge');
+    badge.textContent = eventMode === 'champ' ? 'Championship' : eventMode === 'bigstack' ? 'Big Stack Night' : 'Regular Week';
+    badge.className = 'mode-badge' + (eventMode === 'champ' ? ' champ' : eventMode === 'bigstack' ? ' bigstack' : '');
+    document.getElementById('counter1Label').textContent = MODES[eventMode].g1;
+    document.getElementById('counter2Label').textContent = MODES[eventMode].g2;
+    document.getElementById('tab1').textContent = MODES[eventMode].g1;
+    document.getElementById('tab2').textContent = MODES[eventMode].g2;
+  }
+
+  async function loadMasterList() {
+    try {
+      const result = await PokerAPI.getPlayerList();
+      masterList = result.players || [];
+      playerDirectory = result.directory || masterList.map(function (name) { return { name, aliases: [] }; });
+      renderGrid();
+    } catch (error) {
+      console.error('Player list load failed:', error);
+      showMessage('Player list unavailable. Please tell the director.', true);
+      logClientError('checkin player list load', error);
+    }
+  }
+
+  function normalizePlayer(player) {
+    return typeof player === 'string' ? player : (player && (player.name || player.player)) || '';
+  }
+
+  function normalizeGame(raw) {
+    const data = raw || {};
+    const checkedIn = (data.checkedIn || []).map(normalizePlayer).filter(Boolean);
+    const rsvpList = (data.rsvpList || []).map(normalizePlayer).filter(Boolean);
+    return {
+      checkedIn,
+      rsvpList,
+      checkedInCount: Number(data.checkedInCount !== undefined ? data.checkedInCount : checkedIn.length),
+      rsvpPending: Number(data.rsvpPending !== undefined ? data.rsvpPending : rsvpList.length),
+      total: Number(data.totalExpected !== undefined ? data.totalExpected : (data.total !== undefined ? data.total : checkedIn.length + rsvpList.length))
+    };
+  }
+
+  async function refreshStats() {
+    if (!currentDate || !currentLocation) return;
+    if (scheduleLoadedDay && scheduleLoadedDay !== localDateKey()) {
+      await loadSchedule();
+      return;
+    }
+    try {
+      const data = await PokerAPI.getDailyStats({ date: currentDate, venue: currentLocation });
+      game1 = normalizeGame(data.game1);
+      game2 = normalizeGame(data.game2);
+      refreshStatusStrip();
+      renderGrid();
+      renderBucket();
+    } catch (error) {
+      console.error('Stats refresh failed:', error);
+      logClientError('checkin stats refresh', error);
+    }
+  }
+
+  function refreshStatusStrip() {
+    const ws = getWindowState();
+    const cfg = MODES[eventMode];
+    const windowCard = document.getElementById('windowCard');
+    windowCard.className = currentDate && (ws.g1Open || ws.g2Open) ? 'status-card live' : 'status-card locked';
+    document.getElementById('windowMain').textContent = currentDate ? ws.wText : 'No check-in available';
+    document.getElementById('windowNote').textContent = currentDate ? ws.wNote : 'Only today’s event can be opened';
+
+    const c1 = document.getElementById('counter1Card');
+    c1.className = !currentDate || !ws.g1Open ? 'status-card locked' : ws.highlight === 1 ? (cfg.g1Color === 'gold' ? 'status-card live-gold' : 'status-card live') : 'status-card';
+    document.getElementById('c1seated').textContent = game1.checkedInCount;
+    document.getElementById('c1total').textContent = game1.total;
+    document.getElementById('c1sub').textContent = !currentDate ? 'Unavailable' : ws.g1Open ? (game1.rsvpPending ? game1.rsvpPending + ' on the way' : 'Open now') : eventMode === 'bigstack' ? 'Closed at 9:30 PM' : 'Closed';
+
+    const c2 = document.getElementById('counter2Card');
+    c2.className = !currentDate || !ws.g2Open ? 'status-card locked' : ws.highlight === 2 ? (cfg.g2Color === 'gold' ? 'status-card live-gold' : 'status-card live') : 'status-card';
+    document.getElementById('c2seated').textContent = game2.checkedInCount;
+    document.getElementById('c2total').textContent = game2.total;
+    document.getElementById('c2sub').textContent = !currentDate ? 'Unavailable' : !ws.g2Open ? 'Opens at 8:30 PM' : game2.rsvpPending ? game2.rsvpPending + ' on the way' : 'Open now';
+  }
+
+  function renderAlpha() {
+    const bar = document.getElementById('alphaBar');
+    bar.innerHTML = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(function (letter) {
+      return '<button class="alpha-btn ' + (activeLetter === letter ? 'active' : '') + '" onclick="setLetter(\'' + letter + '\')">' + letter + '</button>';
+    }).join('') + '<button class="alpha-btn clear" onclick="setLetter(null)">×</button>';
+  }
+
+  function setLetter(letter) {
+    activeLetter = letter;
+    renderAlpha();
+    renderGrid();
+  }
+
+  function filterGrid(value) {
+    searchVal = value.trim();
+    activeLetter = null;
+    renderAlpha();
+    renderGrid();
+  }
+
+  function matchingPlayers() {
+    if (!searchVal) return masterList.slice();
+    const matches = PlayerSearch.search(playerDirectory, searchVal, { limit: 200 });
+    return matches.length ? matches.map(function (item) { return item.name; }) : masterList.filter(function (name) {
+      return name.toLowerCase().includes(searchVal.toLowerCase());
+    });
+  }
+
+  function gridCols(count) {
+    if (count <= 1) return 'cols-1';
+    if (count <= 4) return 'cols-1';
+    if (count <= 9) return 'cols-2';
+    if (count <= 16) return 'cols-3';
+    return 'cols-4';
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('playerGrid');
+    let list = matchingPlayers();
+    if (activeLetter) list = list.filter(function (name) { return name.toUpperCase().startsWith(activeLetter); });
+    const colClass = gridCols(list.length);
+    grid.className = 'player-grid ' + colClass;
+    if (!list.length) {
+      grid.innerHTML = '<div style="color:#506070;padding:20px;font-size:0.9rem;">No matches — use New Player below.</div>';
+      return;
+    }
+    const useFullName = colClass === 'cols-1' || colClass === 'cols-2';
+    const ws = getWindowState();
+    const cfg = MODES[eventMode];
+    grid.innerHTML = list.map(function (name) {
+      const inG1 = includesPlayer(game1.checkedIn, name);
+      const inG2 = includesPlayer(game2.checkedIn, name);
+      const displayName = useFullName ? name : compactName(name);
+      let badge = '';
+      let tileClass = '';
+      if (inG1 && inG2) { badge = '✓ ' + cfg.g1 + ' + ' + cfg.g2; tileClass = 'checked'; }
+      else if (inG1) { badge = '✓ ' + cfg.g1; tileClass = 'checked'; }
+      else if (inG2) { badge = '✓ ' + cfg.g2; tileClass = 'checked'; }
+      else if (!currentDate || (!ws.g1Open && !ws.g2Open)) { badge = 'Check-in closed — see director'; tileClass = 'paused'; }
+      else if (eventMode === 'regular' && !ws.g1Open) badge = 'Tap → ' + cfg.g2;
+      else if (eventMode === 'regular') badge = 'Tap → ' + cfg.g1;
+      else if (eventMode === 'champ' || (eventMode === 'bigstack' && ws.g1Open && ws.g2Open)) badge = 'Tap to choose game';
+      else if (eventMode === 'bigstack' && ws.g1Open) badge = 'Tap → ' + cfg.g1;
+      else badge = 'Tap → ' + cfg.g2;
+      return '<div class="p-tile ' + tileClass + '" onclick="tapPlayer(' + escapeAttr(JSON.stringify(name)) + ')"><div class="p-tile-inner"><div class="p-name">' + escapeHtml(displayName) + '</div><div class="p-check">' + escapeHtml(badge) + '</div></div></div>';
+    }).join('');
+  }
+
+  function compactName(name) {
+    const parts = name.trim().split(/\s+/);
+    return parts.length < 2 ? name : parts[0] + ' ' + parts[parts.length - 1].slice(0, 3) + '.';
+  }
+
+  function includesPlayer(list, name) {
+    return list.some(function (item) { return item.toLowerCase() === name.toLowerCase(); });
+  }
+
+  function getDefaultBucketTab() {
+    return getWindowState().highlight === 2 ? 2 : 1;
+  }
+
+  function syncBucketTabToDefault() {
+    clearTimeout(bucketResetTimer);
+    bucketResetTimer = null;
+    activeBucketTab = getDefaultBucketTab();
+    updateBucketTabButtons();
+    renderBucket();
+  }
+
+  function updateBucketTabButtons() {
+    document.getElementById('tab1').classList.toggle('active', activeBucketTab === 1);
+    document.getElementById('tab2').classList.toggle('active', activeBucketTab === 2);
+  }
+
+  function setBucketTab(number) {
+    activeBucketTab = number;
+    updateBucketTabButtons();
+    renderBucket();
+    clearTimeout(bucketResetTimer);
+    if (number !== getDefaultBucketTab()) bucketResetTimer = setTimeout(function () { syncBucketTabToDefault(); }, BUCKET_RESET_MS);
+  }
+
+  function renderBucket() {
+    const list = activeBucketTab === 1 ? game1.checkedIn : game2.checkedIn;
+    const bucket = document.getElementById('bucketList');
+    if (!list.length) { bucket.innerHTML = '<div class="bucket-empty">No players yet.</div>'; return; }
+    bucket.innerHTML = list.map(function (name, index) {
+      return '<span class="tag ' + (index === 0 ? 'tag-new' : '') + '" onclick="promptRemove(' + escapeAttr(JSON.stringify(name)) + ',' + activeBucketTab + ')">' + escapeHtml(name) + '</span>';
+    }).join('');
+  }
+
+  function tapPlayer(name) {
+    if (!currentDate) { showMessage('No event is scheduled today.', true); return; }
+    const options = getCheckinOptions(name);
+    if (!options.available.length) { showMessage(name + ' is already checked in for all available games.', true); return; }
+    const ws = getWindowState();
+    if (eventMode === 'champ' || (eventMode === 'bigstack' && ws.g1Open && ws.g2Open)) openChoiceModal(name, ws);
+    else doCheckIn(name, options.available[0]);
+  }
+
+  function getCheckinOptions(name) {
+    const ws = getWindowState();
+    const inG1 = includesPlayer(game1.checkedIn, name);
+    const inG2 = includesPlayer(game2.checkedIn, name);
+    const available = [];
+    if (ws.g1Open && !inG1) available.push(1);
+    if (ws.g2Open && !inG2) available.push(2);
+    return { ws, inG1, inG2, available };
+  }
+
+  function openChoiceModal(name, ws) {
+    choicePlayer = name;
+    const cfg = MODES[eventMode];
+    const options = getCheckinOptions(name);
+    document.getElementById('choiceName').textContent = name;
+    document.getElementById('choiceSub').textContent = eventMode === 'champ' ? 'Select Bounty, Championship, or both games.' : 'Select the game for tonight.';
+    const actions = [];
+    if (options.available.includes(1)) actions.push('<button class="game-btn ' + (cfg.g1Color === 'blue' ? 'g-blue' : 'g-green') + '" onclick="doChoice(1)"><div><span class="gname">' + cfg.g1 + '</span><span class="gcopy">' + (eventMode === 'champ' ? '7:00 PM start' : 'Registration open until 9:30 PM') + '</span></div><span>→</span></button>');
+    if (options.available.includes(2)) actions.push('<button class="game-btn ' + (cfg.g2Color === 'gold' ? 'g-gold' : 'g-green') + '" onclick="doChoice(2)"><div><span class="gname">' + cfg.g2 + '</span><span class="gcopy">' + (eventMode === 'champ' ? '9:15 PM start' : 'For players who bust the Big Stack') + '</span></div><span>→</span></button>');
+    if (options.available.length === 2 && ws.g1Open && ws.g2Open) actions.push('<button class="game-btn g-both" onclick="doChoice(\'both\')"><div><span class="gname">Both Games</span><span class="gcopy">' + cfg.g1 + ' + ' + cfg.g2 + '</span></div><span>→</span></button>');
+    document.getElementById('choiceActions').innerHTML = actions.join('');
+    document.getElementById('choiceOverlay').classList.add('show');
+  }
+
+  function closeChoiceModal() {
+    choicePlayer = null;
+    document.getElementById('choiceOverlay').classList.remove('show');
+  }
+
+  async function doChoice(selection) {
+    const name = choicePlayer;
+    closeChoiceModal();
+    if (name) await doCheckIn(name, selection);
+  }
+
+  async function doCheckIn(name, selection) {
+    const options = getCheckinOptions(name);
+    let games = selection === 'both' ? options.available.slice() : [Number(selection) || options.available[0]];
+    games = games.filter(function (gameNum) { return options.available.includes(gameNum); });
+    if (!games.length) { showMessage(name + ' is already checked in for all available games.', true); return; }
+    const completed = [];
+    for (const gameNum of games) {
+      const result = await performSingleCheckIn(name, gameNum);
+      if (result === 'error') return;
+      if (result === 'success') completed.push(gameLabel(gameNum));
+    }
+    resetFilter();
+    renderGrid();
+    renderBucket();
+    refreshStatusStrip();
+    showMessage('✓ ' + name + ' → ' + completed.join(' + '));
+    setTimeout(refreshStats, 1500);
+  }
+
+  async function performSingleCheckIn(name, gameNum) {
+    if (!currentDate || !currentLocation) { showMessage('Today’s event is not ready. Please tell the director.', true); return 'error'; }
+    const data = gameNum === 1 ? game1 : game2;
+    if (includesPlayer(data.checkedIn, name)) return 'duplicate';
+    const rsvpIndex = data.rsvpList.findIndex(function (player) { return player.toLowerCase() === name.toLowerCase(); });
+    data.checkedIn.unshift(name);
+    data.checkedInCount += 1;
+    if (rsvpIndex >= 0) { data.rsvpList.splice(rsvpIndex, 1); data.rsvpPending = Math.max(0, data.rsvpPending - 1); }
+    else data.total += 1;
+    refreshStatusStrip();
+    renderGrid();
+    renderBucket();
+    try {
+      await PokerAPI.checkin({ player: name, date: currentDate, gameNum, venue: currentLocation });
+      return 'success';
+    } catch (error) {
+      console.error('Check-in failed:', error);
+      showMessage('Could not save that check-in. Please tell the director.', true);
+      await refreshStats();
+      logClientError('checkin write', error);
+      return 'error';
+    }
+  }
+
+  function promptRemove(name, gameNum) {
+    removeTarget = name;
+    removeGame = gameNum;
+    document.getElementById('removeText').textContent = 'Remove ' + name + ' from ' + gameLabel(gameNum) + '?';
+    document.getElementById('removeOverlay').classList.add('show');
+  }
+
+  function closeRemove() {
+    document.getElementById('removeOverlay').classList.remove('show');
+    removeTarget = null;
+    removeGame = null;
+  }
+
+  async function confirmRemovePlayer() {
+    if (!removeTarget || !removeGame || !currentDate || !currentLocation) return;
+    const name = removeTarget;
+    const gameNum = removeGame;
+    closeRemove();
+    const data = gameNum === 1 ? game1 : game2;
+    const index = data.checkedIn.findIndex(function (player) { return player.toLowerCase() === name.toLowerCase(); });
+    if (index >= 0) { data.checkedIn.splice(index, 1); data.checkedInCount = Math.max(0, data.checkedInCount - 1); data.total = Math.max(0, data.total - 1); }
+    renderGrid();
+    renderBucket();
+    refreshStatusStrip();
+    try {
+      await PokerAPI.removeCheckin({ player: name, date: currentDate, gameNum, venue: currentLocation });
+      setTimeout(refreshStats, 1000);
+    } catch (error) {
+      await refreshStats();
+      logClientError('checkin remove', error);
+    }
+  }
+
+  function openNewPlayer() {
+    document.getElementById('newFirst').value = '';
+    document.getElementById('newLast').value = '';
+    document.getElementById('newEmail').value = '';
+    document.getElementById('matchWarn').style.display = 'none';
+    document.getElementById('btnAdd').disabled = true;
+    document.getElementById('newPlayerOverlay').classList.add('show');
+    setTimeout(function () { document.getElementById('newFirst').focus(); }, 100);
+  }
+
+  function closeNewPlayer() { document.getElementById('newPlayerOverlay').classList.remove('show'); }
+
+  function validateNew() {
+    const first = document.getElementById('newFirst').value.trim();
+    const last = document.getElementById('newLast').value.trim();
+    document.getElementById('btnAdd').disabled = !first || !last;
+    if (first.length < 2) { document.getElementById('matchWarn').style.display = 'none'; return; }
+    const query = (first + ' ' + last).trim();
+    const matches = PlayerSearch.search(playerDirectory, query, { limit: 4 });
+    if (!matches.length) { document.getElementById('matchWarn').style.display = 'none'; return; }
+    document.getElementById('matchList').innerHTML = matches.map(function (item) {
+      return '<span onclick="pickExisting(' + escapeAttr(JSON.stringify(item.name)) + ')">→ ' + escapeHtml(item.name) + ' (tap to check in instead)</span>';
+    }).join('');
+    document.getElementById('matchWarn').style.display = 'block';
+  }
+
+  function pickExisting(name) { closeNewPlayer(); tapPlayer(name); }
+
+  async function confirmNew() {
+    const first = document.getElementById('newFirst').value.trim();
+    const last = document.getElementById('newLast').value.trim();
+    const email = document.getElementById('newEmail').value.trim();
+    if (!first || !last) return;
+    const name = first + ' ' + last;
+    if (!masterList.some(function (player) { return player.toLowerCase() === name.toLowerCase(); })) {
+      masterList.push(name);
+      playerDirectory.push({ name: name, aliases: [] });
+    }
+    closeNewPlayer();
+    await doCheckIn(name, null);
+    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      try { await PokerAPI.updatePlayerEmail({ player: name, email: email }); } catch (error) { logClientError('new player email write', error); }
+    }
+  }
+
+  function openSkinSwitcher() { document.getElementById('skinOverlay').classList.add('show'); }
+  function closeSkinSwitcher() { document.getElementById('skinOverlay').classList.remove('show'); }
+  function openLegacySkin() { window.location.href = './checkin-legacy.html'; }
+
+  function resetFilter() {
+    searchVal = '';
+    activeLetter = null;
+    document.getElementById('searchInput').value = '';
+    renderAlpha();
+  }
+
+  function showMessage(message, isError) {
+    const el = document.getElementById('flashMessage');
+    el.textContent = message;
+    el.style.display = 'block';
+    el.style.borderColor = isError ? 'rgba(255,108,118,.7)' : 'rgba(216,177,90,.5)';
+    clearTimeout(flashTimer);
+    flashTimer = setTimeout(function () { el.style.display = 'none'; }, isError ? 5000 : 3000);
+  }
+
+  function logClientError(context, error) {
+    if (typeof PokerAPI.logClientError === 'function') {
+      PokerAPI.logClientError({ context: context, error: String((error && error.message) || error) }).catch(function () {});
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, function (char) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char];
+    });
+  }
+
+  function escapeAttr(value) { return escapeHtml(value); }
+</script>
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="/clock-fab.js?v=3"></script>
+</body>
+</html>

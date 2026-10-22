@@ -1,0 +1,14 @@
+{
+ "demo-admin": {
+  "email": "admin@example.com",
+  "role": "admin"
+ },
+ "demo-player": {
+  "email": "player@example.com",
+  "linkedName": "Wren Gallowpike"
+ },
+ "demo-staff": {
+  "email": "staff@example.com",
+  "role": "staff"
+ }
+}

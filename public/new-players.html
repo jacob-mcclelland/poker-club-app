@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>♠ New Players - All-In Poker Club ♠</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="New Players">
+  <link rel="icon" type="image/svg+xml" href="/img/favicon-staff.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
+  <link rel="apple-touch-icon" href="/img/gameday-apple-icon.png">
+  <link rel="manifest" href="/manifest-gameday.json">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #050505;
+      --card-bg: rgba(20, 20, 20, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-gold: #d4af37;
+      --accent-blue: #00aaff;
+      --accent-green: #00ff88;
+      --accent-orange: #ff9900;
+      --accent-purple: #cc66ff;
+      --accent-red: #ff4444;
+      --text-main: #ffffff;
+      --text-dim: #888888;
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-color);
+      background: radial-gradient(circle at top right, #001a33 0%, #050505 60%);
+      color: var(--text-main);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    .header {
+      text-align: center;
+      padding: 40px 20px 30px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .profile-btn {
+      position: absolute;
+      left: 20px;
+      top: 40px;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      color: var(--accent-blue);
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      text-decoration: none;
+    }
+    .profile-btn:active { transform: scale(0.92); background: rgba(255,255,255,0.05); }
+
+    h1 {
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      color: var(--text-main);
+      font-size: 1.8rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+      background: linear-gradient(to bottom, #fff, #888);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .sub {
+      color: var(--accent-blue);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      opacity: 0.8;
+    }
+
+    .main-content {
+      padding: 0 20px 60px;
+      flex: 1;
+      max-width: 500px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin: 32px 0 16px 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--card-border);
+    }
+
+    .summary-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: var(--glass-shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .summary-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: var(--accent-gold);
+      opacity: 0.8;
+    }
+    .summary-count {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--accent-gold);
+    }
+    .summary-cutoff {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-top: 6px;
+    }
+
+    .player-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      width: 100%;
+      padding: 18px 20px;
+      margin-bottom: 12px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      box-shadow: var(--glass-shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .player-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: var(--accent-green);
+      opacity: 0.8;
+    }
+    .player-card .info { min-width: 0; }
+    .player-card .name {
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: -0.01em;
+      color: #fff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .player-card .detail {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+    .player-card .badge {
+      flex-shrink: 0;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--accent-blue);
+      background: rgba(0, 170, 255, 0.1);
+      border: 1px solid rgba(0, 170, 255, 0.25);
+      border-radius: 999px;
+      padding: 6px 12px;
+      white-space: nowrap;
+      text-align: center;
+    }
+    .player-card .badge.badge-unattended {
+      color: var(--accent-orange);
+      background: rgba(255, 153, 0, 0.1);
+      border-color: rgba(255, 153, 0, 0.25);
+    }
+
+    .night-header {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      margin: 28px 0 12px 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .night-header .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-gold);
+      flex-shrink: 0;
+    }
+
+    .state-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 32px 24px;
+      text-align: center;
+      color: var(--text-dim);
+      box-shadow: var(--glass-shadow);
+    }
+    .state-card.error {
+      color: #ff8888;
+      background: rgba(255, 68, 68, 0.08);
+      border-color: rgba(255, 68, 68, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <a class="profile-btn" data-back-nav href="gameday.html" aria-label="Back to Game Day">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+    </a>
+    <h1>New Players</h1>
+    <div class="sub">First-time players, last 2 months</div>
+  </div>
+
+  <div class="main-content">
+    <div id="summaryWrap"></div>
+    <div id="reportBody"></div>
+  </div>
+
+  <script type="module">
+    import { db, collection, getDocs, query } from './firebase-api.js?v=8';
+
+    const NEW_PLAYER_WINDOW_DAYS = 62;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Register SW (matches other staff pages).
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));
+        });
+      }
+      loadNewPlayers();
+    });
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    /**
+     * Parse an "M/D/YYYY" date string (month is 1-based) into a Date at local
+     * midnight. Returns null for anything malformed so callers can skip it
+     * rather than crash on bad legacy data.
+     */
+    function parseMDY(str) {
+      const parts = String(str || '').trim().split('/');
+      if (parts.length !== 3) return null;
+      const [m, d, y] = parts.map(Number);
+      if (!Number.isFinite(m) || !Number.isFinite(d) || !Number.isFinite(y)) return null;
+      if (m < 1 || m > 12 || d < 1 || d > 31) return null;
+      const date = new Date(y, m - 1, d);
+      // Guard against JS rolling an invalid day (e.g. 2/30) into the next month.
+      if (date.getMonth() !== m - 1 || date.getDate() !== d) return null;
+      return date;
+    }
+
+    function formatLongDate(date) {
+      return date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    }
+
+    function formatShortDate(date) {
+      return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    }
+
+    async function loadNewPlayers() {
+      const summaryWrap = document.getElementById('summaryWrap');
+      const body = document.getElementById('reportBody');
+      body.innerHTML = '<div class="state-card">Loading new players…</div>';
+
+      let checkinsSnap, rsvpsSnap;
+      try {
+        // Performance note: this reads the full checkins + rsvps collections
+        // (a few thousand docs combined) on every load. That is acceptable for
+        // an occasional staff report; do not add pagination here.
+        [checkinsSnap, rsvpsSnap] = await Promise.all([
+          getDocs(collection(db, 'checkins')),
+          getDocs(collection(db, 'rsvps'))
+        ]);
+      } catch (err) {
+        summaryWrap.innerHTML = '';
+        const isPermission = String(err && err.code || '').includes('permission-denied');
+        body.innerHTML = `<div class="state-card error">
+          ${escapeHtml(isPermission
+            ? 'You do not have access to read this report yet. Open the staff portal signed in with an allowlisted account and try again.'
+            : ('Could not load new players: ' + (err.message || 'unknown error') + '.'))}
+        </div>`;
+        return;
+      }
+
+      // playerName -> { firstDate, firstVia, firstVenue, gameDates: Set<string> }
+      const players = new Map();
+
+      function considerRecord(name, dateStr, venue, via) {
+        const parsed = parseMDY(dateStr);
+        if (!parsed || !name) return;
+        const existing = players.get(name);
+        if (!existing) {
+          players.set(name, { firstDate: parsed, firstVia: via, firstVenue: venue, gameDates: new Set() });
+          return;
+        }
+        if (parsed.getTime() < existing.firstDate.getTime()) {
+          existing.firstDate = parsed;
+          existing.firstVia = via;
+          existing.firstVenue = venue;
+        } else if (parsed.getTime() === existing.firstDate.getTime() && existing.firstVia !== 'checked in' && via === 'checked in') {
+          // Tie on the earliest date: prefer "checked in" over "RSVP'd".
+          existing.firstVia = via;
+          existing.firstVenue = venue;
+        }
+      }
+
+      checkinsSnap.docs.forEach(d => {
+        const rec = d.data();
+        const name = String(rec.player || '').trim();
+        if (!name) return;
+        considerRecord(name, rec.date, rec.venue, 'checked in');
+        // considerRecord guarantees an entry exists for `name` once the date parses.
+        if (parseMDY(rec.date)) {
+          players.get(name).gameDates.add(String(rec.date).trim());
+        }
+      });
+
+      rsvpsSnap.docs.forEach(d => {
+        const rec = d.data();
+        const name = String(rec.player || '').trim();
+        if (!name) return;
+        considerRecord(name, rec.date, rec.venue, "RSVP'd");
+      });
+
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - NEW_PLAYER_WINDOW_DAYS);
+      cutoff.setHours(0, 0, 0, 0);
+
+      const newPlayers = [...players.entries()]
+        .filter(([, info]) => info.firstDate.getTime() >= cutoff.getTime())
+        .map(([name, info]) => ({ name, ...info }));
+
+      summaryWrap.innerHTML = `
+        <div class="summary-card">
+          <div class="summary-count">${newPlayers.length} new player${newPlayers.length === 1 ? '' : 's'} since ${escapeHtml(formatShortDate(cutoff))}</div>
+          <div class="summary-cutoff">New = first checked in or RSVP'd within the last ${NEW_PLAYER_WINDOW_DAYS} days (cutoff: ${escapeHtml(formatShortDate(cutoff))}).</div>
+        </div>
+      `;
+
+      if (!newPlayers.length) {
+        body.innerHTML = '<div class="state-card">No new players in this window. Everyone who has shown up recently has a first-seen date further back.</div>';
+        return;
+      }
+
+      // Group by exact first-seen date, newest section first; alphabetical within a section.
+      const sections = new Map(); // dateKey (ms) -> { date, players: [] }
+      newPlayers.forEach(p => {
+        const key = p.firstDate.getTime();
+        if (!sections.has(key)) sections.set(key, { date: p.firstDate, players: [] });
+        sections.get(key).players.push(p);
+      });
+
+      const orderedSections = [...sections.values()].sort((a, b) => b.date.getTime() - a.date.getTime());
+      orderedSections.forEach(section => section.players.sort((a, b) => a.name.localeCompare(b.name)));
+
+      body.innerHTML = orderedSections.map(section => `
+        <div class="night-header"><span class="dot"></span>${escapeHtml(formatLongDate(section.date))}</div>
+        ${section.players.map(p => renderPlayerCard(p)).join('')}
+      `).join('');
+    }
+
+    function renderPlayerCard(p) {
+      const nights = p.gameDates.size;
+      const badge = nights > 0
+        ? `${nights} night${nights === 1 ? '' : 's'} attended`
+        : "RSVP only, not yet attended";
+      const badgeClass = nights > 0 ? 'badge' : 'badge badge-unattended';
+      return `
+        <div class="player-card">
+          <div class="info">
+            <div class="name">${escapeHtml(p.name)}</div>
+            <div class="detail">First seen: ${escapeHtml(p.firstVia)} at ${escapeHtml(p.firstVenue || 'an unknown venue')}</div>
+          </div>
+          <div class="${badgeClass}">${escapeHtml(badge)}</div>
+        </div>
+      `;
+    }
+  </script>
+  <script src="/update-check.js"></script>
+
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="/clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/gameday.html"></script>
+</body>
+</html>

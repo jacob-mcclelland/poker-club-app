@@ -1,0 +1,3216 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script>
+    /* Themed-event redirects: on an event date, jump to that night's themed timer.
+       Auto-reverts after the day. Add ?nobomb=1 to force the normal timer. */
+    (function(){
+      var EVENTS = {
+        '2026-07-14': 'timer-bombpot.html',      // Tight End — Bomb Pot Big Stack
+        '2026-07-16': 'timer-pocketqueenz.html'  // Wild Corgi — pocket.queenz Rainbow
+      };
+      try {
+        var d = new Date();
+        var today = d.getFullYear() + '-' +
+          String(d.getMonth()+1).padStart(2,'0') + '-' +
+          String(d.getDate()).padStart(2,'0');
+        var target = EVENTS[today];
+        if (target && !new URLSearchParams(location.search).has('nobomb')) {
+          location.replace(target + location.search);
+        }
+      } catch(e) {}
+    })();
+  </script>
+  <title>All-In Poker Timer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    /* ============================================
+       CSS VARIABLES
+       ============================================ */
+    :root {
+      --bg-dark: #1a1a1a;
+      --bg-black: #000000;
+      --timer-green: #ccff00;
+      --blind-red: #ff0000;
+      --blind-yellow: #ffff00;
+      --next-blue: #00aaff;
+      --break-magenta: #ff00ff;
+      --white: #ffffff;
+      --gold: #d4af37;
+
+      /* Tier colors (match leaderboard.html) */
+      --tier-1-bg: rgba(160, 32, 240, 0.40);
+      --tier-1-color: #ffffff;
+      --tier-2-bg: rgba(96, 165, 250, 0.35);
+      --tier-2-color: #ffffff;
+      --tier-3-bg: rgba(40, 167, 69, 0.30);
+      --tier-3-color: #ffffff;
+
+      /* Rainbow gradient */
+      --rainbow: linear-gradient(90deg,
+        #ff0000, #ff7f00, #ffff00, #00ff00,
+        #0000ff, #4b0082, #8f00ff, #ff0000);
+
+      --panel-border: #444;
+      --panel-bg: #111;
+      --panel-header: #1a1a1a;
+    }
+
+    /* ============================================
+       BASE STYLES
+       ============================================ */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Arial Black', 'Impact', Arial, sans-serif;
+      background: var(--bg-black);
+      color: var(--white);
+      height: 100vh;
+      overflow: hidden;
+      margin: 0;
+    }
+
+    .timer-page {
+      display: grid;
+      grid-template-rows: 62px 24px 1fr 62px;
+      height: calc(100vh - 40px);
+      width: calc(100vw - 60px);
+      margin: 20px 30px;
+      overflow: hidden;
+    }
+
+    /* ============================================
+       HEADER & FOOTER (Rainbow Gradient)
+       ============================================ */
+    .header-bar, .footer-bar {
+      background: var(--rainbow);
+      padding: 4px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-section {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .header-left { justify-content: flex-start; }
+    .header-center { justify-content: center; text-align: center; }
+    .header-right { justify-content: flex-end; }
+
+    .venue-title {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: var(--bg-black);
+      text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+      white-space: nowrap;
+    }
+
+    .venue-subtitle {
+      font-size: 0.8rem;
+      color: var(--bg-dark);
+      white-space: nowrap;
+    }
+
+    .venue-logo {
+      height: 46px;
+      margin: 0 8px;
+      object-fit: contain;
+    }
+
+    .hotn-display {
+      background: rgba(0,0,0,0.75);
+      padding: 4px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--gold);
+      font-size: 1.7rem;
+      color: var(--gold);
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s;
+      line-height: 1;
+    }
+
+    .hotn-display:hover {
+      background: rgba(212,175,55,0.2);
+      box-shadow: 0 0 10px rgba(212,175,55,0.6);
+    }
+
+    .hotn-hand { font-weight: bold; margin-right: 8px; }
+    .hotn-bonus { color: var(--timer-green); }
+
+    .hotn-clear-btn {
+      font-size: 0.72rem;
+      color: #555;
+      cursor: pointer;
+      margin-left: 7px;
+      transition: color 0.15s;
+      user-select: none;
+      vertical-align: middle;
+    }
+    .hotn-clear-btn:hover { color: #ff4444; }
+
+    /* Weekly Theme display */
+    .theme-display {
+      background: rgba(0,0,0,0.75);
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1px solid #555;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .theme-display:hover { background: rgba(255,255,255,0.08); }
+
+    .theme-label {
+      font-size: 0.65rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      display: block;
+    }
+
+    .theme-text {
+      font-size: 1.2rem;
+      color: var(--white);
+      font-weight: bold;
+    }
+
+    /* ============================================
+       MENU BAR
+       ============================================ */
+    .menu-bar {
+      background: #0a0a0a;
+      padding: 2px 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: nowrap;
+      border-bottom: 1px solid #333;
+    }
+
+    .menu-link {
+      color: #888;
+      text-decoration: none;
+      font-size: 0.75rem;
+      padding: 3px 6px;
+      border-radius: 4px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .menu-link:hover { color: var(--white); background: #222; }
+    .menu-link.active { color: var(--timer-green); background: #1a2a1a; }
+
+    .menu-separator { color: #333; font-size: 0.7rem; }
+
+    /* ============================================
+       PANEL DASHBOARD
+       ============================================ */
+    .dashboard {
+      position: relative;
+      overflow: hidden;
+      background: #0d0d0d;
+    }
+
+    .panel {
+      position: absolute;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 120px;
+      min-height: 80px;
+    }
+
+    .panel.hidden { display: none; }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--panel-header);
+      padding: 2px 8px;
+      cursor: move;
+      flex-shrink: 0;
+      border-bottom: 1px solid #333;
+      height: 22px;
+      user-select: none;
+    }
+
+    .panel-title {
+      font-size: 0.65rem;
+      color: var(--gold);
+      font-weight: bold;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .panel-title-group {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .panel-time-label {
+      font-size: 0.6rem;
+      color: #aaaaaa;
+      font-weight: normal;
+      font-family: Arial, sans-serif;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .panel-controls {
+      display: flex;
+      gap: 4px;
+    }
+
+    .panel-btn {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      font-size: 8px;
+      line-height: 14px;
+      text-align: center;
+      padding: 0;
+    }
+
+    .panel-btn.minimize { background: #f5a623; color: #000; }
+    .panel-btn.close { background: #ff3b30; color: #fff; }
+
+    .panel-body {
+      flex: 1;
+      overflow: hidden;
+      padding: 4px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    /* Resize handle */
+    .resize-handle {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 14px;
+      height: 14px;
+      cursor: nwse-resize;
+      z-index: 5;
+    }
+
+    .resize-handle::after {
+      content: '';
+      position: absolute;
+      bottom: 3px;
+      right: 3px;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid #555;
+      border-bottom: 2px solid #555;
+    }
+
+    /* Edge resize handles */
+    .resize-e { position: absolute; top: 22px; right: -3px; width: 6px; bottom: 14px; cursor: ew-resize; z-index: 4; }
+    .resize-s { position: absolute; bottom: -3px; left: 0; right: 14px; height: 6px; cursor: ns-resize; z-index: 4; }
+    .resize-w { position: absolute; top: 22px; left: -3px; width: 6px; bottom: 0; cursor: ew-resize; z-index: 4; }
+    .resize-n { position: absolute; top: -3px; left: 0; right: 0; height: 6px; cursor: ns-resize; z-index: 4; }
+
+    .panel.dragging { opacity: 0.8; z-index: 100; }
+    .panel.active { z-index: 50; border-color: var(--gold); }
+
+    /* ============================================
+       TIMER PANEL STYLES
+       ============================================ */
+    .timer-inner {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: var(--bg-black);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .timer-inner.break-mode {
+      box-shadow: inset 0 0 20px rgba(255, 0, 255, 0.2);
+    }
+
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2px 8px;
+      flex-shrink: 0;
+    }
+
+    .game-label {
+      font-size: 0.9rem;
+      color: var(--white);
+    }
+
+    .round-number {
+      font-size: 1.2rem;
+      color: var(--blind-red);
+      font-weight: bold;
+    }
+
+    .timer-display {
+      font-size: clamp(30px, 12vh, 180px); /* overridden by ResizeObserver */
+      color: var(--timer-green);
+      text-align: center;
+      font-weight: bold;
+      line-height: 1;
+      text-shadow: 0 0 20px rgba(204, 255, 0, 0.5);
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 0;
+      transition: font-size 0.1s;
+    }
+
+    .timer-display.warning {
+      animation: flash 1s infinite;
+    }
+
+    @keyframes flash {
+      0%, 100% { color: var(--timer-green); }
+      50% { color: var(--blind-red); }
+    }
+
+    .timer-display.paused { opacity: 0.6; }
+
+    .blinds-section {
+      display: flex;
+      justify-content: space-around;
+      align-items: stretch;
+      padding: 2px 4px;
+      flex: 1.2;
+      min-height: 0;
+    }
+
+    /* Stacked layout for solo/tall timer panels */
+    .blinds-stacked .blinds-section {
+      flex-direction: column;
+      justify-content: center;
+      align-items: stretch;
+      gap: 4px;
+    }
+    .blinds-stacked .blinds-now,
+    .blinds-stacked .blinds-next {
+      flex: 1;
+    }
+    /* In stacked mode next blinds can grow bigger since it has full width */
+    .blinds-stacked .blinds-next .blinds-values {
+      font-size: clamp(14px, 3.5vh, 48px) !important;
+    }
+
+    .blinds-now, .blinds-next {
+      text-align: center;
+      padding: 2px 6px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+    }
+
+    .blinds-label {
+      font-size: 0.65rem;
+      color: #666;
+      margin-bottom: 1px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .blinds-values {
+      font-size: clamp(18px, 4vh, 52px); /* overridden by ResizeObserver */
+      line-height: 1.1;
+      font-weight: bold;
+      transition: font-size 0.1s;
+    }
+
+    .blinds-now {
+      background: rgba(255,255,255,0.05);
+      border-radius: 6px;
+      padding: 4px 10px;
+    }
+
+    .blinds-now .blinds-values .small-blind { color: var(--blind-red); }
+    .blinds-now .blinds-values .big-blind { color: var(--blind-yellow); }
+    .blinds-next .blinds-values { color: var(--next-blue); font-size: clamp(14px, 2.5vh, 32px); }
+    .blind-slash { color: #666; }
+
+    .break-display {
+      font-size: clamp(18px, 4vh, 60px);
+      color: var(--break-magenta);
+      text-align: center;
+      padding: 4px;
+      font-weight: bold;
+    }
+
+    .break-subtitle {
+      font-size: clamp(14px, 2.5vh, 36px);
+      color: #888;
+      margin-top: 2px;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      flex-wrap: nowrap;
+      padding: 4px;
+      flex-shrink: 0;
+    }
+
+    .control-btn {
+      background: #222;
+      color: var(--white);
+      border: 2px solid #444;
+      padding: 4px 10px;
+      font-size: 0.7rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: bold;
+    }
+
+    .control-btn:hover { background: #333; border-color: var(--timer-green); }
+    .control-btn.play-btn { background: #1a3a1a; border-color: var(--timer-green); color: var(--timer-green); }
+    .control-btn.play-btn:hover { background: #2a4a2a; }
+    .control-btn.play-btn.paused { background: #3a1a1a; border-color: var(--blind-red); color: var(--blind-red); }
+
+    /* ============================================
+       CHAMPION SHOWCASE (week-one panel filler)
+       ============================================ */
+    /* The champ panel wraps its contents in #normalLeaderboard, so that wrapper
+       has to become a flex column too or the showcase can't claim the height. */
+    #normalLeaderboard { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+    /* container-type lets the caption shrink out of the way when the panel is
+       dragged small, so the photo keeps the space instead of collapsing to a
+       few pixels behind full-size text. */
+    /* min-width AND min-height must both be 0: a flex item defaults to
+       min-content sizing on each axis, which lets the photos push the group
+       wider than the panel.
+       NOTE: this deliberately does NOT use container-type/@container. An
+       earlier version did, and the timer page killed the renderer in Chrome
+       150 — size containment plus flex-basis:auto on <img> gives the layout
+       engine an intrinsic-size feedback path. Grid with definite tracks has
+       no such path, and auto-fit gets the same responsive behaviour. */
+    .cs-wrap { flex: 1; min-height: 0; min-width: 0; display: flex; }
+    /* Both venues' podiums for one award. auto-fit gives two columns when the
+       panel is wide enough and stacks to one when it isn't — same behaviour the
+       container query provided, with none of the layout-cycle risk. */
+    .cs-group {
+      flex: 1;
+      min-height: 0;
+      min-width: 0;
+      display: grid;
+      grid-auto-rows: minmax(0, 1fr);
+      gap: 6px;
+      padding: 5px;
+    }
+    /* Explicit track counts, NOT auto-fit: auto-fit sized tracks to the panel
+       and happily made four columns for two cards, leaving the photos crammed
+       into the left half with empty tracks beside them. */
+    .cs-group.cs-count-1 { grid-template-columns: minmax(0, 1fr); }
+    .cs-group.cs-count-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    /* 3-4 cards → 2×2 (count-3 covers one missing photo without a hole-y row) */
+    .cs-group.cs-count-3,
+    .cs-group.cs-count-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .cs-card {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;   /* photo flexes, caption hugs */
+      justify-items: center;
+      gap: 4px;
+      text-align: center;
+    }
+    /* contain, not cover: these are three-person podium shots and a cover-crop
+       cuts people out of frame. Definite width AND height from the grid track
+       means the intrinsic image size never feeds back into layout. */
+    .cs-photo {
+      width: 100%;
+      height: 100%;
+      min-width: 0;
+      min-height: 0;
+      object-fit: contain;
+      border-radius: 6px;
+      border: 1px solid var(--panel-border);
+    }
+    /* Wraps to a second line rather than ellipsing — long names were getting
+       cut off mid-word on the old nowrap treatment. */
+    /* Deliberately small: two cards share the panel width, so the old ~15px
+       caption wrapped past its clamp and names got cut mid-word. At this size
+       "Season 28 Champion · Robb Taylor" fits one line on a TV-sized panel and
+       wraps to a readable second line when the panel is squeezed. */
+    .cs-line {
+      font-size: clamp(0.5rem, 0.6vw, 0.8rem);
+      line-height: 1.25;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .cs-title { color: var(--gold); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .cs-dot   { color: #555; }
+    .cs-who   { color: #fff; font-weight: 800; }
+
+    /* ============================================
+       LEADERBOARD STYLES (inside panel)
+       ============================================ */
+    .leaderboard-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .leaderboard-list.two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-auto-flow: column;
+      gap: 0 6px;
+      align-content: start;
+    }
+
+    .leaderboard-entry {
+      display: flex;
+      align-items: center;
+      padding: 1px 4px;
+      border-radius: 2px;
+      line-height: 1.1;
+      flex-shrink: 0;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .leaderboard-entry.tier-1 { background: var(--tier-1-bg); color: var(--tier-1-color); }
+    .leaderboard-entry.tier-2 { background: var(--tier-2-bg); color: var(--tier-2-color); }
+    .leaderboard-entry.tier-3 { background: var(--tier-3-bg); color: var(--tier-3-color); }
+
+    .player-rank {
+      min-width: 28px;
+      text-align: right;
+      margin-right: 8px;
+      color: #888;
+      font-size: 0.85em;
+      flex-shrink: 0;
+    }
+
+    .tier-1 .player-rank { color: var(--tier-1-color); }
+    .tier-2 .player-rank { color: var(--tier-2-color); }
+    .tier-3 .player-rank { color: var(--tier-3-color); }
+
+    .player-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .player-points {
+      min-width: 30px;
+      text-align: right;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-size: 0.85em;
+      flex-shrink: 0;
+    }
+
+    .qualified-badge {
+      color: #44dd44;
+      font-size: 0.68em;
+      font-weight: 600;
+      margin: 0 6px 0 4px;
+      flex-shrink: 0;
+    }
+    .consolation-badge {
+      color: #ffaa00;
+    }
+
+    /* ============================================
+       BOUNTY STYLES (inside panel)
+       ============================================ */
+    .bounty-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .bounty-list.two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-auto-flow: column;
+      gap: 0 6px;
+      align-content: start;
+    }
+
+    .bounty-entry {
+      display: flex;
+      align-items: center;
+      padding: 1px 4px;
+      line-height: 1.1;
+      flex-shrink: 0;
+      min-width: 0;
+    }
+
+    .bounty-entry.tier-1 { background: var(--tier-1-bg); color: var(--tier-1-color); }
+    .bounty-entry.tier-2 { background: var(--tier-2-bg); color: var(--tier-2-color); }
+    .bounty-entry.tier-3 { background: var(--tier-3-bg); color: var(--tier-3-color); }
+    .bounty-entry.tier-1 .player-rank { color: var(--tier-1-color); }
+    .bounty-entry.tier-2 .player-rank { color: var(--tier-2-color); }
+    .bounty-entry.tier-3 .player-rank { color: var(--tier-3-color); }
+    .bounty-entry.tier-1 .bounty-count { color: var(--tier-1-color); }
+    .bounty-entry.tier-2 .bounty-count { color: var(--tier-2-color); }
+    .bounty-entry.tier-3 .bounty-count { color: var(--tier-3-color); }
+
+    .bounty-entry .player-rank {
+      min-width: 28px;
+      text-align: right;
+      margin-right: 8px;
+      font-size: 0.85em;
+      color: #888;
+      flex-shrink: 0;
+    }
+
+    .bounty-entry .player-name {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .bounty-count {
+      color: #ff6666;
+      min-width: 24px;
+      text-align: right;
+      font-family: 'SF Mono', Monaco, monospace;
+      flex-shrink: 0;
+      margin-left: 4px;
+      font-weight: bold;
+    }
+
+    /* ============================================
+       CHIP STYLES
+       ============================================ */
+    .chip-row {
+      display: flex;
+      gap: 4px;
+      justify-content: space-evenly;
+      align-items: center;
+      flex-wrap: nowrap;
+      padding: 4px 6px;
+      width: 100%;
+      height: 100%;
+    }
+
+    .chip {
+      flex: 1;
+      min-width: 28px;
+      max-width: 70px;
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(0.7rem, 2vw, 1.3rem);
+      font-weight: bold;
+      border: 2px dashed rgba(255,255,255,0.3);
+    }
+
+    .chip-25 { background: #ffffff; color: #000; border-color: rgba(0,0,0,0.3); }
+    .chip-50 { background: #cc0000; color: white; }
+    .chip-100 { background: #0044cc; color: white; }
+    .chip-500 { background: #008800; color: white; }
+    .chip-1k { background: #111111; color: white; border-color: rgba(255,255,255,0.4); }
+    .chip-bounty { background: #ff69b4; color: #000; }
+
+    /* ============================================
+       HAND OF NIGHT MODAL
+       ============================================ */
+    .hotn-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hotn-modal-overlay.visible { display: flex; }
+
+    .hotn-modal {
+      background: #222;
+      border: 2px solid var(--gold);
+      border-radius: 12px;
+      padding: 20px;
+      min-width: 320px;
+      color: var(--white);
+    }
+
+    .hotn-modal h3 { color: var(--gold); margin-bottom: 15px; text-align: center; }
+    .hotn-modal label { display: block; margin-bottom: 5px; color: #aaa; font-size: 0.85rem; }
+
+    .hotn-modal input {
+      width: 100%;
+      padding: 8px 12px;
+      background: #111;
+      border: 1px solid #444;
+      border-radius: 6px;
+      color: var(--white);
+      font-size: 1rem;
+      font-family: inherit;
+      margin-bottom: 12px;
+    }
+
+    .hotn-modal input:focus { outline: none; border-color: var(--gold); }
+
+    .hotn-preview {
+      text-align: center;
+      font-size: 1.5rem;
+      color: var(--gold);
+      padding: 10px;
+      background: #111;
+      border-radius: 6px;
+      margin-bottom: 15px;
+    }
+
+    .hotn-hint { font-size: 0.7rem; color: #666; margin-top: -8px; margin-bottom: 12px; }
+
+    .hotn-modal-buttons { display: flex; gap: 10px; justify-content: center; }
+
+    .hotn-modal-buttons button {
+      padding: 8px 20px;
+      border-radius: 6px;
+      border: 2px solid #444;
+      background: #333;
+      color: var(--white);
+      font-family: inherit;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .hotn-modal-buttons .save-btn {
+      background: #1a3a1a;
+      border-color: var(--timer-green);
+      color: var(--timer-green);
+    }
+
+    .hotn-modal-buttons .clear-btn {
+      background: rgba(220,20,60,0.15);
+      border-color: #dc143c;
+      color: #ff7777;
+    }
+    .hotn-modal-buttons .clear-btn:hover { background: rgba(220,20,60,0.32); }
+
+    .hotn-modal-buttons .random-btn {
+      background: rgba(120,60,220,0.18);
+      border-color: #9966ff;
+      color: #cc99ff;
+    }
+    .hotn-modal-buttons .random-btn:hover { background: rgba(120,60,220,0.34); }
+
+    /* ============================================
+       CHAMPIONSHIP STATUS INDICATORS
+       ============================================ */
+    .status-indicator { min-width: 14px; text-align: center; font-size: 0.9em; flex-shrink: 0; }
+    .status-checkedin { color: #44dd44; }
+    .status-rsvp { color: #ffcc00; }
+    .status-absent { color: #ff4444; }
+    .champ-footer { font-size: 0.75rem; color: #ccc; padding: 4px 4px 2px; border-top: 2px solid #444; margin-top: 4px; overflow-y: auto; }
+    .ondeck-header { color: #ffcc00; font-weight: bold; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; padding: 2px 0; }
+    .ondeck-flow { column-count: 2; column-gap: 6px; column-rule: 1px solid #333; }
+    .ondeck-col-header { color: #ffcc00; font-weight: bold; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; padding: 1px 0 2px 0; border-bottom: 1px solid #333; margin-bottom: 2px; column-span: all; }
+    .consol-section-label { color: #ff9900; font-size: 0.6rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; padding: 2px 0 1px 0; border-top: 1px solid #333; margin-top: 2px; break-inside: avoid; }
+    .ondeck-counts { color: #888; font-weight: normal; font-size: 0.65rem; margin-left: 6px; }
+    .ondeck-entry { padding: 1px 2px; line-height: 1.2; }
+    .ondeck-entry.here { background: rgba(255,204,0,0.12); border-left: 2px solid #ffcc00; padding-left: 3px; }
+    .ondeck-num { color: #888; margin-right: 3px; min-width: 16px; display: inline-block; text-align: right; }
+    .consol-header { color: #ff9900; font-weight: bold; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; padding: 2px 0; margin-top: 2px; border-top: 1px solid #333; }
+    .consol-entry { color: #cc8800; }
+    .leaderboard-entry.champ-here, .bounty-entry.champ-here { background: rgba(255,204,0,0.12); border-left: 2px solid #ffcc00; }
+    /* Gave up the seat (declined / no-show after doors closed): stays listed, struck through. */
+    .leaderboard-entry.champ-out .player-name, .bounty-entry.champ-out .player-name { text-decoration: line-through; text-decoration-color: rgba(255,68,68,0.7); opacity: 0.55; }
+    /* Director-assigned seat, e.g. "7" or "T2-4". */
+    .seat-chip { flex: none; margin-left: 6px; padding: 0 6px; border-radius: 4px; font-size: 0.68em; font-weight: 800; letter-spacing: 0.04em; color: #000; background: #d4af37; line-height: 1.5; vertical-align: middle; white-space: nowrap; }
+    .seat-chip::before { content: 'SEAT '; font-weight: 700; font-size: 0.8em; opacity: 0.8; }
+    .seat-chip.red { color: #9b0016; }
+
+    /* Combined On Deck + Consolation panel (championship mode) */
+    .ondeck-mode { margin-left: auto; color: #777; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+    /* column-fill:auto + an explicit height (set by renderOnDeckPanel) makes the
+       list fill the first column top-to-bottom before starting the next, so a
+       short list is one column from the left rather than three thin balanced
+       ones (the owner, 2026-09-09). */
+    .od-flow { column-gap: 14px; column-rule: 1px solid #2a2a2a; column-fill: auto; line-height: 1.25; overflow: hidden; }
+    .od-score { color: #ddd; font-weight: 700; font-variant-numeric: tabular-nums; margin-left: 4px; }
+    .od-score::before { content: '\00b7 '; color: #666; font-weight: 400; }
+    .od-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 8px; font-weight: 800; font-size: 0.72em; text-transform: uppercase; letter-spacing: 1px; padding: 4px 4px 2px; border-bottom: 1px solid #333; margin: 2px 0 2px; break-inside: avoid; break-after: avoid; }
+    .od-head.cleared { color: #33bbff; } .od-head.ondeck { color: #ffcc00; } .od-head.consol { color: #ff9900; } .od-head.wait { color: #cc8a33; }
+    .od-count { font-weight: 600; color: #888; text-transform: none; letter-spacing: 0; font-size: 0.8em; white-space: normal; }
+    .od-row { display: flex; align-items: center; gap: 5px; padding: 1px 4px; break-inside: avoid; }
+    .od-num { color: #888; min-width: 2.3em; text-align: right; font-variant-numeric: tabular-nums; font-size: 0.85em; }
+    .od-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .od-right { color: #888; font-size: 0.8em; font-variant-numeric: tabular-nums; }
+    .od-row.od-cleared { background: rgba(51,187,255,0.10); border-left: 2px solid #33bbff; }
+    .od-row.od-consol .od-name { color: #e0b070; }
+    .od-row.od-wait .od-name { color: #b08a55; }
+    .od-moved { font-size: 0.55em; font-weight: 800; color: #33bbff; border: 1px solid rgba(51,187,255,0.5); border-radius: 3px; padding: 0 3px; margin-left: 5px; vertical-align: middle; }
+    .od-doors { column-span: all; background: rgba(255,68,68,0.12); color: #ff6666; font-weight: 800; font-size: 0.7em; letter-spacing: 1px; text-align: center; padding: 3px; border-radius: 4px; margin-bottom: 3px; }
+    .od-empty { color: #555; font-size: 0.8em; padding: 2px 6px 4px; }
+
+    .menu-link.championship-active {
+      color: var(--gold) !important;
+      background: rgba(212,175,55,0.2) !important;
+      border: 1px solid var(--gold);
+    }
+
+    .roster-count {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--gold);
+      padding: 2px;
+      flex-shrink: 0;
+    }
+
+    /* Loading State */
+    .loading {
+      text-align: center;
+      color: #555;
+      padding: 10px;
+      font-size: 0.8rem;
+    }
+
+    .loading::after {
+      content: '';
+      animation: dots 1.5s infinite;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+
+    .last-updated {
+      text-align: center;
+      font-size: 0.6rem;
+      color: #444;
+      padding: 1px;
+      flex-shrink: 0;
+    }
+
+    /* ============================================
+       LAYOUT PRESET OVERLAY
+       ============================================ */
+    .layout-hint {
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #333;
+      font-size: 0.55rem;
+      z-index: 1;
+      pointer-events: none;
+    }
+    html.back-nav-on .header-bar .header-section.header-left { padding-left: 52px; }
+    html.back-nav-on .menu-bar { justify-content: flex-start; padding-left: 60px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+
+<div class="timer-page">
+  <!-- HEADER -->
+  <div class="header-bar">
+    <div class="header-section header-left">
+      <!-- TOP-LEFT: Hand of the Night -->
+      <div class="hotn-display" id="hotnLeft" onclick="openHotnEditor()">
+        <span class="hotn-hand" id="hotnHandLeft">--</span>
+        <span class="hotn-bonus" id="hotnBonusLeft">| ---</span>
+        <span class="hotn-clear-btn" onclick="event.stopPropagation(); clearHotn();" title="Clear hand">&times;</span>
+      </div>
+    </div>
+    <div class="header-section header-center">
+      <img src="" alt="" class="venue-logo" id="venueLogoLeft" style="display:none;">
+      <div>
+        <div class="venue-title" id="venueTitle">All-In Poker Club</div>
+        <div class="venue-subtitle" id="venueSubtitle">NLTH Poker @7PM & @9PM</div>
+      </div>
+      <img src="" alt="" class="venue-logo" id="venueLogoRight" style="display:none;">
+    </div>
+    <div class="header-section header-right">
+      <!-- TOP-RIGHT: This Week's Theme -->
+      <div class="theme-display" onclick="openHotnEditor()">
+        <span class="theme-label">This Week</span>
+        <span class="theme-text" id="themeTextTop">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MENU BAR -->
+  <div class="menu-bar">
+    <a href="#" class="menu-link" onclick="applyLayout('timerOnly1'); return false;">Timer 1</a>
+    <span class="menu-separator">|</span>
+    <a href="#" class="menu-link" onclick="applyLayout('timerOnly2'); return false;">Timer 2</a>
+    <span class="menu-separator">|</span>
+    <a href="#" class="menu-link" onclick="applyLayout('scoresOnly'); return false;">Scores Only</a>
+    <span class="menu-separator">|</span>
+    <a href="#" class="menu-link active" onclick="applyLayout('full1'); return false;" id="layoutFull">Full 1</a>
+    <span class="menu-separator">|</span>
+    <a href="#" class="menu-link" onclick="applyLayout('full2'); return false;">Full 2</a>
+    <span class="menu-separator">|</span>
+    <a href="#" class="menu-link" onclick="applyLayout('dual'); return false;">Dual Timer</a>
+    <span class="menu-separator">|</span>
+    <a href="#" class="menu-link" onclick="clearHotn(); return false;">Clear HotN</a>
+    <span class="menu-separator">|</span>
+    <a href="#" class="menu-link" onclick="refreshData(); return false;">Refresh</a>
+    <span class="menu-separator">|</span>
+    <a href="#" class="menu-link" id="linkSync" onclick="toggleSyncMode(); return false;">Shared</a>
+    <a href="#" class="menu-link" id="linkSignIn" style="display:none; color:#ffcc00;" onclick="signInForSync(); return false;" title="Sign in with a staff account so phones can follow this clock.">Sign in</a>
+    <span class="menu-separator">|</span>
+    <a href="#" class="menu-link" onclick="toggleChampionshipMode(); return false;" id="linkChamp">Championship</a>
+    <span class="menu-separator">|</span>
+    <a href="?venue=tight" class="menu-link" id="linkTight">Tight End</a>
+    <a href="?venue=corgi" class="menu-link" id="linkCorgi">Wild Corgi</a>
+  </div>
+
+  <!-- DASHBOARD - Movable/Resizable Panels -->
+  <div class="dashboard" id="dashboard">
+
+    <!-- PANEL: Timer 1 -->
+    <div class="panel" id="panel-timer1" data-panel="timer1">
+      <div class="panel-header">
+        <span class="panel-title">Game 1</span>
+        <div class="panel-controls">
+          <button class="panel-btn minimize" onclick="minimizePanel('timer1')" title="Minimize">_</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="timer-inner" id="timerInner_0">
+          <div class="game-header">
+            <span class="game-label">Game 1</span>
+            <span class="round-number" id="roundnumber_0"></span>
+          </div>
+          <div class="timer-display" id="time_0">5:00</div>
+          <div class="blinds-section" id="blinds_0">
+            <div class="blinds-now">
+              <div class="blinds-label">Blinds Now</div>
+              <div class="blinds-values" id="blindsNow_0">
+                <span class="small-blind">--</span>
+                <span class="blind-slash"> / </span>
+                <span class="big-blind">--</span>
+              </div>
+            </div>
+            <div class="blinds-next">
+              <div class="blinds-label">Next Blinds</div>
+              <div class="blinds-values" id="blindsNext_0">
+                <span>25 / 50</span>
+              </div>
+            </div>
+          </div>
+          <div class="controls" id="controls_0">
+            <button class="control-btn play-btn" id="play_0" onclick="togglePlay(0)">Play</button>
+            <button class="control-btn" onclick="Timer.addMinute(0)">+Min</button>
+            <button class="control-btn" onclick="Timer.subtractMinute(0)">-Min</button>
+            <button class="control-btn" onclick="Timer.prevRound(0)">Prev</button>
+            <button class="control-btn" onclick="Timer.nextRound(0)">Next</button>
+            <button class="control-btn" onclick="Timer.reset(0)">Reset</button>
+          </div>
+        </div>
+      </div>
+      <div class="resize-handle"></div>
+      <div class="resize-e"></div>
+      <div class="resize-s"></div>
+    </div>
+
+    <!-- PANEL: Timer 2 -->
+    <div class="panel hidden" id="panel-timer2" data-panel="timer2">
+      <div class="panel-header">
+        <span class="panel-title">Game 2</span>
+        <div class="panel-controls">
+          <button class="panel-btn minimize" onclick="minimizePanel('timer2')" title="Minimize">_</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="timer-inner" id="timerInner_1">
+          <div class="game-header">
+            <span class="game-label">Game 2</span>
+            <span class="round-number" id="roundnumber_1"></span>
+          </div>
+          <div class="timer-display" id="time_1">5:00</div>
+          <div class="blinds-section" id="blinds_1">
+            <div class="blinds-now">
+              <div class="blinds-label">Blinds Now</div>
+              <div class="blinds-values" id="blindsNow_1">
+                <span class="small-blind">--</span>
+                <span class="blind-slash"> / </span>
+                <span class="big-blind">--</span>
+              </div>
+            </div>
+            <div class="blinds-next">
+              <div class="blinds-label">Next Blinds</div>
+              <div class="blinds-values" id="blindsNext_1">
+                <span>25 / 50</span>
+              </div>
+            </div>
+          </div>
+          <div class="controls" id="controls_1">
+            <button class="control-btn play-btn" id="play_1" onclick="togglePlay(1)">Play</button>
+            <button class="control-btn" onclick="Timer.addMinute(1)">+Min</button>
+            <button class="control-btn" onclick="Timer.subtractMinute(1)">-Min</button>
+            <button class="control-btn" onclick="Timer.prevRound(1)">Prev</button>
+            <button class="control-btn" onclick="Timer.nextRound(1)">Next</button>
+            <button class="control-btn" onclick="Timer.reset(1)">Reset</button>
+          </div>
+        </div>
+      </div>
+      <div class="resize-handle"></div>
+      <div class="resize-e"></div>
+      <div class="resize-s"></div>
+    </div>
+
+    <!-- PANEL: Championship -->
+    <div class="panel" id="panel-champ" data-panel="champ">
+      <div class="panel-header">
+        <div class="panel-title-group">
+          <span class="panel-title" id="leaderboardTitle">The Championship</span>
+          <span class="panel-time-label">9:15 PM</span>
+        </div>
+        <div class="panel-controls">
+          <button class="panel-btn minimize" onclick="minimizePanel('champ')" title="Minimize">_</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <!-- Normal leaderboard (non-championship) -->
+        <div id="normalLeaderboard">
+          <div id="leaderboardLoading" class="loading">Loading leaderboard</div>
+          <!-- Week one: last season's podium instead of an empty board -->
+          <div id="champShowcase" class="cs-wrap" style="display:none;"></div>
+          <div class="leaderboard-list" id="leaderboardGrid" style="display:none;"></div>
+          <div class="last-updated" id="leaderboardUpdatedRow">Updated: <span id="leaderboardUpdated">-</span></div>
+          <div id="champLeaderboardFooter" class="champ-footer" style="display:none;"></div>
+        </div>
+      </div>
+      <div class="resize-handle"></div>
+      <div class="resize-e"></div>
+      <div class="resize-s"></div>
+      <div class="resize-w"></div>
+    </div>
+
+    <!-- PANEL: Bounty -->
+    <div class="panel" id="panel-bounty" data-panel="bounty">
+      <div class="panel-header">
+        <div class="panel-title-group">
+          <span class="panel-title">Bounty Leaders</span>
+          <span class="panel-time-label">7:00 PM</span>
+        </div>
+        <div class="panel-controls">
+          <button class="panel-btn minimize" onclick="minimizePanel('bounty')" title="Minimize">_</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div id="bountyLoading" class="loading">Loading</div>
+        <!-- Week one: last season's gladiator podium instead of "No bounties" -->
+        <div id="bountyShowcase" class="cs-wrap" style="display:none;"></div>
+        <div class="bounty-list" id="bountyGrid" style="display:none;"></div>
+        <div id="champBountyFooter" class="champ-footer" style="display:none;"></div>
+      </div>
+      <div class="resize-handle"></div>
+      <div class="resize-e"></div>
+      <div class="resize-s"></div>
+      <div class="resize-w"></div>
+    </div>
+
+    <!-- PANEL: Chips -->
+    <div class="panel" id="panel-chips" data-panel="chips">
+      <div class="panel-header">
+        <span class="panel-title">Chip Values</span>
+        <div class="panel-controls">
+          <button class="panel-btn minimize" onclick="minimizePanel('chips')" title="Minimize">_</button>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="chip-row" id="chipRow"></div>
+      </div>
+      <div class="resize-handle"></div>
+      <div class="resize-e"></div>
+      <div class="resize-s"></div>
+    </div>
+
+    <!-- Championship: On Deck + Consolation, one panel across the bottom.
+         Shows the Bounty game until 8:00 PM, then rolls to the Championship.
+         Click the header to force the other game for this session. -->
+    <div class="panel" id="panel-ondeck" style="display:none;">
+      <div class="panel-header" id="onDeckHeader" style="cursor:pointer;" title="Click to switch game">
+        <span class="panel-title" id="onDeckTitle" style="color:#ff9900;">🎯 Bounty — On Deck &amp; Consolation A</span>
+        <span class="ondeck-mode" id="onDeckMode">auto · rolls to Championship at 8:00 PM</span>
+      </div>
+      <div class="panel-body" id="onDeckBody" style="overflow:hidden;">
+        <div id="onDeckList"></div>
+      </div>
+    </div>
+
+    <div class="layout-hint">Drag panels to move | Drag edges to resize | F = fullscreen</div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer-bar">
+    <div class="header-section header-left">
+      <!-- BOTTOM-LEFT: Next Week's Theme -->
+      <div class="theme-display" onclick="openHotnEditor()">
+        <span class="theme-label">Next Week</span>
+        <span class="theme-text" id="themeTextBottom">—</span>
+      </div>
+    </div>
+    <div class="header-section header-center">
+      <img src="" alt="" class="venue-logo" id="venueLogoFooterLeft" style="display:none;">
+      <div>
+        <div class="venue-title" id="venueTitle2">All-In Poker Club</div>
+        <div class="venue-subtitle" id="venueSubtitle2">NLTH Poker @7PM & @9PM</div>
+      </div>
+      <img src="" alt="" class="venue-logo" id="venueLogoFooterRight" style="display:none;">
+    </div>
+    <div class="header-section header-right">
+      <!-- BOTTOM-RIGHT: Hand of the Night -->
+      <div class="hotn-display" onclick="openHotnEditor()">
+        <span class="hotn-bonus" id="hotnBonusRight2">--- |</span>
+        <span class="hotn-hand" id="hotnHandRight2">--</span>
+        <span class="hotn-clear-btn" onclick="event.stopPropagation(); clearHotn();" title="Clear hand">&times;</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HAND OF NIGHT EDITOR MODAL -->
+<div class="hotn-modal-overlay" id="hotnModal">
+  <div class="hotn-modal">
+    <h3>Hand of the Night &amp; Theme</h3>
+    <label>Weekly Theme</label>
+    <input type="text" id="hotnThemeInput" placeholder="e.g. 80s Night, Aloha Night">
+    <label>Hand (e.g., A/s K/h)</label>
+    <input type="text" id="hotnHandInput" placeholder="A/s K/h" oninput="updateHotnPreview()">
+    <div class="hotn-hint">Suits: /s=&#9824; /h=&#9829; /c=&#9827; /d=&#9830;</div>
+    <label>Bonus Amount</label>
+    <input type="text" id="hotnBonusInput" placeholder="500">
+    <div class="hotn-preview" id="hotnPreview">-- | ---</div>
+    <div class="hotn-modal-buttons">
+      <button onclick="closeHotnEditor()">Cancel</button>
+      <button class="clear-btn" onclick="clearHotn(); closeHotnEditor();">Clear Hand</button>
+      <button class="random-btn" onclick="randomizeHotn()">&#127922; Random</button>
+      <button class="save-btn" onclick="saveHotn()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  // Firebase loads in the background, never as a static import. A static
+  // import that fails (no internet, venue Wi-Fi with no uplink) kills this
+  // whole module, clock included. The clock must run with no network
+  // (docs/timer-prd/07-synced-clock.md, Part 3b), so everything that needs
+  // Firebase waits on firebaseReady and copes with it resolving to null.
+  let fb = null, PokerAPI = null, auth = null, signInWithPopup = null, GoogleAuthProvider = null;
+  const firebaseReady = import('../firebase-api.js')
+    .then((m) => {
+      fb = m;
+      ({ PokerAPI, auth, signInWithPopup, GoogleAuthProvider } = m);
+      return m;
+    })
+    .catch((err) => {
+      console.warn('[timer] Firebase unavailable, running the clock locally:', err);
+      return null;
+    });
+  // Synced clock math: pure, same-origin, no network needed.
+  import { clockAt, applyAction, initialGame, normalizeGame, isNewer, rebaseGame } from '../clock-engine.js?v=2';
+  // Server time and the Firestore mirror. No imports of its own (Firebase is
+  // passed in), so it loads offline like the engine.
+  import { serverNow, measureServerOffset, currentOffsetMs, isOffsetCalibrated, createClockSync } from '../clock-sync.js?v=4';
+  import { STRUCTURES } from '../clock-structures.js?v=1';
+  // Championship seating rules — the SAME module the director page and the
+  // Championship Night dashboard use, so the TV can never disagree with them.
+  import { buildSeating, buildChampionshipRanking, rankByBounties, loadAttendance as fetchChampAttendance, splitOverrides, seatedRoster, seatChipHtml, fmtTime } from '../champ-seating.js?v=13';
+
+  // Hand of Night writes go through the saveHandOfNight callable, which is
+  // staff-gated server-side. This page historically had NO auth of its own —
+  // it only worked when the browser profile had already signed into another
+  // staff page on this origin and the session bled over. On a fresh profile
+  // the call went up anonymous and died with 'Sign in required' (verified in
+  // functions logs: auth VALID on 7/29, auth MISSING on 7/30). Prompt once,
+  // on the button click that needs it; the session persists on-device after.
+  async function ensureStaffAuth() {
+    await firebaseReady;
+    if (!auth) throw new Error('No internet connection, so sign-in is unavailable.');
+    if (auth.currentUser) return;
+    await signInWithPopup(auth, new GoogleAuthProvider());
+  }
+  // ?v= is load-bearing: hosting serves both HTML and JS with max-age=3600, so
+  // a client can get new HTML alongside a cached old module. When this file
+  // started importing buildShowcaseGroupHtml, that mismatch threw an import
+  // error and killed the WHOLE module — blank timer. Bump on every change here.
+  import { seasonHasStarted, buildShowcaseGroupHtml,
+           preloadChampionPhoto, championPhotoReady } from '../champions-showcase.js?v=3';
+
+  // Both venues are featured on either timer: Tight End's week one had already
+  // passed before the showcase shipped, so their winners would otherwise never
+  // get screen time. Trim this list to scope it back to one venue later.
+  const SHOWCASE_VENUES = ['Tight End', 'Wild Corgi'];
+
+  // Escape hatch for game night: ?noshowcase on the URL falls straight back to
+  // the normal empty-standings behaviour without needing a deploy.
+  const SHOWCASE_DISABLED = new URLSearchParams(window.location.search).has('noshowcase');
+
+  // Week-one champion showcase state. `seasonStarted` is computed from the raw
+  // standings (not the filtered bounty list) so both panels agree, and so a
+  // seeded auto-qualifier with 0 games never counts as the season having begun.
+  let seasonStarted = true;
+  let hallOfFame = {};
+
+  // ============================================
+  // VENUE CONFIGURATION
+  // ============================================
+  const VENUES = {
+    tight: {
+      name: "Tight End",
+      fullName: "Tight End & All-In Poker Club",
+      schedule: "NLTH Poker @7PM & @9PM",
+      logo: "/img/TightEndshapedblack.png",
+      apiVenue: "Tight End",
+      chips: [
+        { value: '25', cssClass: 'chip-25' },
+        { value: '50', cssClass: 'chip-50' },
+        { value: '100', cssClass: 'chip-100' },
+        { value: '500', cssClass: 'chip-500' },
+        { value: '1K', cssClass: 'chip-1k' },
+        { value: 'B', cssClass: 'chip-bounty' }
+      ]
+    },
+    corgi: {
+      name: "Wild Corgi",
+      fullName: "Wild Corgi & All-In Poker Club",
+      schedule: "NLTH Poker @7PM & @9PM",
+      logo: "/img/corgi3.png",
+      apiVenue: "Wild Corgi",
+      chips: [
+        { value: '25', cssClass: 'chip-25' },
+        { value: '50', cssClass: 'chip-50' },
+        { value: '100', cssClass: 'chip-100' },
+        { value: '500', cssClass: 'chip-500' },
+        { value: '1K', cssClass: 'chip-1k' },
+        { value: 'B', cssClass: 'chip-bounty' }
+      ]
+    }
+  };
+
+  // ============================================
+  // BLIND STRUCTURE
+  // ============================================
+  // The blind structure lives in clock-structures.js so a staff phone can
+  // start the shared clock without this page (2026-10-15).
+  const BLIND_LEVELS = STRUCTURES.standard.levels;
+
+  // ============================================
+  // TIMER STATE: synced clock (docs/timer-prd/07-synced-clock.md)
+  // ============================================
+  // The clock is an anchor ("at server time T there were N ms left on level
+  // L, running or paused"), not a counter that subtracts a second at a time.
+  // clock-engine.js derives the time from the anchor, so the TV can't drift,
+  // a reload comes back at the right time, and every phone reading the same
+  // anchor from timerClocks/{venue} shows the same clock.
+  //
+  // The TV is local-first: `clock` is its own copy and always drives this
+  // screen. Firestore is a mirror (Shared mode) that the TV writes to and
+  // adopts newer presses from. With no network, or in Local mode, the TV runs
+  // exactly like the old standalone timer.
+  //
+  // Timer.games keeps the old shape (currentLevelIndex, timeRemaining in
+  // seconds, isRunning) for the display code; tick() refreshes it.
+  const STRUCTURE = { id: 'standard', levels: BLIND_LEVELS };
+  const GAME_KEYS = ['1', '2'];             // Firestore keys for TV games 0 and 1
+  const STALE_MS = 12 * 3600 * 1000;        // older than this is a previous night
+
+  function nowMs() { return serverNow(); }
+
+  // An untouched game: changedAt 0, so any real press, here or on a phone,
+  // beats it. A fresh laptop must never overwrite a clock a phone started.
+  function freshGame() { return { ...initialGame(BLIND_LEVELS, nowMs()), changedAt: 0 }; }
+
+  const clock = { '1': freshGame(), '2': freshGame() };
+  const lastView = {};   // per game: last derived view, to spot natural level ends for the chime
+
+  function sameGame(a, b) {
+    return a.levelIndex === b.levelIndex && a.status === b.status && a.remainingMs === b.remainingMs &&
+      a.anchorAt === b.anchorAt && a.changedAt === b.changedAt && a.startedTonight === b.startedTonight;
+  }
+
+  // Recompute one game's display from its anchor. `chime` is only true from
+  // tick(): a level that ran out on its own chimes; a button press or a
+  // change from a phone doesn't (same as the old timer).
+  function refreshTimerView(gameId, { chime = false } = {}) {
+    const key = GAME_KEYS[gameId];
+    const view = clockAt(clock[key], BLIND_LEVELS, nowMs());
+    const prev = lastView[key];
+    const levelChanged = !prev || prev.levelIndex !== view.levelIndex;
+    const ranOut = prev && prev.phase === 'running' &&
+      (levelChanged || view.phase === 'holding' || view.phase === 'finished');
+    lastView[key] = view;
+
+    const g = Timer.games[gameId];
+    const seconds = Math.ceil(view.remainingMs / 1000);
+    const running = view.phase === 'running';
+    const changed = g.currentLevelIndex !== view.levelIndex || g.timeRemaining !== seconds || g.isRunning !== running;
+    g.currentLevelIndex = view.levelIndex;
+    g.timeRemaining = seconds;
+    g.isRunning = running;
+
+    if (chime && ranOut) playLevelEndSound();
+    if (levelChanged) {
+      updateDisplay(gameId);
+    } else if (changed) {
+      updateTimerDisplay(gameId);
+      updatePlayButton(gameId);
+    }
+  }
+
+  // Games pressed before this device ever measured its server offset; see
+  // calibrateClock().
+  const uncalibratedKeys = new Set();
+
+  // 'key' while a keyboard shortcut runs (handleKeyboard), so the press log
+  // can tell the space bar from a click.
+  let inputVia = 'button';
+
+  function act(gameId, action) {
+    const key = GAME_KEYS[gameId];
+    if (!isOffsetCalibrated()) uncalibratedKeys.add(key);
+    const now = nowMs();
+    const was = clockAt(clock[key], BLIND_LEVELS, now);
+    clock[key] = applyAction(clock[key], BLIND_LEVELS, action, now);
+    saveLocalClock();
+    refreshTimerView(gameId);
+    pushGames([key], { action, was: { [key]: was }, via: inputVia });
+  }
+
+  const Timer = {
+    games: {
+      0: { currentLevelIndex: 0, timeRemaining: 0, isRunning: false },
+      1: { currentLevelIndex: 0, timeRemaining: 0, isRunning: false }
+    },
+    start(gameId) { act(gameId, 'start'); },
+    pause(gameId) { act(gameId, 'pause'); },
+    addMinute(gameId) { act(gameId, 'addMinute'); },
+    subtractMinute(gameId) { act(gameId, 'subtractMinute'); },
+    nextRound(gameId) { act(gameId, 'next'); },
+    prevRound(gameId) { act(gameId, 'prev'); },
+    reset(gameId) { act(gameId, 'reset'); },
+    // Rounds and pre-game roll straight into the next level; breaks stop at
+    // the end and wait for Play. Both come from clockAt, not from here.
+    tick() {
+      refreshTimerView(0, { chime: true });
+      refreshTimerView(1, { chime: true });
+    }
+  };
+
+  // Which timerClocks document this TV mirrors: its venue's, or a named clock
+  // given as ?clock= (a home game on a TV, or a test clock, so testing never
+  // touches a venue's live clock; 2026-10-16). A named clock keeps its own
+  // saved state and Shared / Local choice on this device.
+  const namedClock = (() => {
+    const c = new URLSearchParams(location.search).get('clock');
+    return c && /^[a-z0-9-]{3,40}$/.test(c) && !VENUES[c] ? c : null;
+  })();
+  function syncClockId() { return namedClock || currentVenue; }
+
+  // --- Survive a reload, with or without internet ---
+  function clockStorageKey() { return `timerClock_${syncClockId()}`; }
+
+  function saveLocalClock() {
+    try {
+      localStorage.setItem(clockStorageKey(), JSON.stringify({ v: 1, savedAt: Date.now(), games: clock }));
+    } catch (e) { /* storage blocked: the clock still runs, it just won't survive a reload */ }
+  }
+
+  function restoreLocalClock() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(clockStorageKey()) || 'null');
+      if (!saved || saved.v !== 1 || Date.now() - saved.savedAt > STALE_MS) return;
+      for (const key of GAME_KEYS) {
+        const game = normalizeGame(saved.games && saved.games[key], BLIND_LEVELS);
+        if (game) clock[key] = game;
+      }
+    } catch (e) { /* corrupt or blocked: start fresh */ }
+  }
+
+  // --- Shared / Local ---
+  // Shared: phones follow this clock and staff phones can control it.
+  // Local only: this TV ignores the database and runs on its own (Part 3b).
+  // The choice lasts the night; the next night starts Shared again.
+  let syncMode = 'shared';
+  let syncStatus = 'connecting';   // 'live' | 'sending' | 'connecting' | 'error'
+  let clockSync = null;            // created once Firebase loads
+  let tvSeen = null;               // last controller command counters applied
+  let hotnUnsub = null;
+
+  function syncModeKey() { return `timerSyncMode_${syncClockId()}`; }
+
+  function restoreSyncMode() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(syncModeKey()) || 'null');
+      if (saved && saved.mode === 'local' && Date.now() - saved.at < STALE_MS) syncMode = 'local';
+    } catch (e) { /* default Shared */ }
+  }
+
+  // Per game: the version (changedAt) last sent and how it went:
+  // 'pending' | 'ok' | 'denied' | 'error'.
+  //   - While a version is pending, or after it was refused, never send that
+  //     same version again. When the rules refuse a write, Firestore first
+  //     reports the server's document (empty or older) and only then rejects;
+  //     re-sending on that report looped forever for a signed-out TV (found in
+  //     testing 2026-10-14). signInForSync re-sends on purpose with force.
+  //   - Once a version was accepted, sending it again is allowed: if another
+  //     device later uploads an older queued press over it, this TV must put
+  //     the newer state back (review finding 2026-10-14).
+  const sent = {};
+
+  // Every push also leaves a press-log record per game it writes
+  // (clock-sync.js logPress), saved only if the push goes through. For a
+  // press, `was` holds where the game stood just before it; for the TV's own
+  // writes ('shared' back from Local, 'resend', 'calibrate') the record shows
+  // the TV's clock, which everyone now follows.
+  function pressRecord(key, action, was, via) {
+    const view = was || clockAt(clock[key], BLIND_LEVELS, nowMs());
+    return {
+      action, game: key, levelIndex: view.levelIndex, remainingMs: Math.round(view.remainingMs),
+      phase: view.phase, status: clock[key].status, changedAt: clock[key].changedAt, via
+    };
+  }
+
+  function pushGames(keys, { force = false, action = 'resend', was = {}, via = 'auto' } = {}) {
+    if (syncMode !== 'shared' || !clockSync) return;
+    const games = {};
+    const versions = {};
+    const presses = [];
+    keys.forEach((k) => {
+      const version = clock[k].changedAt;
+      const last = sent[k];
+      if (!force && last && last.version === version && last.outcome !== 'ok') return;
+      sent[k] = { version, outcome: 'pending' };
+      versions[k] = version;
+      games[k] = clock[k];
+      presses.push(pressRecord(k, action, was[k], via));
+    });
+    if (!Object.keys(games).length) return;
+    clockSync.writeGames(games, STRUCTURE, presses).then((outcome) => {
+      Object.entries(versions).forEach(([k, version]) => {
+        if (sent[k] && sent[k].version === version) sent[k].outcome = outcome;
+      });
+    });
+  }
+
+  // Newest press wins, per game. A newer remote state replaces ours; if ours
+  // is newer (presses made here while offline), send it back up.
+  //   - Only push after hearing from the server. A cached or empty snapshot
+  //     (reload while offline) says nothing about what phones did meanwhile,
+  //     and a queued push would overwrite their newer press on reconnect.
+  //   - Compare against the raw remote state, and never push a stale one, so
+  //     a TV left open overnight doesn't rewrite its own old state in a loop.
+  function onClockData(data, meta) {
+    if (syncMode !== 'shared') return;
+    const sameStructure = !data || !data.structure || data.structure.id === STRUCTURE.id;
+    if (sameStructure) {
+      const remoteGames = (data && data.games) || {};
+      const now = nowMs();
+      const fromServer = !!meta && !meta.fromCache;
+      const toPush = [];
+      let adopted = false;
+      GAME_KEYS.forEach((key, gameId) => {
+        const remote = normalizeGame(remoteGames[key], BLIND_LEVELS);
+        const remoteFresh = remote && now - remote.changedAt <= STALE_MS ? remote : null;
+        const local = clock[key];
+        const localFresh = local.changedAt > 0 && now - local.changedAt <= STALE_MS;
+        if (remoteFresh && isNewer(remoteFresh, local)) {
+          if (!sameGame(remoteFresh, local)) {
+            clock[key] = remoteFresh;
+            uncalibratedKeys.delete(key);   // another device's anchor: not ours to shift
+            adopted = true;
+            refreshTimerView(gameId);
+          }
+        } else if (fromServer && localFresh && (!remote || local.changedAt > remote.changedAt)) {
+          toPush.push(key);
+        }
+      });
+      if (adopted) saveLocalClock();
+      // Refused for lack of a staff sign-in: retrying would loop. The Sync
+      // link offers sign-in, then retries (signInForSync).
+      if (syncStatus !== 'denied') pushGames(toPush);
+    }
+    handleTvCommands(data && data.tv, meta);
+  }
+
+  // Layout and Refresh sent from the staff phone controller. Only counters
+  // that go up after this page loaded count, so a reload never replays an
+  // old command.
+  function handleTvCommands(tv, meta) {
+    const seen = { layoutSeq: Number(tv && tv.layoutSeq) || 0, refreshSeq: Number(tv && tv.refreshSeq) || 0 };
+    if (!tvSeen) {
+      if (!meta || !meta.fromCache) tvSeen = seen;
+      return;
+    }
+    if (seen.layoutSeq > tvSeen.layoutSeq && tv.layout && LAYOUTS[tv.layout]) applyLayout(tv.layout);
+    if (seen.refreshSeq > tvSeen.refreshSeq) refreshData();
+    tvSeen = seen;
+  }
+
+  // Hand of the Night live from the database, so a save from a phone shows
+  // without a refresh. Saving still goes through the staff-gated callables.
+  function startHotnListener() {
+    if (hotnUnsub || !fb) return;
+    const apiVenue = VENUES[currentVenue].apiVenue;
+    hotnUnsub = fb.onSnapshot(fb.doc(fb.db, 'config', 'handOfNight'), (snap) => {
+      const v = snap.exists() ? snap.data()[apiVenue] : null;
+      if (!v) return;
+      handOfNight = { theme: v.theme || '', hand: v.hand || '--', bonus: v.bonus || '---', success: true };
+      updateHandOfNightDisplay();
+    }, (err) => console.warn('[timer] Hand of the Night listener failed:', err));
+  }
+
+  function stopHotnListener() {
+    if (hotnUnsub) {
+      hotnUnsub();
+      hotnUnsub = null;
+    }
+  }
+
+  function setSyncMode(mode) {
+    syncMode = mode;
+    try {
+      localStorage.setItem(syncModeKey(), JSON.stringify({ mode, at: Date.now() }));
+    } catch (e) { /* storage blocked */ }
+    if (mode === 'local') {
+      if (clockSync) clockSync.stop();
+      stopHotnListener();
+    } else if (clockSync) {
+      // Back from Local: this TV's clock, both games, is the one everyone
+      // follows (Part 3b), including a game the TV never touched.
+      const now = nowMs();
+      GAME_KEYS.forEach((k) => {
+        clock[k] = rebaseGame(clock[k], BLIND_LEVELS, now);
+        if (!isOffsetCalibrated()) uncalibratedKeys.add(k);
+      });
+      saveLocalClock();
+      pushGames(GAME_KEYS, { action: 'shared', via: 'button' });
+      tvSeen = null;
+      clockSync.start();
+      startHotnListener();
+    }
+    renderSyncLink();
+  }
+
+  // Only staff accounts may change the shared clock (firestore.rules
+  // timerClocks). A TV that isn't signed in keeps running, shows
+  // "Shared · sign in", and gets a separate "Sign in" link. That link opens
+  // the Google window straight from the click: Chrome only allows a popup for
+  // a few seconds after a click, so nothing (no confirm box) may come first.
+  async function signInForSync() {
+    try {
+      if (!auth) throw new Error('No internet connection, so sign-in is unavailable.');
+      if (!auth.currentUser) await signInWithPopup(auth, new GoogleAuthProvider());
+    } catch (err) {
+      alert('Sign-in failed: ' + (err.message || err.code || 'unknown error'));
+      return;
+    }
+    pushGames(GAME_KEYS.filter((k) => clock[k].changedAt > 0), { force: true });
+  }
+  window.signInForSync = signInForSync;
+
+  // Always just Shared <-> Local only, signed in or not.
+  function toggleSyncMode() {
+    setSyncMode(syncMode === 'shared' ? 'local' : 'shared');
+  }
+  window.toggleSyncMode = toggleSyncMode;
+
+  function renderSyncLink() {
+    const link = document.getElementById('linkSync');
+    if (!link) return;
+    const signInLink = document.getElementById('linkSignIn');
+    if (signInLink) signInLink.style.display = (syncMode === 'shared' && syncStatus === 'denied') ? '' : 'none';
+    if (syncMode === 'local') {
+      link.textContent = 'Local only';
+      link.style.color = '#888';
+      link.title = 'This TV is running on its own. Click to share the clock with phones again.';
+      return;
+    }
+    const label = { live: 'Shared', sending: 'Shared · sending', connecting: 'Shared · offline', denied: 'Shared · sign in', error: 'Shared · error' };
+    const color = { live: '#33dd77', sending: '#ffcc00', connecting: '#ffcc00', denied: '#ffcc00', error: '#ff5544' };
+    link.textContent = label[syncStatus] || 'Shared';
+    link.style.color = color[syncStatus] || '';
+    link.title = 'Phones follow this clock. Click to run this TV on its own (Local only).';
+  }
+
+  // Measure the server offset. If this device had never measured one, any
+  // press made so far was anchored on the raw laptop clock: a laptop two
+  // minutes fast would leave that anchor two minutes in the future and the
+  // countdown frozen. Shift those anchors by the correction and re-send them
+  // as the newest change.
+  async function calibrateClock() {
+    const before = currentOffsetMs();
+    const after = await measureServerOffset();
+    if (after === null || !uncalibratedKeys.size) return;
+    const delta = after - before;
+    const keys = [...uncalibratedKeys];
+    uncalibratedKeys.clear();
+    if (Math.abs(delta) < 500) return;
+    const now = nowMs();
+    keys.forEach((k) => {
+      clock[k] = { ...clock[k], anchorAt: clock[k].anchorAt + delta, changedAt: now };
+      refreshTimerView(GAME_KEYS.indexOf(k));
+    });
+    saveLocalClock();
+    pushGames(keys, { action: 'calibrate' });
+  }
+
+  function startClockSync() {
+    calibrateClock();
+    setInterval(calibrateClock, 10 * 60 * 1000);
+    window.addEventListener('online', () => calibrateClock());
+
+    firebaseReady.then((m) => {
+      if (!m) {
+        syncStatus = 'connecting';
+        renderSyncLink();
+        return;
+      }
+      clockSync = createClockSync({
+        fb: m,
+        venue: syncClockId(),
+        device: 'tv',
+        onData: onClockData,
+        onStatus: (status) => { syncStatus = status; renderSyncLink(); }
+      });
+      if (syncMode === 'shared') {
+        clockSync.start();
+        startHotnListener();
+      }
+    });
+  }
+
+  // Cache everything this page loaded, so a refresh with no internet still
+  // opens the timer. Uses its own worker (timer-sw.js, scope /staff/timer),
+  // not the app-wide /sw.js, whose install fails in Chrome (see timer-sw.js).
+  function registerOfflineCache() {
+    if (!('serviceWorker' in navigator)) return;
+    navigator.serviceWorker.register('/staff/timer-sw.js', { scope: '/staff/timer' })
+      .then((reg) => {
+        const urls = new Set([location.href]);
+        performance.getEntriesByType('resource').forEach((entry) => urls.add(entry.name));
+        const send = (worker) => worker.postMessage({ type: 'WARM_CACHE', urls: [...urls] });
+        const worker = reg.active || reg.waiting || reg.installing;
+        if (!worker) return;
+        if (worker.state === 'activated') send(worker);
+        else worker.addEventListener('statechange', () => { if (worker.state === 'activated') send(worker); });
+      })
+      .catch((err) => console.warn('[timer] offline cache unavailable:', err));
+  }
+
+  window.Timer = Timer;
+
+  // ============================================
+  // STATE
+  // ============================================
+  let currentVenue = 'tight';
+  let leagueData = [];
+  let bountyData = [];
+  let activeGame = 0;
+  let handOfNight = { hand: '--', bonus: '---' };
+  let isChampionshipMode = false;
+  let championshipEventDate = null; // set from leaderboard API response
+  let champAttendanceG1 = {}; // game 1 (bounty): name -> status
+  let champAttendanceG2 = {}; // game 2 (championship): name -> status
+  let champOnDeckG1 = [], champConsolG1 = [], champOnDeckG2 = [], champConsolG2 = [];
+  let champCounts = { g1ci: 0, g1rsvp: 0, g2ci: 0, g2rsvp: 0 };
+  let champOverrides = { 1: {}, 2: {} }; // manual director overrides: gameNum -> { playerNameLower: section }
+  let champDoors = { 1: false, 2: false };
+  let champSeats = { 1: {}, 2: {} };     // director seat assignments: gameNum -> { playerNameLower: "7" }
+  let champSeating = { 1: null, 2: null };   // buildSeating() output per game
+  let onDeckGameOverride = null;             // 1 | 2 | null (auto by clock)
+  const ONDECK_ROLL_MINS = 20 * 60;          // 8:00 PM — bottom panel rolls Bounty → Championship
+  let attendanceMap = {}; // { playerName: 'checkedin'|'rsvp'|'declined'|'blank' }
+  let championshipRefreshInterval = null;
+
+  // ============================================
+  // PANEL SYSTEM - Drag, Resize, Layout
+  // ============================================
+  const panelState = {};
+  let dragState = null;
+
+  function initPanels() {
+    const dashboard = document.getElementById('dashboard');
+    const panels = dashboard.querySelectorAll('.panel');
+
+    panels.forEach(panel => {
+      const id = panel.dataset.panel;
+      panelState[id] = { el: panel, minimized: false };
+
+      // Drag via header
+      const header = panel.querySelector('.panel-header');
+      header.addEventListener('mousedown', (e) => {
+        if (e.target.closest('.panel-btn')) return;
+        e.preventDefault();
+        bringToFront(panel);
+        dragState = {
+          type: 'move',
+          panel,
+          startX: e.clientX,
+          startY: e.clientY,
+          origLeft: panel.offsetLeft,
+          origTop: panel.offsetTop
+        };
+      });
+
+      // Resize via corner handle
+      const cornerHandle = panel.querySelector('.resize-handle');
+      if (cornerHandle) {
+        cornerHandle.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          bringToFront(panel);
+          dragState = {
+            type: 'resize-se',
+            panel,
+            startX: e.clientX,
+            startY: e.clientY,
+            origW: panel.offsetWidth,
+            origH: panel.offsetHeight
+          };
+        });
+      }
+
+      // Resize via edge handles
+      ['e', 's', 'w', 'n'].forEach(dir => {
+        const handle = panel.querySelector(`.resize-${dir}`);
+        if (handle) {
+          handle.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            bringToFront(panel);
+            dragState = {
+              type: `resize-${dir}`,
+              panel,
+              startX: e.clientX,
+              startY: e.clientY,
+              origW: panel.offsetWidth,
+              origH: panel.offsetHeight,
+              origLeft: panel.offsetLeft,
+              origTop: panel.offsetTop
+            };
+          });
+        }
+      });
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!dragState) return;
+      e.preventDefault();
+      const dx = e.clientX - dragState.startX;
+      const dy = e.clientY - dragState.startY;
+      const p = dragState.panel;
+      const db = document.getElementById('dashboard');
+      const maxW = db.offsetWidth;
+      const maxH = db.offsetHeight;
+
+      if (dragState.type === 'move') {
+        let newLeft = Math.max(0, Math.min(dragState.origLeft + dx, maxW - 60));
+        let newTop = Math.max(0, Math.min(dragState.origTop + dy, maxH - 30));
+        p.style.left = newLeft + 'px';
+        p.style.top = newTop + 'px';
+      } else if (dragState.type === 'resize-se') {
+        p.style.width = Math.max(120, dragState.origW + dx) + 'px';
+        p.style.height = Math.max(80, dragState.origH + dy) + 'px';
+      } else if (dragState.type === 'resize-e') {
+        p.style.width = Math.max(120, dragState.origW + dx) + 'px';
+      } else if (dragState.type === 'resize-s') {
+        p.style.height = Math.max(80, dragState.origH + dy) + 'px';
+      } else if (dragState.type === 'resize-w') {
+        const newW = Math.max(120, dragState.origW - dx);
+        p.style.width = newW + 'px';
+        p.style.left = (dragState.origLeft + dragState.origW - newW) + 'px';
+      } else if (dragState.type === 'resize-n') {
+        const newH = Math.max(80, dragState.origH - dy);
+        p.style.height = newH + 'px';
+        p.style.top = (dragState.origTop + dragState.origH - newH) + 'px';
+      }
+
+      // Auto-adapt leaderboard when championship panel resizes
+      const panelId = p.dataset.panel;
+      if (panelId === 'champ' || panelId === 'bounty') {
+        adaptListToPanel(panelId);
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (dragState) {
+        const panelId = dragState.panel.dataset.panel;
+        if (panelId === 'champ' || panelId === 'bounty') {
+          adaptListToPanel(panelId);
+        }
+        dragState = null;
+        saveLayout();
+      }
+    });
+  }
+
+  function bringToFront(panel) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    panel.classList.add('active');
+  }
+
+  function minimizePanel(panelId) {
+    const panel = document.getElementById(`panel-${panelId}`);
+    panel.classList.add('hidden');
+    panelState[panelId].minimized = true;
+    saveLayout();
+  }
+  window.minimizePanel = minimizePanel;
+
+  function showPanel(panelId) {
+    const panel = document.getElementById(`panel-${panelId}`);
+    panel.classList.remove('hidden');
+    panelState[panelId].minimized = false;
+    saveLayout();
+  }
+
+  // ============================================
+  // AUTO-ADAPT: Show as many rows as fit
+  // ============================================
+  function adaptListToPanel(panelId) {
+    if (panelId === 'champ') {
+      renderLeaderboard();
+    } else if (panelId === 'bounty') {
+      renderBountyList();
+    }
+  }
+
+  // ============================================
+  // PRESET LAYOUTS
+  // ============================================
+  const LAYOUTS = {
+    // Chips ride under the running timer, NOT under a scores column — parking
+    // them beneath the standings clipped that list to 85% for no reason.
+    full: {
+      timer1: { left: '0%', top: '0%', width: '28%', height: '85%', hidden: false },
+      timer2: { hidden: true },
+      champ: { left: '28.5%', top: '0%', width: '37%', height: '100%', hidden: false },
+      bounty: { left: '66%', top: '0%', width: '34%', height: '100%', hidden: false },
+      chips: { left: '0%', top: '86%', width: '28%', height: '14%', hidden: false }
+    },
+    timerOnly1: {
+      timer1: { left: '2%', top: '1%', width: '96%', height: '98%', hidden: false },
+      timer2: { hidden: true },
+      champ: { hidden: true },
+      bounty: { hidden: true },
+      chips: { hidden: true }
+    },
+    timerOnly2: {
+      timer1: { hidden: true },
+      timer2: { left: '2%', top: '1%', width: '96%', height: '98%', hidden: false },
+      champ: { hidden: true },
+      bounty: { hidden: true },
+      chips: { hidden: true }
+    },
+    scoresOnly: {
+      timer1: { hidden: true },
+      timer2: { hidden: true },
+      champ: { left: '0%', top: '0%', width: '55%', height: '100%', hidden: false },
+      bounty: { left: '55.5%', top: '0%', width: '44.5%', height: '85%', hidden: false },
+      chips: { left: '55.5%', top: '86%', width: '44.5%', height: '14%', hidden: false }
+    },
+    dual: {
+      timer1: { left: '0%', top: '0%', width: '25%', height: '50%', hidden: false },
+      timer2: { left: '0%', top: '51%', width: '25%', height: '49%', hidden: false },
+      bounty: { left: '25.5%', top: '0%', width: '40%', height: '85%', hidden: false },
+      champ: { left: '66%', top: '0%', width: '34%', height: '100%', hidden: false },
+      chips: { left: '25.5%', top: '86%', width: '40%', height: '14%', hidden: false }
+    },
+    full1: {
+      timer1: { left: '0%', top: '0%', width: '28%', height: '85%', hidden: false },
+      timer2: { hidden: true },
+      bounty: { left: '28.5%', top: '0%', width: '37%', height: '100%', hidden: false },
+      champ: { left: '66%', top: '0%', width: '34%', height: '100%', hidden: false },
+      chips: { left: '0%', top: '86%', width: '28%', height: '14%', hidden: false },
+      'ondeck': { hidden: true }
+    },
+    full2: {
+      timer1: { hidden: true },
+      timer2: { left: '0%', top: '0%', width: '28%', height: '85%', hidden: false },
+      bounty: { left: '28.5%', top: '0%', width: '37%', height: '100%', hidden: false },
+      champ: { left: '66%', top: '0%', width: '34%', height: '100%', hidden: false },
+      chips: { left: '0%', top: '86%', width: '28%', height: '14%', hidden: false },
+      'ondeck': { hidden: true }
+    },
+    // Chips under the timer, same as full/full1 (the owner, 2026-10-14: chip values
+    // were missing on championship night). This preset is only ever applied
+    // by the Championship toggle, which re-applies it on every click, so no
+    // LAYOUT_VERSION bump is needed (a bump would reset every dragged TV).
+    championship: {
+      timer1: { left: '0%', top: '0%', width: '28%', height: '85%', hidden: false },
+      timer2: { hidden: true },
+      bounty: { left: '28.5%', top: '0%', width: '37%', height: '62%', hidden: false },
+      champ: { left: '66%', top: '0%', width: '34%', height: '62%', hidden: false },
+      chips: { left: '0%', top: '86%', width: '28%', height: '14%', hidden: false },
+      'ondeck': { left: '28.5%', top: '63%', width: '71.5%', height: '37%', hidden: false }
+    },
+  };
+
+  function applyLayout(name) {
+    const layout = LAYOUTS[name];
+    if (!layout) return;
+
+    const db = document.getElementById('dashboard');
+    const dbW = db.offsetWidth;
+    const dbH = db.offsetHeight;
+
+    for (const [panelId, cfg] of Object.entries(layout)) {
+      const panel = document.getElementById(`panel-${panelId}`);
+      if (!panel) continue;
+
+      if (cfg.hidden) {
+        panel.classList.add('hidden');
+        panel.style.display = 'none';
+        if (panelState[panelId]) panelState[panelId].minimized = true;
+        continue;
+      }
+
+      panel.classList.remove('hidden');
+      panel.style.display = '';
+      if (panelState[panelId]) panelState[panelId].minimized = false;
+
+      // Convert percentages to pixels
+      panel.style.left = (parseFloat(cfg.left) / 100 * dbW) + 'px';
+      panel.style.top = (parseFloat(cfg.top) / 100 * dbH) + 'px';
+      panel.style.width = (parseFloat(cfg.width) / 100 * dbW) + 'px';
+      panel.style.height = (parseFloat(cfg.height) / 100 * dbH) + 'px';
+    }
+
+    // blinds-stacked is handled by ResizeObserver — no layout override needed
+
+    // Highlight active layout link
+    document.querySelectorAll('.menu-link').forEach(l => l.classList.remove('active'));
+    const venueLinks = document.querySelectorAll('#linkTight, #linkCorgi');
+    venueLinks.forEach(l => { if (l.classList.contains('active')) return; });
+    updateVenueLinks();
+
+    // Re-render lists to fit
+    setTimeout(() => {
+      renderLeaderboard();
+      renderBountyList();
+    }, 50);
+
+    localStorage.setItem(`timerLayout_${currentVenue}`, name);
+    saveLayout();
+  }
+  window.applyLayout = applyLayout;
+
+  // Bump whenever LAYOUTS changes. A saved layout always wins over the preset,
+  // so without this a preset edit is invisible to anyone who has ever dragged a
+  // panel — which is every real screen. Moving chips under Game 1 was silently
+  // a no-op on the bar TV until this landed.
+  const LAYOUT_VERSION = 2;
+
+  function saveLayout() {
+    const data = { __v: LAYOUT_VERSION };
+    document.querySelectorAll('.panel').forEach(p => {
+      const id = p.dataset.panel;
+      data[id] = {
+        left: p.style.left,
+        top: p.style.top,
+        width: p.style.width,
+        height: p.style.height,
+        hidden: p.classList.contains('hidden')
+      };
+    });
+    localStorage.setItem(`timerPanels_${currentVenue}`, JSON.stringify(data));
+  }
+
+  function restoreLayout() {
+    const saved = localStorage.getItem(`timerPanels_${currentVenue}`);
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        // Stale save from before a preset change — drop it and fall through to
+        // the new preset. Costs one re-drag; the alternative is a screen that
+        // can never pick up a layout fix.
+        if (data.__v !== LAYOUT_VERSION) {
+          localStorage.removeItem(`timerPanels_${currentVenue}`);
+          return false;
+        }
+        for (const [id, cfg] of Object.entries(data)) {
+          if (id === '__v') continue;
+          const panel = document.getElementById(`panel-${id}`);
+          if (!panel) continue;
+          if (cfg.left) panel.style.left = cfg.left;
+          if (cfg.top) panel.style.top = cfg.top;
+          if (cfg.width) panel.style.width = cfg.width;
+          if (cfg.height) panel.style.height = cfg.height;
+          if (cfg.hidden) {
+            panel.classList.add('hidden');
+            panelState[id].minimized = true;
+          } else {
+            panel.classList.remove('hidden');
+            panelState[id].minimized = false;
+          }
+        }
+        return true;
+      } catch (e) { /* fall through */ }
+    }
+    return false;
+  }
+
+  // ============================================
+  // INITIALIZATION
+  // ============================================
+  // Thursday is Wild Corgi, every other day Tight End (Denver time).
+  function defaultVenueForToday() {
+    const day = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Denver', weekday: 'short' }).format(new Date());
+    return day === 'Thu' ? 'corgi' : 'tight';
+  }
+
+  // Opened without ?venue=: if the other venue has a game started in the last
+  // 12 hours, more recently than this one, reopen on that venue. An explicit
+  // ?venue= is never overridden, so this cannot loop.
+  function followTonightsClock() {
+    firebaseReady.then(async (m) => {
+      if (!m) return;
+      const now = nowMs();
+      const latest = {};
+      for (const v of Object.keys(VENUES)) {
+        try {
+          const snap = await m.getDoc(m.doc(m.db, 'timerClocks', v));
+          const games = snap.exists() ? (snap.data().games || {}) : {};
+          latest[v] = Math.max(0, ...Object.values(games)
+            .filter((g) => g && g.startedTonight === true && Number.isFinite(Number(g.changedAt)) && now - Number(g.changedAt) <= STALE_MS)
+            .map((g) => Number(g.changedAt)));
+        } catch (e) { latest[v] = 0; }
+      }
+      const best = Object.keys(latest).reduce((a, b) => (latest[b] > latest[a] ? b : a), currentVenue);
+      if (best !== currentVenue && latest[best] > (latest[currentVenue] || 0)) {
+        location.replace(`${location.pathname}?venue=${best}`);
+      }
+    });
+  }
+
+  function init() {
+    const params = new URLSearchParams(window.location.search);
+    // No ?venue= (the staff hub's Live Display button, old bookmarks): use
+    // tonight's venue rather than always Tight End (2026-10-15: it showed
+    // Tight End's idle clock on a Wild Corgi night). followTonightsClock()
+    // then switches to the venue whose clock is actually running.
+    const venueGiven = !!VENUES[params.get('venue')];
+    currentVenue = venueGiven ? params.get('venue') : defaultVenueForToday();
+
+    applyVenueBranding();
+    updateVenueLinks();
+    renderChipValues();
+    restoreLocalClock();
+    restoreSyncMode();
+    renderSyncLink();
+    refreshTimerView(0);
+    refreshTimerView(1);
+
+    initPanels();
+
+    // Restore saved layout or apply default
+    if (!restoreLayout()) {
+      // Wait for dashboard to have dimensions
+      requestAnimationFrame(() => applyLayout('full'));
+    } else {
+      // Re-render after restoring
+      setTimeout(() => {
+        renderLeaderboard();
+        renderBountyList();
+      }, 100);
+    }
+
+    // Data panels need Firebase; the clock doesn't, so it starts first.
+    firebaseReady.then((m) => {
+      if (!m) return;
+      loadLeaderboard();
+      loadHandOfNight();
+      loadThemeFromSchedule();
+    });
+    startClockSync();
+    if (!venueGiven && !namedClock) followTonightsClock();
+    window.addEventListener('load', () => setTimeout(registerOfflineCache, 5000));
+
+    // 4x a second so the TV turns over each second within 250 ms of the
+    // phones; the display only redraws when the shown second changes.
+    setInterval(() => Timer.tick(), 250);
+    setInterval(() => { if (PokerAPI) loadLeaderboard(); }, 60000);
+
+    initTimerScale(0);
+    initTimerScale(1);
+    initBlindsScale(0);
+    initBlindsScale(1);
+    initBlindsStackObserver(0);
+    initBlindsStackObserver(1);
+
+    document.addEventListener('keydown', handleKeyboard);
+
+    // Re-layout on window resize
+    window.addEventListener('resize', () => {
+      // Keep panels within bounds
+      const db = document.getElementById('dashboard');
+      document.querySelectorAll('.panel').forEach(p => {
+        const maxL = db.offsetWidth - 60;
+        const maxT = db.offsetHeight - 30;
+        if (p.offsetLeft > maxL) p.style.left = maxL + 'px';
+        if (p.offsetTop > maxT) p.style.top = maxT + 'px';
+      });
+    });
+  }
+
+  // ============================================
+  // VENUE BRANDING
+  // ============================================
+  function applyVenueBranding() {
+    const venue = VENUES[currentVenue] || VENUES.tight;
+
+    document.getElementById('venueTitle').textContent = venue.fullName;
+    document.getElementById('venueSubtitle').textContent = venue.schedule;
+    document.getElementById('venueTitle2').textContent = venue.fullName;
+    document.getElementById('venueSubtitle2').textContent = venue.schedule;
+
+    document.title = `Timer - ${venue.name}`;
+
+    if (venue.logo) {
+      ['venueLogoLeft','venueLogoRight','venueLogoFooterLeft','venueLogoFooterRight'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.src = venue.logo; el.style.display = 'block'; }
+      });
+    }
+  }
+
+  // ============================================
+  // TIMER AUTO-SCALE (fit text to panel)
+  // ============================================
+  // Writing a font-size onto the very element being observed is a ResizeObserver
+  // feedback loop: the write resizes the element, which re-fires the observer.
+  // It only settles while the element's box is definite; once a panel geometry
+  // makes it content-sized the loop runs away and takes the renderer with it.
+  // stableWrite() breaks that — it ignores sub-pixel churn and hard-stops a
+  // burst that refuses to converge (oscillating between two values).
+  function makeStableWriter() {
+    let last = null, hits = 0, burstStart = 0;
+    return function stableWrite(apply, value) {
+      const now = performance.now();
+      if (now - burstStart > 400) { burstStart = now; hits = 0; }
+      if (++hits > 24) return;                      // not converging — leave it be
+      const v = Math.round(value);
+      if (last !== null && Math.abs(v - last) < 1) return;
+      last = v;
+      apply(v);
+    };
+  }
+
+  function initTimerScale(gameId) {
+    const timeEl = document.getElementById(`time_${gameId}`);
+    if (!timeEl) return;
+    const write = makeStableWriter();
+    const obs = new ResizeObserver(() => {
+      const h = timeEl.offsetHeight;
+      const w = timeEl.offsetWidth;
+      // "12:34" is ~5 chars — width / 3.2 fits it; also cap at 85% of height
+      const size = Math.max(24, Math.min(h * 0.85, w / 3.2));
+      write(v => { timeEl.style.fontSize = v + 'px'; }, size);
+    });
+    obs.observe(timeEl);
+  }
+
+  function initBlindsScale(gameId) {
+    const nowEl  = document.querySelector(`#blinds_${gameId} .blinds-now`);
+    const nextEl = document.querySelector(`#blinds_${gameId} .blinds-next`);
+    if (!nowEl || !nextEl) return;
+
+    const write = makeStableWriter();
+    const obs = new ResizeObserver(() => {
+      // Scale current blinds to fill its container
+      const nowVal = nowEl.querySelector('.blinds-values');
+      if (nowVal) {
+        const h = nowEl.offsetHeight;
+        const w = nowEl.offsetWidth;
+        const labelH = nowEl.querySelector('.blinds-label')?.offsetHeight || 14;
+        const avail = h - labelH - 4;
+        const nowSize = Math.max(16, Math.min(avail * 0.85, w / 5.5));
+        // Same feedback-loop guard as the clock: .blinds-values is a descendant
+        // of the observed .blinds-now, so its font-size can resize the observer's
+        // own target.
+        write(v => {
+          nowVal.style.fontSize = v + 'px';
+          const nextVal = nextEl.querySelector('.blinds-values');
+          if (nextVal) nextVal.style.fontSize = Math.max(11, v * 0.5) + 'px';
+        }, nowSize);
+      }
+    });
+    obs.observe(nowEl);
+  }
+
+  function initBlindsStackObserver(gameId) {
+    // Watch the timer panel — stack blinds vertically when panel is portrait (taller than wide)
+    const panel = document.getElementById(`panel-timer${gameId + 1}`);
+    if (!panel) return;
+    const obs = new ResizeObserver(() => {
+      const isPortrait = panel.offsetHeight > panel.offsetWidth;
+      panel.classList.toggle('blinds-stacked', isPortrait);
+    });
+    obs.observe(panel);
+  }
+
+  function updateVenueLinks() {
+    document.getElementById('linkTight').classList.toggle('active', currentVenue === 'tight');
+    document.getElementById('linkCorgi').classList.toggle('active', currentVenue === 'corgi');
+  }
+
+  function renderChipValues() {
+    const venue = VENUES[currentVenue] || VENUES.tight;
+    const chipRow = document.getElementById('chipRow');
+    chipRow.innerHTML = venue.chips.map(c =>
+      `<div class="chip ${c.cssClass}">${c.value}</div>`
+    ).join('');
+  }
+
+  // ============================================
+  // TIMER DISPLAY
+  // ============================================
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  function formatBlinds(small, big) {
+    if (small >= 1000) {
+      return { small: (small / 1000) + 'K', big: (big / 1000) + 'K' };
+    }
+    return { small, big };
+  }
+
+  function updateTimerDisplay(gameId) {
+    const game = Timer.games[gameId];
+    const timeEl = document.getElementById(`time_${gameId}`);
+    timeEl.textContent = formatTime(game.timeRemaining);
+    timeEl.classList.toggle('warning', game.isRunning && game.timeRemaining <= 60 && game.timeRemaining > 0);
+    timeEl.classList.toggle('paused', !game.isRunning);
+  }
+
+  function updateBlindsDisplay(gameId) {
+    const game = Timer.games[gameId];
+    const level = BLIND_LEVELS[game.currentLevelIndex];
+    const nextLevel = BLIND_LEVELS[Math.min(game.currentLevelIndex + 1, BLIND_LEVELS.length - 1)];
+
+    const blindsNowEl = document.getElementById(`blindsNow_${gameId}`);
+    const blindsNextEl = document.getElementById(`blindsNext_${gameId}`);
+    const roundEl = document.getElementById(`roundnumber_${gameId}`);
+    const timerInner = document.getElementById(`timerInner_${gameId}`);
+
+    if (level.isPreGame) {
+      roundEl.textContent = level.name;
+    } else if (typeof level.level === 'string') {
+      roundEl.textContent = level.name;
+    } else {
+      roundEl.textContent = `R${level.level}`;
+    }
+
+    if (timerInner) timerInner.classList.toggle('break-mode', level.isBreak);
+
+    // Restore blinds section visibility (hidden during pre-game)
+    const blindsSect = document.getElementById(`blinds_${gameId}`);
+    if (blindsSect && !level.isPreGame) blindsSect.style.display = '';
+
+    if (level.isBreak) {
+      const panelW = timerInner ? timerInner.offsetWidth : 400;
+      const breakName = panelW < 250 ? (level.name === 'Break & Chip Up' ? 'Chip Up' : 'Break') : level.name;
+      const chipUpText = level.chipUp ? (panelW < 300 ? 'Chip Up' : level.chipUp) : '';
+      blindsNowEl.innerHTML = `
+        <div class="break-display">${breakName}</div>
+        ${chipUpText ? `<div class="break-subtitle">${chipUpText}</div>` : ''}
+      `;
+    } else if (level.isPreGame) {
+      // Hide blinds section during pre-game; name shown in round header
+      const blindsSection = document.getElementById(`blinds_${gameId}`);
+      if (blindsSection) blindsSection.style.display = 'none';
+    } else if (level.displayChips) {
+      blindsNowEl.innerHTML = `
+        <span class="small-blind">${level.displayChips.split('/')[0]}</span>
+        <span class="blind-slash"> / </span>
+        <span class="big-blind">${level.displayChips.split('/')[1]}</span>
+        <div style="font-size: 1.2vw; color: #888; margin-top: 3px;">chips (5K each)</div>
+      `;
+    } else {
+      const blinds = formatBlinds(level.small, level.big);
+      blindsNowEl.innerHTML = `
+        <span class="small-blind">${blinds.small}</span>
+        <span class="blind-slash"> / </span>
+        <span class="big-blind">${blinds.big}</span>
+      `;
+    }
+
+    if (nextLevel.isBreak) {
+      blindsNextEl.innerHTML = `<span>${nextLevel.name}</span>`;
+    } else if (nextLevel.displayChips) {
+      blindsNextEl.innerHTML = `<span>${nextLevel.displayChips}</span>`;
+    } else if (nextLevel.isPreGame) {
+      blindsNextEl.innerHTML = `<span>${nextLevel.name}</span>`;
+    } else {
+      const nextBlinds = formatBlinds(nextLevel.small, nextLevel.big);
+      blindsNextEl.innerHTML = `<span>${nextBlinds.small} / ${nextBlinds.big}</span>`;
+    }
+  }
+
+  function updatePlayButton(gameId) {
+    const game = Timer.games[gameId];
+    const btn = document.getElementById(`play_${gameId}`);
+    btn.textContent = game.isRunning ? 'Pause' : 'Play';
+    btn.classList.toggle('paused', !game.isRunning);
+  }
+
+  function updateDisplay(gameId) {
+    updateTimerDisplay(gameId);
+    updateBlindsDisplay(gameId);
+    updatePlayButton(gameId);
+  }
+
+  // ============================================
+  // TOGGLE PLAY
+  // ============================================
+  function togglePlay(gameId) {
+    const game = Timer.games[gameId];
+    if (game.isRunning) {
+      Timer.pause(gameId);
+    } else {
+      Timer.start(gameId);
+    }
+  }
+  window.togglePlay = togglePlay;
+
+  // ============================================
+  // DATA LOADING
+  // ============================================
+  async function loadLeaderboard() {
+    try {
+      const venue = VENUES[currentVenue];
+      const result = await PokerAPI.getLeaderboard({ venue: venue.apiVenue });
+
+      if (result.status === 'success') {
+        const raw = result.standings || [];
+        seasonStarted = seasonHasStarted(raw);
+        leagueData = buildChampionshipRanking(raw);
+
+        // Week-one showcase prep. Names are best-effort (a stale
+        // config/champions doc must not suppress the photo), but the photo
+        // probe has to finish before render or the panel could be blanked in
+        // favour of an image that 404s.
+        if (!seasonStarted) {
+          if (!Object.keys(hallOfFame).length) {
+            try { hallOfFame = await PokerAPI.getHallOfFame(); } catch (e) { hallOfFame = {}; }
+          }
+          // All four photos, both venues — see SHOWCASE_VENUES.
+          await Promise.all(SHOWCASE_VENUES.flatMap(v => [
+            preloadChampionPhoto(v, 'champion'),
+            preloadChampionPhoto(v, 'gladiator')
+          ]));
+        }
+
+        // Full bounty ranking, everyone included (0-bounty players rank at the
+        // bottom with a score of 0 rather than vanishing). The season-view
+        // Bounty panel filters to bounties > 0 at render time.
+        bountyData = rankByBounties(leagueData);
+
+        // 'TBD' is what the server sends when a season has no championshipDate.
+        // It is truthy, so without this test the venue display would try to
+        // load a championship roster for a date called "TBD".
+        if (result.championshipDate && /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(String(result.championshipDate).trim())) {
+          championshipEventDate = result.championshipDate;
+        }
+        if (result.seasonName) {
+          document.getElementById('leaderboardTitle').textContent =
+            `${result.seasonName} - ${result.championshipDate || 'TBD'}`;
+        } else if (result.championshipDate) {
+          document.getElementById('leaderboardTitle').textContent =
+            `The Championship - ${result.championshipDate}`;
+        }
+
+        // Load director overrides for championship mode
+        if (isChampionshipMode && championshipEventDate) {
+          try {
+            const ov = await PokerAPI.getChampOverrides({
+              venue: venue.apiVenue,
+              date: championshipEventDate
+            });
+            const split = splitOverrides(ov.overrides || { 1: {}, 2: {} });
+            champOverrides = split.overrides;
+            champDoors = split.doors;
+            champSeats = split.seats || { 1: {}, 2: {} };
+          } catch(e) {
+            // Staff-gated call: on a TV profile that is not signed in this fails
+            // silently and the panel shows automatic seating only. Say so.
+            console.warn('getChampOverrides failed — director moves, doors and seats will not show on this display:', e && e.message);
+            champOverrides = { 1: {}, 2: {} }; champDoors = { 1: false, 2: false }; champSeats = { 1: {}, 2: {} };
+          }
+        }
+
+        renderLeaderboard();
+        renderBountyList();
+
+        document.getElementById('leaderboardUpdated').textContent = new Date().toLocaleTimeString();
+      }
+    } catch (err) {
+      console.error('Error loading leaderboard:', err);
+      document.getElementById('leaderboardLoading').textContent = 'Failed to load';
+    }
+  }
+
+  async function loadHandOfNight() {
+    try {
+      const venue = VENUES[currentVenue];
+      const data = await PokerAPI.getHandOfNight({ venue: venue.apiVenue });
+
+      if (data.success && data.hand) {
+        handOfNight = { theme: data.theme, hand: data.hand, bonus: data.bonus, success: true };
+        updateHandOfNightDisplay();
+      }
+    } catch (err) {
+      console.error('Error loading Hand of Night:', err);
+    }
+  }
+
+  async function loadThemeFromSchedule() {
+    try {
+      const venue = VENUES[currentVenue];
+      const result = await PokerAPI.getSchedule();
+      const schedule = result.schedule || [];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // Parse schedule dates and sort ascending
+      const dated = schedule.map(g => {
+        const d = new Date(g.date);
+        d.setHours(0, 0, 0, 0);
+        return { ...g, _d: d };
+      }).sort((a, b) => a._d - b._d);
+
+      const venueKey = venue.name.toLowerCase().split(' ')[0];
+      const forVenue = g => (g.location || '').toLowerCase().includes(venueKey);
+
+      // This week = most recent game today or in the past 7 days (or today)
+      const thisWeek = dated.filter(g => forVenue(g) && g._d <= today)
+                            .sort((a, b) => b._d - a._d)[0]
+                       || dated.find(g => forVenue(g) && g._d >= today);
+
+      // Next week = first upcoming game after this week's date
+      const thisWeekDate = thisWeek?._d;
+      const nextWeek = thisWeekDate
+        ? dated.find(g => forVenue(g) && g._d > thisWeekDate)
+        : null;
+
+      const topEl    = document.getElementById('themeTextTop');
+      const bottomEl = document.getElementById('themeTextBottom');
+      if (topEl)    topEl.textContent    = thisWeek?.theme || '—';
+      if (bottomEl) bottomEl.textContent = nextWeek?.theme || '—';
+
+      // Auto-highlight Championship button if today is championship
+      if (thisWeek?.type === 'Championship') {
+        const champLink = document.getElementById('linkChamp');
+        if (champLink) champLink.style.animation = 'flash 1.5s infinite';
+      }
+    } catch (err) {
+      console.error('Error loading theme from schedule:', err);
+    }
+  }
+
+  function datesMatch(d1, d2) {
+    if (!d1 || !d2) return false;
+    const n = s => s.replace(/\//g, '-').replace(/(\d)-(\d)/g, '$1-0$2');
+    return n(d1) === n(d2) || d1 === d2;
+  }
+
+  function refreshData() {
+    loadLeaderboard();
+    loadHandOfNight();
+    loadThemeFromSchedule();
+  }
+  window.refreshData = refreshData;
+
+  // ============================================
+  // CHAMPIONSHIP RANKING — shared. buildChampionshipRanking and rankByBounties
+  // are imported from champ-seating.js (THE rule, same as the director page and
+  // the dashboard). A local copy used to live here and drifted: it never
+  // marked ties, and its bounty list dropped everyone with 0 bounties, so those
+  // players showed on the TV as unranked "walk-ins" with no score.
+  // ============================================
+
+  // ============================================
+  // RENDERING - Auto-adapt to panel size
+  // ============================================
+  // Week one the board has nothing worth showing, so the panel carries last
+  // season's podium photos instead. Returns true when the showcase took over
+  // the panel and the caller should stop. Championship night is by definition
+  // mid-season, so the showcase never runs there.
+  // `awards` is an array (['champion','gladiator'] → the 2×2 grid of all four
+  // winners) or null to keep this panel's normal behaviour.
+  function renderChampionShowcase(containerId, awards, hideIds) {
+    const box = document.getElementById(containerId);
+    if (!box) return false;
+
+    const html = (!seasonStarted && !isChampionshipMode && !SHOWCASE_DISABLED && awards)
+      ? buildShowcaseGroupHtml({
+          awards,
+          hallOfFame,
+          venues: SHOWCASE_VENUES,
+          isReady: championPhotoReady
+        })
+      : '';
+
+    if (!html) {
+      box.style.display = 'none';
+      box.innerHTML = '';
+      // Hand the panel back: the caller re-sets grid/loading itself, but the
+      // rows we hid on its behalf would otherwise stay hidden for good.
+      hideIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = '';
+      });
+      return false;
+    }
+
+    box.innerHTML = html;
+    box.style.display = 'flex';
+    hideIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    return true;
+  }
+
+  function renderLeaderboard() {
+    const grid = document.getElementById('leaderboardGrid');
+    const loading = document.getElementById('leaderboardLoading');
+
+    // All four winners tile 2×2 in this panel; the Bounty panel stays normal
+    // so the same faces aren't up twice.
+    if (renderChampionShowcase('champShowcase', ['champion', 'gladiator'],
+        ['leaderboardGrid', 'leaderboardLoading', 'leaderboardUpdatedRow', 'champLeaderboardFooter'])) {
+      return;
+    }
+
+    if (leagueData.length === 0) {
+      loading.textContent = 'No standings data';
+      return;
+    }
+
+    loading.style.display = 'none';
+
+    const panel = document.getElementById('panel-champ');
+    const body = panel.querySelector('.panel-body');
+    const champRosterSize = 20;
+    const availH = body.offsetHeight - 24;
+    const availW = body.offsetWidth;
+    const rowH = 20;
+    const maxRowsPerCol = Math.max(5, Math.floor(availH / rowH));
+
+    // Use 2 columns if panel is wide enough (>300px)
+    const useTwoCols = availW > 300;
+    const totalSlots = useTwoCols ? maxRowsPerCol * 2 : maxRowsPerCol;
+    // In championship mode: top 20 + manually promoted alternates (director overrides)
+    let displaySlice;
+    let fromSeating = false;
+    if (isChampionshipMode) {
+      // Seated = Playing + Cleared to Seat from the shared seating rules, in
+      // the ORDER those rules give: rank order, with promoted alternates
+      // (rank 21+) below every berth holder. Do NOT re-sort by points here —
+      // that put a rank-21 alternate above the auto-qualifiers and renumbered
+      // the whole list (the owner, championship night 2026-09-08).
+      const seat = champSeating[2];
+      if (seat) {
+        const byName = new Map(leagueData.map(p => [p.name, p]));
+        displaySlice = seatedRoster(seat).map(e => Object.assign({}, byName.get(e.name) || { name: e.name, points: e.score || 0, gamesPlayed: 0, qualified: !!e.qualified }, { _seat: e }));
+        fromSeating = true;
+      } else {
+        displaySlice = leagueData.slice(0, champRosterSize);
+      }
+    } else {
+      displaySlice = leagueData.slice(0, Math.min(leagueData.length, totalSlots));
+    }
+    const showCount = displaySlice.length;
+
+    grid.className = 'leaderboard-list' + (useTwoCols ? ' two-col' : '');
+    grid.style.display = useTwoCols ? 'grid' : 'flex';
+    if (useTwoCols) {
+      grid.style.gridTemplateRows = `repeat(${Math.ceil(showCount / 2)}, auto)`;
+    }
+
+    const fontSize = showCount > 30 ? '0.96rem' : showCount > 15 ? '1.04rem' : '1.2rem';
+
+    // Compute display-based ranks (season view). In championship mode the
+    // seating entries already carry the real rank and tie flag.
+    if (!fromSeating) {
+      displaySlice.forEach((p, i) => {
+        if (i === 0) { p.dispRank = 1; }
+        else {
+          const prev = displaySlice[i - 1];
+          p.dispRank = (prev.points === p.points && prev.gamesPlayed === p.gamesPlayed && (prev.rsvpsHonored || 0) === (p.rsvpsHonored || 0))
+            ? prev.dispRank : i + 1;
+        }
+      });
+      displaySlice.forEach(p => {
+        p.dispTied = displaySlice.filter(o => o.dispRank === p.dispRank).length > 1;
+      });
+    }
+
+    let html = '';
+    for (let i = 0; i < showCount; i++) {
+      const player = displaySlice[i];
+      const e = player._seat || null;
+      const rank = e ? (e.dispRank || e.origRank) : player.dispRank;
+      const tierRank = e ? (e.origRank || 999) : rank;
+      const tierClass = tierRank <= 5 ? 'tier-1' : tierRank <= 10 ? 'tier-2' : tierRank <= 20 ? 'tier-3' : '';
+      // Alternates (rank 21+, no tier color) get yellow to show they moved up
+      const altClass = (isChampionshipMode && !tierClass) ? ' champ-here' : '';
+      const outClass = (e && e.out) ? ' champ-out' : '';
+      const badge = player.qualified ? '<span class="qualified-badge">Q</span>' : '';
+      const seatChip = e ? seatChipHtml(e.seat) : '';
+      const rankDisplay = (e ? e.tied : player.dispTied) ? `T${rank}` : rank;
+      let statusPre = '';
+      if (isChampionshipMode) {
+        const st = (e && e.out) ? 'declined' : (champAttendanceG2[player.name] || 'blank');
+        const { icon, cls } = getStatusIcon(st);
+        statusPre = icon ? `<span class="status-indicator ${cls}">${icon}</span>` : '<span class="status-indicator"></span>';
+      }
+
+      html += `
+        <div class="leaderboard-entry ${tierClass}${altClass}${outClass}" style="font-size: ${fontSize};">
+          ${statusPre}<span class="player-rank">${rankDisplay}</span>
+          <span class="player-name">${escapeHtml(player.name)}</span>${badge}${seatChip}
+          <span class="player-points">${Math.round(player.points)}</span>
+        </div>
+      `;
+    }
+    grid.innerHTML = html;
+
+    // Championship counts in footer
+    const footer = document.getElementById('champLeaderboardFooter');
+    if (isChampionshipMode && (champCounts.g2ci || champCounts.g2rsvp)) {
+      footer.innerHTML = `${champCounts.g2ci} here · ${champCounts.g2rsvp} RSVP`;
+      footer.style.display = '';
+    } else {
+      footer.style.display = 'none';
+    }
+  }
+
+  function renderBountyList() {
+    const grid = document.getElementById('bountyGrid');
+    const loading = document.getElementById('bountyLoading');
+
+    // awards:null — gladiators moved into the champ panel's 2×2 grid; passing
+    // null (rather than deleting the call) keeps the un-hide logic that
+    // restores this panel's own elements.
+    if (renderChampionShowcase('bountyShowcase', null,
+        ['bountyGrid', 'bountyLoading', 'champBountyFooter'])) {
+      return;
+    }
+
+    if (bountyData.length === 0) {
+      loading.textContent = 'No bounties';
+      return;
+    }
+
+    loading.style.display = 'none';
+
+    const panel = document.getElementById('panel-bounty');
+    const body = panel.querySelector('.panel-body');
+    const availH = body.offsetHeight - 8;
+    const availW = body.offsetWidth;
+    const rowH = 20;
+    const maxRowsPerCol = Math.max(5, Math.floor(availH / rowH));
+
+    const useTwoCols = availW > 300;
+    const totalSlots = useTwoCols ? maxRowsPerCol * 2 : maxRowsPerCol;
+    const champRosterSize = 20;
+
+    // In championship mode: top 20 + manually promoted alternates (director overrides)
+    let bountyDisplaySlice;
+    let bFromSeating = false;
+    if (isChampionshipMode) {
+      // Same rule as the championship panel: show the seated roster in the
+      // order the shared seating rules give, never re-sorted by bounties.
+      const seat = champSeating[1];
+      if (seat) {
+        const byName = new Map(bountyData.map(p => [p.name, p]));
+        bountyDisplaySlice = seatedRoster(seat).map(e => Object.assign({}, byName.get(e.name) || { name: e.name, bounties: e.score || 0, gamesPlayed: 0 }, { _seat: e }));
+        bFromSeating = true;
+      } else {
+        bountyDisplaySlice = bountyData.slice(0, champRosterSize);
+      }
+    } else {
+      // Season view: leaders only — nobody wants a wall of zeros on the TV.
+      const leaders = bountyData.filter(p => (p.bounties || 0) > 0);
+      bountyDisplaySlice = leaders.slice(0, Math.min(leaders.length, totalSlots));
+    }
+    const showCount = bountyDisplaySlice.length;
+
+    grid.className = 'bounty-list' + (useTwoCols ? ' two-col' : '');
+    grid.style.display = useTwoCols ? 'grid' : 'flex';
+    if (useTwoCols) {
+      grid.style.gridTemplateRows = `repeat(${Math.ceil(showCount / 2)}, auto)`;
+    }
+
+    const fontSize = showCount > 30 ? '0.96rem' : showCount > 20 ? '1.04rem' : '1.2rem';
+
+    let html = '';
+    // Assign tied bounty ranks (season view). In championship mode the seating
+    // entries already carry the real rank and tie flag.
+    if (!bFromSeating) {
+      bountyDisplaySlice.forEach((p, i) => {
+        if (i === 0) { p.bRank = 1; }
+        else {
+          const prev = bountyDisplaySlice[i-1];
+          p.bRank = (prev.bounties === p.bounties && prev.gamesPlayed === p.gamesPlayed) ? prev.bRank : i + 1;
+        }
+      });
+      bountyDisplaySlice.forEach(p => { p.bTied = bountyDisplaySlice.filter(o => o.bRank === p.bRank).length > 1; });
+    }
+
+    for (let i = 0; i < showCount; i++) {
+      const player = bountyDisplaySlice[i];
+      const e = player._seat || null;
+      const rank = e ? (e.dispRank || e.origRank) : player.bRank;
+      const tierRank = e ? (e.origRank || 999) : rank;
+      const tierClass = tierRank <= 5 ? 'tier-1' : tierRank <= 10 ? 'tier-2' : tierRank <= 20 ? 'tier-3' : '';
+      // Alternates (rank 21+, no tier color) get yellow to show they moved up
+      const altClass = (isChampionshipMode && !tierClass) ? ' champ-here' : '';
+      const outClass = (e && e.out) ? ' champ-out' : '';
+      const seatChip = e ? seatChipHtml(e.seat) : '';
+      const rankDisplay = (e ? e.tied : player.bTied) ? `T${rank}` : rank;
+      let statusPre = '';
+      if (isChampionshipMode) {
+        const st = (e && e.out) ? 'declined' : (champAttendanceG1[player.name] || 'blank');
+        const { icon, cls } = getStatusIcon(st);
+        statusPre = icon ? `<span class="status-indicator ${cls}">${icon}</span>` : '<span class="status-indicator"></span>';
+      }
+
+      html += `
+        <div class="bounty-entry ${tierClass}${altClass}${outClass}" style="font-size: ${fontSize};">
+          ${statusPre}<span class="player-rank">${rankDisplay}</span>
+          <span class="player-name">${escapeHtml(player.name)}</span>${seatChip}
+          <span class="bounty-count">${player.bounties}</span>
+        </div>
+      `;
+    }
+    grid.innerHTML = html;
+
+    // Championship counts in footer
+    const bFooter = document.getElementById('champBountyFooter');
+    if (isChampionshipMode && (champCounts.g1ci || champCounts.g1rsvp)) {
+      bFooter.innerHTML = `${champCounts.g1ci} here · ${champCounts.g1rsvp} RSVP`;
+      bFooter.style.display = '';
+    } else {
+      bFooter.style.display = 'none';
+    }
+  }
+
+  // ============================================
+  // CHAMPIONSHIP MODE
+  // ============================================
+  function toggleChampionshipMode() {
+    isChampionshipMode = !isChampionshipMode;
+    const link = document.getElementById('linkChamp');
+    link.classList.toggle('championship-active', isChampionshipMode);
+
+    if (isChampionshipMode) {
+      applyLayout('championship');
+      loadChampionshipRoster();
+      championshipRefreshInterval = setInterval(loadChampionshipRoster, 30000);
+    } else {
+      clearInterval(championshipRefreshInterval);
+      championshipRefreshInterval = null;
+      champAttendanceG1 = {};
+      champAttendanceG2 = {};
+      champOnDeckG1 = []; champConsolG1 = []; champOnDeckG2 = []; champConsolG2 = [];
+      champSeating = { 1: null, 2: null };
+      onDeckGameOverride = null;
+      champCounts = { g1ci: 0, g1rsvp: 0, g2ci: 0, g2rsvp: 0 };
+      renderLeaderboard();
+      renderBountyList();
+      applyLayout('full1');
+    }
+  }
+  window.toggleChampionshipMode = toggleChampionshipMode;
+
+  async function loadChampionshipRoster() {
+    try {
+      const venue = VENUES[currentVenue];
+      const today = new Date();
+      const fallbackDate = `${today.getMonth()+1}/${today.getDate()}/${today.getFullYear()}`;
+      const dateStr = championshipEventDate || fallbackDate;
+
+      const att = await fetchChampAttendance({ project: 'demo-poker', apiKey: 'demo-api-key', venue: venue.apiVenue, date: dateStr });
+
+      // Attendance icons on the leaderboard panels use the legacy status names.
+      const legacy = (st) => st === 'ci' ? 'checkedin' : st === 'rsvp' ? 'rsvp' : st === 'declined' ? 'declined' : 'blank';
+      champAttendanceG1 = {};
+      bountyData.forEach(p => { champAttendanceG1[p.name] = legacy(att.attendance[1][p.name]); });
+      champAttendanceG2 = {};
+      leagueData.forEach(p => { champAttendanceG2[p.name] = legacy(att.attendance[2][p.name]); });
+
+      champSeating[1] = buildSeating({ ranked: bountyData, attendance: att.attendance[1], checkinTime: att.checkinTime[1], overrides: champOverrides[1] || {}, seats: champSeats[1] || {}, doorsClosed: champDoors[1], scoreField: 'bounties' });
+      champSeating[2] = buildSeating({ ranked: leagueData, attendance: att.attendance[2], checkinTime: att.checkinTime[2], overrides: champOverrides[2] || {}, seats: champSeats[2] || {}, doorsClosed: champDoors[2], scoreField: 'points' });
+
+      const c1 = champSeating[1].meta.counts, c2 = champSeating[2].meta.counts;
+      champCounts = { g1ci: c1.ci, g1rsvp: c1.rsvp, g2ci: c2.ci, g2rsvp: c2.rsvp };
+
+      // Re-render existing panels with attendance data overlaid
+      renderLeaderboard();
+      renderBountyList();
+      renderOnDeckPanel();
+
+    } catch (err) {
+      console.error('Error loading championship rosters:', err);
+    }
+  }
+
+  function getStatusIcon(status) {
+    switch(status) {
+      case 'checkedin': return { icon: '&#10003;', cls: 'status-checkedin' };
+      case 'declined':  return { icon: '&#10007;', cls: 'status-absent' };
+      case 'rsvp':      return { icon: '&#9679;',  cls: 'status-rsvp' };
+      default:          return { icon: '',          cls: '' };
+    }
+  }
+
+  // Which game the bottom panel shows: Bounty until 8:00 PM, then Championship.
+  function onDeckGame() {
+    if (onDeckGameOverride) return onDeckGameOverride;
+    const n = new Date();
+    return (n.getHours() * 60 + n.getMinutes()) >= ONDECK_ROLL_MINS ? 2 : 1;
+  }
+  window.toggleOnDeckGame = function () {
+    onDeckGameOverride = onDeckGame() === 1 ? 2 : 1;
+    renderOnDeckPanel();
+  };
+  document.getElementById('onDeckHeader')?.addEventListener('click', () => window.toggleOnDeckGame());
+  // Roll on the clock even when nothing else changes.
+  setInterval(() => { if (isChampionshipMode) renderOnDeckPanel(); }, 60000);
+
+  function renderOnDeckPanel() {
+    const list = document.getElementById('onDeckList');
+    const body = document.getElementById('onDeckBody');
+    const title = document.getElementById('onDeckTitle');
+    const mode = document.getElementById('onDeckMode');
+    if (!list || !body) return;
+
+    const g = onDeckGame();
+    const st = champSeating[g];
+    const isB = g === 1;
+    title.innerHTML = isB ? '🎯 Bounty — On Deck &amp; Consolation A' : '🏆 Championship — On Deck &amp; Consolation B';
+    title.style.color = isB ? '#ff9900' : '#d4af37';
+    mode.textContent = onDeckGameOverride
+      ? (isB ? 'manual · click for Championship' : 'manual · click for Bounty')
+      : (isB ? 'auto · rolls to Championship at 8:00 PM' : 'auto · Championship');
+
+    if (!st) { list.innerHTML = '<div style="color:#555;padding:6px;font-size:0.8rem;">Loading…</div>'; return; }
+    const m = st.meta;
+
+    const entry = (p, num, right, extra) => {
+      const { icon, cls } = getStatusIcon(p.status === 'ci' ? 'checkedin' : p.status === 'declined' ? 'declined' : p.status === 'rsvp' ? 'rsvp' : 'blank');
+      return `<div class="od-row ${extra || ''}"><span class="status-indicator ${cls}">${icon}</span><span class="od-num">${num}</span><span class="od-name">${escapeHtml(p.name)}${p.manual ? '<span class="od-moved">MOVED</span>' : ''}</span><span class="od-right">${right || ''}</span></div>`;
+    };
+    const head = (cls, text, count) => `<div class="od-head ${cls}"><span>${text}</span><span class="od-count">${count}</span></div>`;
+
+    let h = '';
+    if (m.closed) h += `<div class="od-doors">DOORS CLOSED — no-shows have given up their seats</div>`;
+    // Players cleared to seat are NOT repeated here: they already appear in the
+    // seated list above (yellow rows = moved up from the alternates).
+    h += head('ondeck', '▲ On Deck', `${st.ondeck.length} waiting${m.closed ? '' : (m.unconfirmed ? ` · ${m.unconfirmed} seat${m.unconfirmed === 1 ? '' : 's'} could open` : '')}`);
+    if (!st.ondeck.length) h += `<div class="od-empty">${m.closed ? 'Doors are closed.' : 'No alternates waiting.'}</div>`;
+    // Every row carries the player's score (points or bounties by game) so the
+    // room can see WHY someone is where they are (the owner, 2026-09-09).
+    const score = (p) => (p.score === null || p.score === undefined) ? '' : `<span class="od-score">${p.score}</span>`;
+    st.ondeck.forEach(p => h += entry(p, '#' + p.origRank, score(p)));
+    h += head('consol', `♠ Consolation ${isB ? 'A' : 'B'}`, `${m.consolFilled} of ${m.consolSeats} seats · arrival order`);
+    if (!st.consolation.length) h += `<div class="od-empty">No consolation players yet.</div>`;
+    st.consolation.forEach((p, i) => h += entry(p, (i + 1) + '.', (p.origRank ? '#' + p.origRank : 'walk-in') + score(p), 'od-consol'));
+    if (st.consolWait.length) {
+      h += head('wait', '⏳ Waitlist · arrival order', `${st.consolWait.length}`);
+      // Sorted by check-in time, but the time itself is not shown (the owner, 2026-09-11).
+      st.consolWait.forEach((p, i) => h += entry(p, (i + 1) + '.', (p.origRank ? '#' + p.origRank : 'walk-in') + score(p), 'od-wait'));
+    }
+    list.innerHTML = `<div class="od-flow">${h}</div>`;
+
+    // Fit: the room may have 35+ consolation players and nobody scrolls a TV.
+    // Columns fill LEFT TO RIGHT: the flow gets an explicit height and
+    // column-fill:auto, so column 1 fills top-to-bottom before column 2 starts
+    // (a short list is one column, not three balanced slivers). Fixed column
+    // grid (the owner's call): 5 columns on a wide display, 4 on a narrower one. Only the
+    // type size adapts: shrink until nothing spills past the last column.
+    const flow = list.firstElementChild;
+    const availH = body.clientHeight - 6;
+    const availW = body.clientWidth;
+    flow.style.columnCount = availW >= 1100 ? 5 : 4;
+    flow.style.height = Math.max(40, availH) + 'px';
+    let size = 1.0;
+    for (let tries = 0; tries < 16; tries++) {
+      flow.style.fontSize = size + 'rem';
+      // With column-fill:auto, overflow shows up as extra columns to the RIGHT
+      // (scrollWidth), not as extra height.
+      if (flow.scrollWidth <= availW + 1 || size <= 0.62) break;
+      size = Math.round((size - 0.05) * 100) / 100;
+    }
+  }
+
+  // ============================================
+  // HAND OF NIGHT
+  // ============================================
+  function updateHandOfNightDisplay() {
+    const hand = handOfNight.hand || '--';
+    const bonus = handOfNight.bonus || '---';
+    const theme = handOfNight.theme || '—';
+    const displayHand = convertSuits(hand);
+
+    // Theme corners are managed by loadThemeFromSchedule()
+
+    // Top-left HotN
+    document.getElementById('hotnHandLeft').textContent = displayHand;
+    document.getElementById('hotnBonusLeft').textContent = `| ${bonus}`;
+    // Bottom-right HotN
+    document.getElementById('hotnBonusRight2').textContent = `${bonus} |`;
+    document.getElementById('hotnHandRight2').textContent = displayHand;
+  }
+
+  function openHotnEditor() {
+    document.getElementById('hotnThemeInput').value = handOfNight.theme || '';
+    document.getElementById('hotnHandInput').value = handOfNight.hand || '';
+    document.getElementById('hotnBonusInput').value = handOfNight.bonus || '';
+    updateHotnPreview();
+    document.getElementById('hotnModal').classList.add('visible');
+  }
+  window.openHotnEditor = openHotnEditor;
+
+  async function clearHotn() {
+    const venue = VENUES[currentVenue];
+    try {
+      await ensureStaffAuth();
+      await PokerAPI.clearHandOfNight({ venue: venue.apiVenue });
+    } catch (err) {
+      console.error('Error clearing Hand of Night:', err);
+      alert('Failed to clear Hand of Night: ' + (err.message || err.code || 'unknown error'));
+      return;
+    }
+    handOfNight.hand = '--';
+    handOfNight.bonus = '---';
+    handOfNight.success = false;
+    updateHandOfNightDisplay();
+  }
+  window.clearHotn = clearHotn;
+
+  function closeHotnEditor() {
+    document.getElementById('hotnModal').classList.remove('visible');
+  }
+  window.closeHotnEditor = closeHotnEditor;
+
+  function updateHotnPreview() {
+    const hand = document.getElementById('hotnHandInput').value || '--';
+    const bonus = document.getElementById('hotnBonusInput').value || '---';
+    document.getElementById('hotnPreview').textContent = `${convertSuits(hand)} | ${bonus}`;
+  }
+  window.updateHotnPreview = updateHotnPreview;
+
+  // Weighted by hand strength — better hands appear more often.
+  // No suits: randomizer outputs ranks only (e.g. "A K", "J T", "9 8").
+  const HOTN_TOP_HANDS = [
+    // Premium — 4x
+    'A A','A A','A A','A A',
+    'K K','K K','K K','K K',
+    'Q Q','Q Q','Q Q','Q Q',
+    'A K','A K','A K','A K',
+    // Strong — 3x
+    'J J','J J','J J',
+    'T T','T T','T T',
+    'A Q','A Q','A Q',
+    'K Q','K Q','K Q',
+    // Good — 2x
+    '9 9','9 9','8 8','8 8',
+    'A J','A J','K J','K J','Q J','Q J','J T','J T',
+    // Decent — 1x
+    '7 7','6 6','5 5','4 4','3 3','2 2',
+    'A T','A 9','A 8','A 7','A 6','A 5','A 4','A 3','A 2',
+    'K T','K 9','Q T','Q 9','J 9','T 9','T 8','9 8','8 7','7 6','6 5','5 4','4 3','3 2',
+  ];
+
+  function buildRandomHand() {
+    return HOTN_TOP_HANDS[Math.floor(Math.random() * HOTN_TOP_HANDS.length)];
+  }
+
+  function randomizeHotn() {
+    document.getElementById('hotnHandInput').value = buildRandomHand();
+    document.getElementById('hotnBonusInput').value = '500';
+    updateHotnPreview();
+  }
+  window.randomizeHotn = randomizeHotn;
+
+  async function saveHotn() {
+    const theme = document.getElementById('hotnThemeInput').value.trim() || '';
+    const hand = document.getElementById('hotnHandInput').value.trim() || '--';
+    const bonus = document.getElementById('hotnBonusInput').value.trim() || '---';
+    const venue = VENUES[currentVenue];
+
+    try {
+      await ensureStaffAuth();
+      await PokerAPI.saveHandOfNight({ venue: venue.apiVenue, hand, bonus, theme });
+    } catch (err) {
+      console.error('Error saving Hand of Night:', err);
+      // Surface the real reason — the old generic text hid 'Sign in required'
+      // for weeks and made this look like a random flake.
+      alert('Failed to save Hand of Night: ' + (err.message || err.code || 'unknown error'));
+      return;
+    }
+
+    handOfNight = { theme, hand, bonus, success: true };
+    updateHandOfNightDisplay();
+    closeHotnEditor();
+  }
+  window.saveHotn = saveHotn;
+
+  function convertSuits(hand) {
+    return hand
+      .replace(/\/s/gi, '\u2660')
+      .replace(/\/h/gi, '\u2665')
+      .replace(/\/c/gi, '\u2663')
+      .replace(/\/d/gi, '\u2666');
+  }
+
+  // ============================================
+  // KEYBOARD SHORTCUTS
+  // ============================================
+  function handleKeyboard(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    inputVia = 'key';
+    try { handleKey(e); } finally { inputVia = 'button'; }
+  }
+
+  function handleKey(e) {
+    switch (e.key) {
+      case ' ':
+        e.preventDefault();
+        togglePlay(activeGame);
+        break;
+      case '1':
+        activeGame = 0;
+        showPanel('timer1');
+        break;
+      case '2':
+        activeGame = 1;
+        showPanel('timer2');
+        break;
+      case 'n':
+      case 'N':
+        Timer.nextRound(activeGame);
+        break;
+      case '+':
+      case '=':
+        Timer.addMinute(activeGame);
+        break;
+      case '-':
+        Timer.subtractMinute(activeGame);
+        break;
+      case 'h':
+      case 'H':
+        if (document.getElementById('hotnModal').classList.contains('visible')) {
+          closeHotnEditor();
+        } else {
+          openHotnEditor();
+        }
+        break;
+      case 'r':
+      case 'R':
+        refreshData();
+        break;
+      case 'f':
+      case 'F':
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+        break;
+      case 'Escape':
+        if (document.getElementById('hotnModal').classList.contains('visible')) {
+          closeHotnEditor();
+        }
+        break;
+    }
+  }
+
+  // ============================================
+  // HELPERS
+  // ============================================
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  // One shared AudioContext for the whole session. Chrome caps a page at six
+  // live contexts; creating a fresh one per level change (the old code) hit
+  // that cap after six levels and the chime went silent for the rest of the
+  // night. Same pattern as timer-bombpot.html / timer-pocketqueenz.html.
+  let _levelAudioCtx = null;
+  function playLevelEndSound() {
+    try {
+      if (!_levelAudioCtx) _levelAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const audioCtx = _levelAudioCtx;
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      oscillator.frequency.value = 880;
+      oscillator.type = 'sine';
+      gainNode.gain.value = 0.3;
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.5);
+    } catch (e) { /* Audio not supported */ }
+  }
+
+  // ============================================
+  // START
+  // ============================================
+  init();
+</script>
+
+<script src="/back-nav.js?v=1" data-home="/gameday.html"></script>
+</body>
+</html>

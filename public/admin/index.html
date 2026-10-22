@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>&#9824; Admin Portal — All-In Poker</title>
+  <link rel="icon" type="image/svg+xml" href="/img/favicon-admin.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050508;
+      --card-bg: rgba(20,20,25,0.7);
+      --border: rgba(255,255,255,0.08);
+      --gold: #d4af37;
+      --blue: #3b82f6;
+      --green: #10b981;
+      --red: #ef4444;
+      --purple: #8b5cf6;
+      --amber: #f59e0b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      background: var(--bg);
+      background: radial-gradient(circle at top right, #1a1200 0%, #050508 60%);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+    #authGuard {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      z-index: 9999;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center; gap: 16px;
+    }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid rgba(255,255,255,0.1);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #authMsg { color: var(--gold); font-weight: 700; font-size: 0.95rem; letter-spacing: 1px; text-transform: uppercase; text-align: center; padding: 0 24px; }
+    .auth-sign-in-btn {
+      background: #fff; color: #000; border: none; border-radius: 12px;
+      padding: 14px 28px; font-size: 1rem; font-weight: 700;
+      cursor: pointer; margin-top: 8px; font-family: inherit;
+    }
+    .header {
+      padding: 48px 20px 28px;
+      text-align: center;
+    }
+    h1 {
+      font-weight: 800; font-size: 1.9rem;
+      text-transform: uppercase; letter-spacing: 3px;
+      background: linear-gradient(to bottom, #fff 30%, #888);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .sub {
+      margin-top: 6px;
+      color: var(--gold); font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 3px;
+    }
+    /* Unfinalized-game alert — mirrors the one on the staff portal. Players
+       in these games are missing attendance points until a human finalizes. */
+    .alert-card { background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.35); border-radius:16px; padding:18px 20px; margin-bottom:20px; }
+    .alert-head { display:flex; align-items:center; gap:10px; font-weight:800; color:var(--red); text-transform:uppercase; letter-spacing:1px; font-size:0.82rem; }
+    .alert-sub { color:var(--muted); font-size:0.84rem; margin:6px 0 14px; line-height:1.45; }
+    .alert-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:11px 0; border-top:1px solid rgba(239,68,68,0.18); }
+    .alert-game { font-weight:700; font-size:0.9rem; }
+    .alert-detail { color:var(--muted); font-size:0.76rem; margin-top:3px; line-height:1.4; }
+    .alert-fix { flex:none; background:var(--red); color:#fff; text-decoration:none; font-weight:800; font-size:0.76rem; padding:9px 16px; border-radius:10px; text-transform:uppercase; letter-spacing:0.5px; }
+
+    .main-content {
+      padding: 0 20px 60px;
+      flex: 1;
+      max-width: 540px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .section-label {
+      font-size: 0.72rem; font-weight: 800;
+      color: var(--muted); text-transform: uppercase; letter-spacing: 2px;
+      margin: 28px 0 14px 2px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-label::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+    .menu-btn {
+      display: flex; align-items: center; gap: 18px;
+      width: 100%; padding: 20px 18px; margin-bottom: 12px;
+      text-decoration: none; color: var(--text);
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+      position: relative; overflow: hidden;
+      font-family: inherit;
+      text-align: left;
+    }
+    .menu-btn::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 4px; background: var(--accent, var(--gold)); opacity: 0.85;
+    }
+    .menu-btn:active { transform: scale(0.97) translateX(3px); background: rgba(40,40,45,0.9); }
+    .menu-btn .icon {
+      font-size: 1.6rem; width: 48px; height: 48px;
+      background: rgba(255,255,255,0.03); border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .menu-btn .text { display: flex; flex-direction: column; gap: 3px; }
+    .menu-btn .lbl { font-weight: 700; font-size: 1rem; }
+    .menu-btn .dsc { font-size: 0.8rem; color: var(--muted); }
+    .toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: var(--green); color: #000;
+      padding: 10px 22px; border-radius: 10px; font-weight: 700; font-size: 0.9rem;
+      z-index: 500; display: none;
+    }
+    html.back-nav-on .header { padding-left: 60px; }
+  </style>
+</head>
+<body>
+
+  <div id="authGuard">
+    <div class="spinner"></div>
+    <p id="authMsg">Verifying Identity…</p>
+    <button id="loginBtn" class="auth-sign-in-btn" onclick="doLogin()" style="display:none;">Sign In with Google</button>
+  </div>
+
+  <div class="header">
+    <h1>&#9824; Admin Portal</h1>
+    <div class="sub" id="userDisplay">Mission Control</div>
+  </div>
+
+  <div class="main-content">
+
+    <div id="unfinalizedAlert"></div>
+
+    <div class="section-label">Data & Records</div>
+
+    <a href="game-inspector.html" class="menu-btn" style="--accent:var(--gold)">
+      <span class="icon">&#128269;</span>
+      <div class="text">
+        <div class="lbl">Game Inspector</div>
+        <div class="dsc">Edit ranks, bounties &amp; attendance</div>
+      </div>
+    </a>
+
+    <a href="seasons.html" class="menu-btn" style="--accent:var(--blue)">
+      <span class="icon">&#128197;</span>
+      <div class="text">
+        <div class="lbl">Season Admin</div>
+        <div class="dsc">Boot seasons &amp; crown title holders</div>
+      </div>
+    </a>
+
+    <a href="schedule.html" class="menu-btn" style="--accent:var(--blue)">
+      <span class="icon">&#128198;</span>
+      <div class="text">
+        <div class="lbl">Schedule Admin</div>
+        <div class="dsc">Dates, themes &amp; game types</div>
+      </div>
+    </a>
+
+    <a href="event-publisher.html" class="menu-btn" style="--accent:var(--amber)">
+      <span class="icon">&#128240;</span>
+      <div class="text">
+        <div class="lbl">Event Publisher</div>
+        <div class="dsc">Schedule, content &amp; Facebook kit in one flow</div>
+      </div>
+    </a>
+
+    <div class="section-label">Access &amp; Identity</div>
+
+    <a href="players.html" class="menu-btn" style="--accent:var(--green)">
+      <span class="icon">&#128101;</span>
+      <div class="text">
+        <div class="lbl">Player Hub</div>
+        <div class="dsc">Manage roles, profiles &amp; merges</div>
+      </div>
+    </a>
+
+    <div class="section-label">League Operations</div>
+
+    <a href="jackpots.html" class="menu-btn" style="--accent:var(--amber)">
+      <span class="icon">&#128142;</span>
+      <div class="text">
+        <div class="lbl">Jackpots &amp; News</div>
+        <div class="dsc">High hands &amp; announcements</div>
+      </div>
+    </a>
+
+    <a href="comms.html" class="menu-btn" style="--accent:var(--green)">
+      <span class="icon">&#128227;</span>
+      <div class="text">
+        <div class="lbl">Comms Center</div>
+        <div class="dsc">Email blasts &amp; subscriber list</div>
+      </div>
+    </a>
+
+    <a href="content.html" class="menu-btn" style="--accent:var(--amber)">
+      <span class="icon">&#127912;</span>
+      <div class="text">
+        <div class="lbl">Event Content</div>
+        <div class="dsc">Theme descriptions &amp; images</div>
+      </div>
+    </a>
+
+    <div class="section-label">Bar &amp; Analytics</div>
+
+    <a href="shot-log.html" class="menu-btn" style="--accent:var(--purple)">
+      <span class="icon">&#129347;</span>
+      <div class="text">
+        <div class="lbl">Shot Log</div>
+        <div class="dsc">Shot-round orders &amp; trends</div>
+      </div>
+    </a>
+
+    <a href="/bar.html" class="menu-btn" style="--accent:var(--blue)">
+      <span class="icon">&#127864;</span>
+      <div class="text">
+        <div class="lbl">Bar Orders</div>
+        <div class="dsc">Live incoming orders by table</div>
+      </div>
+    </a>
+
+    <a href="/bar-qr.html" class="menu-btn" style="--accent:var(--green)">
+      <span class="icon">&#128241;</span>
+      <div class="text">
+        <div class="lbl">Bartender QR</div>
+        <div class="dsc">Scannable code &rarr; live orders</div>
+      </div>
+    </a>
+
+    <a href="/bar-demo.html" class="menu-btn" style="--accent:var(--amber)">
+      <span class="icon">&#127916;</span>
+      <div class="text">
+        <div class="lbl">Bartender Demo</div>
+        <div class="dsc">Sample mid-shift view (nothing saved)</div>
+      </div>
+    </a>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { PokerAPI, db, auth } from '../firebase-api.js?v=7';
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    window.doLogin = async function() {
+      try { await signInWithPopup(auth, new GoogleAuthProvider()); location.reload(); }
+      catch(e) { alert('Sign in failed: ' + e.message); }
+    };
+
+    function toast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg; el.style.display = 'block';
+      clearTimeout(el._t); el._t = setTimeout(() => el.style.display = 'none', 2500);
+    }
+
+    function escAlert(v) {
+      return String(v == null ? '' : v)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    // Past game nights with check-ins but no finalized results. Same live scan
+    // the staff portal uses — see functions/index.js scanUnfinalizedGames.
+    async function loadUnfinalizedAlert() {
+      const host = document.getElementById('unfinalizedAlert');
+      if (!host) return;
+      try {
+        const res = await PokerAPI.getUnfinalizedGames();
+        const games = (res && res.games) || [];
+        if (!games.length) { host.innerHTML = ''; return; }
+
+        const plural = games.length > 1;
+        const rows = games.map(function (g) {
+          const what = g.issue === 'NEVER_SCORED'
+            ? 'no results entered at all'
+            : g.eliminations + ' places entered, never submitted';
+          return '<div class="alert-row"><div>' +
+            '<div class="alert-game">' + escAlert(g.venue) + ' &middot; ' + escAlert(g.date) + ' &middot; Game ' + g.gameNum + '</div>' +
+            '<div class="alert-detail">' + g.checkins + ' checked in &middot; ' + what + ' &middot; ' + g.daysLate + ' days ago</div>' +
+            '</div><a class="alert-fix" href="/director.html">Fix</a></div>';
+        }).join('');
+
+        host.innerHTML = '<div class="alert-card">' +
+          '<div class="alert-head"><span>&#9888;</span><span>' + games.length + ' game' + (plural ? 's' : '') + ' not finalized</span></div>' +
+          '<div class="alert-sub">Nobody in ' + (plural ? 'these games' : 'this game') + ' has been awarded attendance points yet. Open Director Mode, pick the date, and finalize.</div>' +
+          rows + '</div>';
+      } catch (e) {
+        host.innerHTML = '';
+      }
+    }
+
+    async function init() {
+      const guard = document.getElementById('authGuard');
+      const msg   = document.getElementById('authMsg');
+      const btn   = document.getElementById('loginBtn');
+
+      await auth.authStateReady();
+      const user = auth.currentUser;
+
+      if (!user) {
+        msg.textContent = 'Sign in to access Admin Portal';
+        guard.querySelector('.spinner').style.display = 'none';
+        btn.style.display = 'inline-block';
+        return;
+      }
+      try {
+        const snap    = await getDoc(doc(db, 'userProfiles', user.uid));
+        const profile = snap.data() || {};
+        if (profile.role === 'admin' || profile.isAdmin === true) {
+          guard.style.display = 'none';
+          document.getElementById('userDisplay').textContent =
+            '🟢 ' + (profile.linkedName || user.email);
+          loadUnfinalizedAlert();
+        } else {
+          msg.textContent = 'Access denied — admin role required';
+          guard.querySelector('.spinner').style.display = 'none';
+        }
+      } catch(e) {
+        msg.textContent = 'Error: ' + e.message;
+        guard.querySelector('.spinner').style.display = 'none';
+      }
+    }
+
+    init();
+  </script>
+
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="/clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/" data-z="10000"></script>
+</body>
+</html>

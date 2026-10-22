@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Championship Night - All-In Poker Staff</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon" type="image/svg+xml" href="/img/favicon-staff.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050505; --card: rgba(20,20,20,0.75); --line: rgba(255,255,255,0.08);
+      --gold: #d4af37; --blue: #33bbff; --green: #44dd44; --yellow: #ffcc00; --orange: #ff9900; --red: #ff4444;
+      --text: #fff; --dim: #888;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { background: radial-gradient(circle at top right, #001a33 0%, #050505 60%); color: var(--text); font-family: 'Inter', -apple-system, sans-serif; min-height: 100vh; }
+    a { color: var(--blue); }
+
+    .top { position: sticky; top: 0; z-index: 20; background: rgba(5,5,5,0.94); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+    .top-row { display: flex; align-items: center; gap: 10px; padding: 12px 14px; max-width: 1200px; margin: 0 auto; }
+    .back { width: 40px; height: 40px; flex: none; border-radius: 12px; text-decoration: none; display: flex; align-items: center; justify-content: center; background: var(--card); border: 1px solid var(--line); color: var(--blue); }
+    .title { flex: 1; min-width: 0; }
+    .title h1 { font-size: 1.15rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+    .title .sub { color: var(--dim); font-size: 0.78rem; font-weight: 600; margin-top: 2px; }
+    .pill-btn { flex: none; background: var(--card); border: 1px solid var(--line); color: var(--text); border-radius: 12px; padding: 9px 12px; font-weight: 700; font-size: 0.78rem; cursor: pointer; font-family: inherit; }
+    .pill-btn.edit { border-color: var(--gold); color: var(--gold); text-decoration: none; }
+
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 12px 12px 60px; }
+    .games { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 900px) { .games { grid-template-columns: 1fr; } }
+
+    .game { background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+    .game-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+    .game-head h2 { font-size: 1rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+    .game.bounty .game-head h2 { color: var(--orange); }
+    .game.champ .game-head h2 { color: var(--gold); }
+    .doors { font-size: 0.68rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 4px 9px; border-radius: 999px; }
+    .doors.open { background: rgba(255,204,0,0.15); color: var(--yellow); }
+    .doors.closed { background: rgba(255,68,68,0.15); color: var(--red); }
+
+    .strip { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--line); }
+    .strip .cell { padding: 10px 6px; text-align: center; border-right: 1px solid var(--line); }
+    .strip .cell:last-child { border-right: none; }
+    .strip .n { font-size: 1.3rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
+    .strip .l { color: var(--dim); font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px; }
+    .n.green { color: var(--green); } .n.yellow { color: var(--yellow); } .n.red { color: var(--red); } .n.blue { color: var(--blue); }
+
+    .sec { padding: 8px 12px 4px; font-size: 0.72rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; display: flex; justify-content: space-between; align-items: baseline; border-top: 1px solid var(--line); }
+    .sec .cnt { font-weight: 600; color: var(--dim); text-transform: none; letter-spacing: 0; font-size: 0.7rem; }
+    .sec.playing { color: var(--green); } .sec.cleared { color: var(--blue); } .sec.ondeck { color: var(--yellow); }
+    .sec.consolation { color: var(--orange); } .sec.wait { color: #cc8a33; } .sec.out { color: #777; }
+
+    .rows { padding: 0 6px 8px; }
+    .row { display: flex; align-items: center; gap: 6px; padding: 5px 6px; font-size: 0.88rem; border-radius: 6px; }
+    .row:nth-child(even) { background: rgba(255,255,255,0.025); }
+    .row .st { width: 18px; flex: none; text-align: center; font-size: 0.85rem; }
+    .st.ci { color: var(--green); } .st.rsvp { color: var(--yellow); } .st.declined { color: var(--red); } .st.none { color: #444; }
+    .row .rk { width: 26px; flex: none; color: var(--dim); font-size: 0.72rem; text-align: right; font-variant-numeric: tabular-nums; }
+    .row .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+    .row .sc { flex: none; color: var(--dim); font-size: 0.78rem; font-variant-numeric: tabular-nums; }
+    .row.unconf .nm { color: #9a9a9a; font-weight: 500; }
+    .row.out .nm { color: #777; text-decoration: line-through; text-decoration-color: rgba(255,68,68,0.6); }
+    .row.manual .nm::after { content: 'MOVED'; font-size: 0.55rem; font-weight: 800; color: var(--blue); border: 1px solid rgba(51,187,255,0.5); border-radius: 4px; padding: 1px 4px; margin-left: 6px; vertical-align: middle; }
+    .berth { flex: none; color: var(--gold); font-size: 0.7rem; margin: 0 2px; }
+    /* Director-assigned seat number, e.g. "7" or "T2-4". */
+    .seat-chip { flex: none; margin: 0 4px; padding: 0 6px; border-radius: 4px; background: var(--gold); color: #000; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.04em; line-height: 1.6; white-space: nowrap; }
+    .seat-chip::before { content: 'SEAT '; font-size: 0.8em; opacity: 0.8; }
+    .seat-chip.red { color: #9b0016; }
+    .empty { color: #555; font-size: 0.78rem; padding: 6px 12px 10px; }
+    .footer { color: var(--dim); font-size: 0.72rem; text-align: center; margin-top: 16px; }
+    .legend { color: var(--dim); font-size: 0.7rem; padding: 10px 4px 0; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="top">
+    <div class="top-row">
+      <a class="back" data-back-nav href="gameday.html" aria-label="Back">&#8592;</a>
+      <div class="title">
+        <h1>Championship Night</h1>
+        <div class="sub" id="sub">Loading&hellip;</div>
+      </div>
+      <button class="pill-btn" id="venueBtn" onclick="toggleVenue()">Tight End</button>
+      <a class="pill-btn edit" href="championship-director.html">Edit seating</a>
+      <button class="pill-btn" id="refreshBtn" onclick="refreshAll()">&#8635;</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="games">
+      <div class="game bounty" id="game1"><div class="empty">Loading&hellip;</div></div>
+      <div class="game champ" id="game2"><div class="empty">Loading&hellip;</div></div>
+    </div>
+    <div class="legend">&#10003; here &nbsp; &#9679; RSVP'd &nbsp; &#10007; declined &nbsp; &middot; no response &nbsp; &#9733; holds a berth &nbsp; Grey names in Playing have not arrived yet.</div>
+    <div class="footer" id="footer">&mdash;</div>
+  </div>
+
+<script type="module">
+  // Same ?v as staff-auth.js so Firebase initializes once.
+  import { PokerAPI, functions } from './firebase-api.js?v=6';
+  import { httpsCallable } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js";
+  import { requireStaff } from './staff-auth.js';
+  import { buildSeating, buildChampionshipRanking, rankByBounties, loadAttendance, splitOverrides, seatChipHtml, fmtTime } from './champ-seating.js?v=13';
+
+  await requireStaff();
+
+  const PROJECT = 'demo-poker';
+  const KEY = 'demo-api-key';
+  const VENUES = { te: 'Tight End', wc: 'Wild Corgi' };
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  let venueKey = localStorage.getItem('champNightVenue') || 'te';
+  let venue = VENUES[venueKey];
+  let dateStr = null;
+  let leagueData = [], bountyData = [];
+  let timer = null;
+
+  window.toggleVenue = function () {
+    venueKey = venueKey === 'te' ? 'wc' : 'te';
+    venue = VENUES[venueKey];
+    try { localStorage.setItem('champNightVenue', venueKey); } catch (e) {}
+    $('venueBtn').textContent = venue;
+    loadRanking().then(refreshAll);
+  };
+
+  async function loadRanking() {
+    $('sub').textContent = venue + ' — loading…';
+    const lb = await PokerAPI.getLeaderboard({ venue });
+    leagueData = buildChampionshipRanking(lb.standings || []);
+    bountyData = rankByBounties(leagueData);
+    const looksLikeDate = v => /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(String(v || '').trim());
+    if (looksLikeDate(lb.championshipDate)) dateStr = lb.championshipDate;
+    else { const t = new Date(); dateStr = `${t.getMonth() + 1}/${t.getDate()}/${t.getFullYear()}`; }
+    $('sub').textContent = `${venue} — ${dateStr}${looksLikeDate(lb.championshipDate) ? '' : ' (no championship date set)'}`;
+  }
+
+  window.refreshAll = async function () {
+    if (!dateStr) return;
+    $('refreshBtn').disabled = true;
+    try {
+      const [att, ovRes] = await Promise.all([
+        loadAttendance({ project: PROJECT, apiKey: KEY, venue, date: dateStr }),
+        httpsCallable(functions, 'getChampOverrides')({ venue, date: dateStr }).then(r => r.data.overrides).catch(() => ({ 1: {}, 2: {} }))
+      ]);
+      const { overrides, doors, seats } = splitOverrides(ovRes);
+      const s1 = buildSeating({ ranked: bountyData, attendance: att.attendance[1], checkinTime: att.checkinTime[1], overrides: overrides[1], seats: seats[1], doorsClosed: doors[1], scoreField: 'bounties' });
+      const s2 = buildSeating({ ranked: leagueData, attendance: att.attendance[2], checkinTime: att.checkinTime[2], overrides: overrides[2], seats: seats[2], doorsClosed: doors[2], scoreField: 'points' });
+      $('game1').innerHTML = renderGame(s1, 'Bounty', 'A');
+      $('game2').innerHTML = renderGame(s2, 'Championship', 'B');
+      $('footer').textContent = 'Updated ' + new Date().toLocaleTimeString() + ' · refreshes every 30s';
+    } catch (e) {
+      console.error(e);
+      $('footer').textContent = 'Refresh failed: ' + (e.message || e);
+    }
+    $('refreshBtn').disabled = false;
+    clearInterval(timer);
+    timer = setInterval(window.refreshAll, 30000);
+  };
+
+  function stIcon(st, out) {
+    if (out && st !== 'ci') return '<span class="st declined">&#10007;</span>';
+    if (st === 'ci') return '<span class="st ci">&#10003;</span>';
+    if (st === 'rsvp') return '<span class="st rsvp">&#9679;</span>';
+    if (st === 'declined') return '<span class="st declined">&#10007;</span>';
+    return '<span class="st none">&middot;</span>';
+  }
+  function row(p, rank, right, extraCls) {
+    const cls = ['row', p.manual ? 'manual' : '', p.out ? 'out' : '', extraCls || ''].join(' ');
+    const berth = p.qualified ? '<span class="berth" title="holds a berth">&#9733;</span>' : '';
+    const seat = seatChipHtml(p.seat);
+    return `<div class="${cls}">${stIcon(p.status, p.out)}<span class="rk">${rank}</span><span class="nm">${esc(p.name)}</span>${berth}${seat}<span class="sc">${right}</span></div>`;
+  }
+  function section(cls, title, count, rows, emptyText) {
+    return `<div class="sec ${cls}"><span>${title}</span><span class="cnt">${esc(count)}</span></div>` +
+      (rows.length ? `<div class="rows">${rows.join('')}</div>` : `<div class="empty">${esc(emptyText)}</div>`);
+  }
+
+  function renderGame(s, label, consolLetter) {
+    const m = s.meta;
+    let h = `<div class="game-head"><h2>${label === 'Bounty' ? '🎯' : '🏆'} ${label}</h2>` +
+      `<span class="doors ${m.closed ? 'closed' : 'open'}">${m.closed ? 'Doors closed' : 'Doors open'}</span></div>`;
+    h += `<div class="strip">` +
+      `<div class="cell"><div class="n green">${m.filled}<span style="font-size:0.75rem;color:var(--dim)">/${m.seats}</span></div><div class="l">seats filled</div></div>` +
+      `<div class="cell"><div class="n ${m.openNow ? 'red' : ''}">${m.openNow}</div><div class="l">open now</div></div>` +
+      `<div class="cell"><div class="n ${m.unconfirmed ? 'yellow' : ''}">${m.unconfirmed}</div><div class="l">unconfirmed</div></div>` +
+      `<div class="cell"><div class="n blue">${m.counts.ci}</div><div class="l">here</div></div>` +
+      `</div>`;
+
+    h += section('playing', '🎮 Playing', `${m.filled} of ${m.seats}` + (m.openNow ? ` · ${m.openNow} open` : ''),
+      s.playing.map(p => row(p, (p.tied ? 'T' : '') + (p.dispRank || p.origRank), p.score, p.status !== 'ci' ? 'unconf' : '')), 'Nobody seated.');
+    h += section('cleared', '✅ Cleared to seat', s.cleared.length ? `${s.cleared.length} moved up` : 'none',
+      s.cleared.map(p => row(p, p.origRank, p.score)), m.openNow ? 'Seats are open — the director can move someone up.' : 'Nobody has been moved up.');
+    h += section('ondeck', '▲ On deck', `${s.ondeck.length} waiting` + (m.closed ? ' · doors closed' : (s.ondeck.length ? ` · ${m.unconfirmed} could open` : '')),
+      s.ondeck.map(p => row(p, p.origRank, p.score)), m.closed ? 'Doors are closed.' : 'No alternates waiting.');
+    h += section('consolation', `♠ Consolation ${consolLetter}`, `${m.consolFilled} of ${m.consolSeats} seats · arrival order`,
+      s.consolation.map((p, i) => row(p, i + 1, (p.origRank ? '#' + p.origRank + ' · ' : 'walk-in · ') + (p.score ?? '—'))), 'No consolation players yet.');
+    if (s.consolWait.length) {
+      h += section('wait', '⏳ Consolation waitlist', `${s.consolWait.length} · arrival order`,
+        s.consolWait.map((p, i) => row(p, i + 1, (p.origRank ? '#' + p.origRank + ' · ' : 'walk-in · ') + (p.score ?? '—'))), '');
+    }
+    return h;
+  }
+
+  $('venueBtn').textContent = venue;
+  loadRanking().then(refreshAll).catch(e => { $('sub').textContent = 'Could not load: ' + e.message; });
+</script>
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="/clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/gameday.html"></script>
+</body>
+</html>

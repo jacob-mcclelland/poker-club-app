@@ -1,0 +1,63 @@
+{
+ "corgi": {
+  "games": {
+   "1": {
+    "anchorAt": 1792551600000,
+    "changedAt": 1792551600000,
+    "levelIndex": 0,
+    "remainingMs": 1200000,
+    "status": "paused"
+   },
+   "2": {
+    "anchorAt": 1792551600000,
+    "changedAt": 1792551600000,
+    "levelIndex": 0,
+    "remainingMs": 1200000,
+    "status": "paused"
+   }
+  },
+  "name": "Wild Corgi",
+  "sound": "voice",
+  "structure": "standard",
+  "updatedAt": "2026-10-21T03:00:00.000Z",
+  "venue": "Wild Corgi"
+ },
+ "sams-house-k3x9q2": {
+  "games": {
+   "1": {
+    "anchorAt": 1792551600000,
+    "changedAt": 1792551600000,
+    "levelIndex": 0,
+    "remainingMs": 1200000,
+    "status": "paused"
+   }
+  },
+  "name": "Sam's house",
+  "sound": "chime",
+  "structure": "standard",
+  "updatedAt": "2026-10-21T03:00:00.000Z"
+ },
+ "tight": {
+  "games": {
+   "1": {
+    "anchorAt": 1792551600000,
+    "changedAt": 1792551600000,
+    "levelIndex": 6,
+    "remainingMs": 540000,
+    "status": "running"
+   },
+   "2": {
+    "anchorAt": 1792551600000,
+    "changedAt": 1792551600000,
+    "levelIndex": 2,
+    "remainingMs": 900000,
+    "status": "paused"
+   }
+  },
+  "name": "Tight End",
+  "sound": "voice",
+  "structure": "standard",
+  "updatedAt": "2026-10-21T03:00:00.000Z",
+  "venue": "Tight End"
+ }
+}

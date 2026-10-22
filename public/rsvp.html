@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>RSVP — All-In Poker Club</title>
+  <meta charset="UTF-8">
+  <meta name="description" content="RSVP for the next All-In Poker Club game in Denver. Free poker every Tuesday & Thursday — no buy-in required.">
+  <meta property="og:title" content="All-In Poker Club — RSVP for the Next Game">
+  <meta property="og:description" content="Reserve your spot at the next free poker night in Denver, CO. No buy-in, all skill levels welcome.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://poker-club.example/img/hero-bg.jpg">
+  <meta property="og:url" content="https://poker-club.example/rsvp.html">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="All-In Poker Club — RSVP for the Next Game">
+  <meta name="twitter:description" content="Reserve your spot at the next free poker night in Denver, CO.">
+  <meta name="twitter:image" content="https://poker-club.example/img/hero-bg.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
+  <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#0a0a0a">
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      background-color: #0a0a0a;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 20px;
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #222;
+    }
+    h1 {
+      color: #d4af37;
+      margin: 0 0 5px 0;
+      font-size: 1.4rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    }
+    .subtitle { color: #666; font-size: 0.85rem; }
+
+    /* Dual Counters */
+    .counters-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .counter-box {
+      flex: 1;
+      background: linear-gradient(135deg, #1a1a1a, #111);
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 12px 8px;
+      text-align: center;
+    }
+    .counter-label {
+      font-size: 0.65rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .counter-main {
+      font-size: 1.8rem;
+      font-weight: bold;
+      font-family: 'SF Mono', 'Monaco', monospace;
+    }
+    .counter-seated { color: #00ff88; }
+    .counter-divider { color: #444; margin: 0 2px; }
+    .counter-total { color: #ffa500; }
+
+    /* Form */
+    .rsvp-form {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 15px;
+    }
+    .input-group {
+      margin-bottom: 12px;
+    }
+    .input-group label {
+      display: block;
+      color: #888;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    select, input[type="text"] {
+      width: 100%;
+      padding: 14px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background: #000;
+      color: white;
+    }
+    select { color: #d4af37; font-weight: 600; }
+    input[type="text"]:focus { border-color: #e000ff; outline: none; }
+
+    /* Autocomplete */
+    .input-wrapper { position: relative; }
+    #autocomplete-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      position: absolute;
+      width: 100%;
+      z-index: 100;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 0 0 8px 8px;
+      max-height: 180px;
+      overflow-y: auto;
+      display: none;
+    }
+    .player-option {
+      padding: 12px 14px;
+      text-align: left;
+      font-size: 0.95rem;
+      border-bottom: 1px solid #252525;
+      cursor: pointer;
+    }
+    .player-option:active { background: #252525; }
+    /* New Player Button */
+    .new-player-btn {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      margin-top: 8px;
+      background: transparent;
+      border: 1px dashed #00ff88;
+      border-radius: 8px;
+      color: #00ff88;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+    .new-player-btn:active { background: rgba(0, 255, 136, 0.1); }
+
+    /* New Player Modal */
+    .modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+    .new-player-modal {
+      background: #1a1a1a; border: 1px solid #333; border-radius: 16px;
+      padding: 24px; width: 100%; max-width: 400px;
+    }
+    .new-player-modal h3 { color: #d4af37; margin: 0 0 8px 0; font-size: 1.1rem; }
+    .new-player-modal .modal-subtitle { color: #888; font-size: 0.85rem; margin: 0 0 16px 0; }
+    .new-player-modal .name-fields { display: flex; gap: 10px; margin-bottom: 12px; }
+    .new-player-modal input {
+      flex: 1; padding: 12px; font-size: 1rem; border-radius: 8px;
+      border: 1px solid #333; background: #000; color: #fff;
+    }
+    .new-player-modal input:focus { border-color: #e000ff; outline: none; }
+    .new-player-modal input::placeholder { color: #666; font-size: 1rem; }
+    .new-player-modal .match-warning {
+      background: rgba(255, 165, 0, 0.1); border: 1px solid #ffa500;
+      border-radius: 8px; padding: 10px; margin-bottom: 12px;
+      font-size: 0.85rem; color: #ffa500; display: none;
+    }
+    .new-player-modal .match-warning span {
+      display: inline-block; margin: 4px 8px 4px 0; color: #60a5fa;
+      cursor: pointer; text-decoration: underline;
+    }
+    .new-player-modal .sheet-reminder {
+      background: rgba(96, 165, 250, 0.1); border: 1px solid #60a5fa;
+      border-radius: 8px; padding: 10px; margin-bottom: 16px;
+      font-size: 0.8rem; color: #60a5fa;
+    }
+    .new-player-modal .modal-buttons { display: flex; gap: 10px; }
+    .new-player-modal .btn-cancel {
+      flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #333;
+      background: #222; color: #888; font-size: 0.95rem; font-weight: 600; cursor: pointer;
+    }
+    .new-player-modal .btn-add {
+      flex: 1; padding: 12px; border-radius: 8px; border: none;
+      background: linear-gradient(135deg, #e000ff, #b000cc); color: #fff;
+      font-size: 0.95rem; font-weight: 600; cursor: pointer;
+    }
+    .new-player-modal .btn-add:disabled { background: #333; color: #666; }
+
+    /* Game Selection */
+    .game-select {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .game-option {
+      flex: 1;
+      padding: 12px 8px;
+      background: #1a1a1a;
+      border: 2px solid #333;
+      border-radius: 8px;
+      color: #666;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-align: center;
+    }
+    .game-option.selected {
+      border-color: #e000ff;
+      color: #e000ff;
+      background: rgba(224, 0, 255, 0.1);
+    }
+
+    .rsvp-btn {
+      width: 100%;
+      padding: 16px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #e000ff, #b000cc);
+      color: #fff;
+    }
+    .rsvp-btn:active { transform: scale(0.98); }
+    .rsvp-btn:disabled { background: #333; color: #666; }
+
+    /* Message */
+    #message {
+      text-align: center;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      display: none;
+      font-size: 0.95rem;
+    }
+    #message.success {
+      display: block;
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid #00ff88;
+      color: #00ff88;
+    }
+    #message.error {
+      display: block;
+      background: rgba(255, 68, 68, 0.1);
+      border: 1px solid #ff4444;
+      color: #ff4444;
+    }
+
+    /* Theme Banner */
+    .theme-banner {
+      margin-top: 10px;
+      padding: 8px 15px;
+      background: linear-gradient(135deg, #4a1a6b, #2a1a4b);
+      border: 1px solid #8b4fc7;
+      border-radius: 8px;
+      color: #e0b0ff;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .theme-banner::before {
+      content: '🎭 ';
+    }
+    html.back-nav-on .header { padding-left: 60px; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>♠ ALL-IN POKER CLUB ♠</h1>
+    <div class="subtitle">🂡 RSVP for Upcoming Games 🂡</div>
+    <div class="theme-banner" id="themeBanner" style="display:none;"></div>
+  </div>
+
+  <!-- Counters -->
+  <div class="counters-row">
+    <div class="counter-box">
+      <div class="counter-label" id="g1Label">Game 1</div>
+      <div class="counter-main">
+        <span class="counter-seated" id="g1Seated">-</span>
+        <span class="counter-divider">/</span>
+        <span class="counter-total" id="g1Total">-</span>
+      </div>
+    </div>
+    <div class="counter-box">
+      <div class="counter-label" id="g2Label">Game 2</div>
+      <div class="counter-main">
+        <span class="counter-seated" id="g2Seated">-</span>
+        <span class="counter-divider">/</span>
+        <span class="counter-total" id="g2Total">-</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="message"></div>
+
+  <div class="rsvp-form">
+    <div class="input-group">
+      <label>Select Game Date</label>
+      <select id="eventSelect" onchange="onEventChange()">
+        <option>Loading schedule...</option>
+      </select>
+    </div>
+
+    <div class="input-group">
+      <label>Your Name</label>
+      <div class="input-wrapper">
+        <input type="text" id="nameInput" placeholder="Start typing..." autocomplete="off">
+        <ul id="autocomplete-list"></ul>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label>Which Game(s)?</label>
+      <div class="game-select">
+        <div class="game-option selected" data-game="1" id="gameOpt1" onclick="selectGame(this)">Game 1</div>
+        <div class="game-option" data-game="2" id="gameOpt2" onclick="selectGame(this)">Game 2</div>
+        <div class="game-option" data-game="both" id="gameOptBoth" onclick="selectGame(this)">Both</div>
+      </div>
+    </div>
+
+    <button class="rsvp-btn" id="rsvpBtn" onclick="submitRsvp()">Count Me In!</button>
+  </div>
+
+  <!-- Unable to Attend (championship week only) -->
+  <div id="declineSection" style="display:none;">
+    <div class="rsvp-form" style="border-color:#ff4444; background: rgba(255,68,68,0.05);">
+      <div style="text-align:center; color:#ff6666; font-size:0.85rem; font-weight:600; margin-bottom:12px; text-transform:uppercase; letter-spacing:1px;">Unable to Attend Championship?</div>
+      <div class="input-group">
+        <label>Your Name</label>
+        <div class="input-wrapper">
+          <input type="text" id="declineNameInput" placeholder="Start typing..." autocomplete="off">
+          <ul id="decline-autocomplete-list"></ul>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Can't make it to...</label>
+        <div class="game-select">
+          <div class="game-option selected" data-game="1" id="declineOpt1" onclick="selectDeclineGame(this)">Bounty</div>
+          <div class="game-option" data-game="2" id="declineOpt2" onclick="selectDeclineGame(this)">Championship</div>
+          <div class="game-option" data-game="both" id="declineOptBoth" onclick="selectDeclineGame(this)">Both</div>
+        </div>
+      </div>
+      <button class="rsvp-btn" id="declineBtn" onclick="submitDecline()" style="background: linear-gradient(135deg, #cc2200, #991a00);">Can't Make It</button>
+    </div>
+  </div>
+
+  <button class="new-player-btn" onclick="openNewPlayer()">+ First Time? Register as New Player</button>
+
+  <!-- New Player Modal -->
+  <div class="modal-overlay" id="newPlayerModal">
+    <div class="new-player-modal">
+      <h3>New Player Registration</h3>
+      <p class="modal-subtitle">Enter your full name (first and last)</p>
+      <div class="name-fields">
+        <input type="text" id="newFirstName" placeholder="First" autocomplete="off">
+        <input type="text" id="newLastName" placeholder="Last" autocomplete="off">
+      </div>
+      <div class="match-warning" id="matchWarning">
+        <strong>Did you mean one of these?</strong><br>
+        <span id="matchList"></span>
+      </div>
+      <div class="sheet-reminder">
+        Please also write your full name on the sign-in sheet at the table so we can verify your info.
+      </div>
+      <div class="modal-buttons">
+        <button class="btn-cancel" onclick="closeNewPlayer()">Cancel</button>
+        <button class="btn-add" id="btnAddNewPlayer" onclick="confirmNewPlayer()" disabled>RSVP as New Player</button>
+      </div>
+    </div>
+  </div>
+
+<script type="module">
+  import { PokerAPI, PlayerSearch } from './firebase-api.js?v=8';
+
+  // ============================================
+  // STATE
+  // ============================================
+  let masterList = [];
+  let playerDirectory = [];  // [{ name, aliases }] — alias-aware mirror of masterList
+  let game1Data = { checkedIn: [], rsvpList: [], checkedInCount: 0, rsvpPending: 0, totalExpected: 0 };
+  let game2Data = { checkedIn: [], rsvpList: [], checkedInCount: 0, rsvpPending: 0, totalExpected: 0 };
+  let currentDate = "";
+  let currentLocation = "";
+  let currentTheme = "";
+  let selectedGame = "1";
+  let selectedDeclineGame = "1";
+  let scheduleData = [];
+  let isChampionship = false;
+
+  let selectedPlayerValid = false;
+  let declinePlayerValid = false;
+
+  function gameLabel(n) {
+    if (isChampionship) return n === 1 ? 'Bounty' : 'Championship';
+    return `Game ${n}`;
+  }
+
+  // Make functions available globally
+  window.selectGame = selectGame;
+  window.selectDeclineGame = selectDeclineGame;
+  window.onEventChange = onEventChange;
+  window.submitRsvp = submitRsvp;
+  window.submitDecline = submitDecline;
+  window.openNewPlayer = openNewPlayer;
+  window.closeNewPlayer = closeNewPlayer;
+  window.confirmNewPlayer = confirmNewPlayer;
+
+  // ============================================
+  // INITIALIZATION
+  // ============================================
+  loadSchedule();
+  loadMasterList();
+
+  const input = document.getElementById('nameInput');
+  input.addEventListener('input', () => {
+    selectedPlayerValid = false;
+    showSuggestions(input.value, 'autocomplete-list', (name) => {
+      document.getElementById('nameInput').value = name;
+      selectedPlayerValid = true;
+      document.getElementById('autocomplete-list').style.display = 'none';
+    });
+  });
+  input.addEventListener('focus', () => showSuggestions(input.value, 'autocomplete-list', (name) => {
+    document.getElementById('nameInput').value = name;
+    selectedPlayerValid = true;
+    document.getElementById('autocomplete-list').style.display = 'none';
+  }));
+
+  const declineInput = document.getElementById('declineNameInput');
+  declineInput.addEventListener('input', () => {
+    declinePlayerValid = false;
+    showSuggestions(declineInput.value, 'decline-autocomplete-list', (name) => {
+      document.getElementById('declineNameInput').value = name;
+      declinePlayerValid = true;
+      document.getElementById('decline-autocomplete-list').style.display = 'none';
+    });
+  });
+  declineInput.addEventListener('focus', () => showSuggestions(declineInput.value, 'decline-autocomplete-list', (name) => {
+    document.getElementById('declineNameInput').value = name;
+    declinePlayerValid = true;
+    document.getElementById('decline-autocomplete-list').style.display = 'none';
+  }));
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.input-wrapper')) {
+      document.getElementById('autocomplete-list').style.display = 'none';
+      document.getElementById('decline-autocomplete-list').style.display = 'none';
+    }
+  });
+
+  // New player modal listeners
+  document.getElementById('newFirstName').addEventListener('input', validateNewPlayer);
+  document.getElementById('newLastName').addEventListener('input', validateNewPlayer);
+
+  setInterval(refreshStats, 30000);
+
+  function selectGame(el) {
+    document.querySelectorAll('#gameOpt1, #gameOpt2, #gameOptBoth').forEach(opt => opt.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedGame = el.dataset.game;
+  }
+
+  function selectDeclineGame(el) {
+    document.querySelectorAll('#declineOpt1, #declineOpt2, #declineOptBoth').forEach(opt => opt.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedDeclineGame = el.dataset.game;
+  }
+
+  function datesMatch(d1, d2) {
+    const clean = (value) => String(value).replace(/\b0/g, '').trim();
+    const c1 = clean(d1);
+    const c2 = clean(d2);
+    return c1 === c2 || c1.includes(c2) || c2.includes(c1);
+  }
+
+  function isChampionshipEvent(game) {
+    return game?.type === 'Championship';
+  }
+
+  // ============================================
+  // SCHEDULE
+  // ============================================
+  async function loadSchedule() {
+    try {
+      const result = await PokerAPI.getSchedule();
+      scheduleData = result.schedule || [];
+      const select = document.getElementById('eventSelect');
+      select.innerHTML = "";
+
+      if (!scheduleData || scheduleData.length === 0) {
+        select.innerHTML = '<option>No games scheduled</option>';
+        return;
+      }
+
+      const todayStr = new Date().toLocaleDateString();
+      let selectedIndex = 0;
+
+      scheduleData.forEach((game, index) => {
+        const opt = document.createElement('option');
+        opt.value = index;
+        let label = `${game.date} - ${game.location}`;
+        if (game.type && game.type !== "Regular") label += ` (${game.type})`;
+        opt.innerText = label;
+        select.appendChild(opt);
+
+        if (datesMatch(game.date, todayStr)) {
+          selectedIndex = index;
+        }
+      });
+
+      select.selectedIndex = selectedIndex;
+      onEventChange();
+    } catch (err) {
+      console.error("Failed to load schedule:", err);
+      document.getElementById('eventSelect').innerHTML = '<option>Error loading schedule</option>';
+    }
+  }
+
+  function onEventChange() {
+    const index = parseInt(document.getElementById('eventSelect').value);
+    if (isNaN(index) || !scheduleData[index]) return;
+
+    const game = scheduleData[index];
+    currentDate = game.date;
+    currentLocation = game.location;
+    currentTheme = game.theme || "";
+    isChampionship = isChampionshipEvent(game);
+
+    // Update theme banner
+    const banner = document.getElementById('themeBanner');
+    if (isChampionship) {
+      banner.innerText = '🏆 CHAMPIONSHIP WEEK';
+      banner.style.display = 'block';
+      banner.style.background = 'linear-gradient(135deg, #3a2a00, #1a1200)';
+      banner.style.border = '2px solid #d4af37';
+      banner.style.color = '#ffd700';
+      banner.style.letterSpacing = '3px';
+    } else if (currentTheme) {
+      banner.innerText = currentTheme;
+      banner.style.display = 'block';
+      banner.style.background = '';
+      banner.style.border = '';
+      banner.style.color = '';
+      banner.style.letterSpacing = '';
+    } else {
+      banner.style.display = 'none';
+    }
+
+    applyChampionshipMode();
+    refreshStats();
+  }
+
+  function applyChampionshipMode() {
+    document.getElementById('g1Label').textContent = gameLabel(1);
+    document.getElementById('g2Label').textContent = gameLabel(2);
+    document.getElementById('gameOpt1').textContent = gameLabel(1);
+    document.getElementById('gameOpt2').textContent = gameLabel(2);
+    document.getElementById('declineOpt1').textContent = gameLabel(1);
+    document.getElementById('declineOpt2').textContent = gameLabel(2);
+    document.getElementById('declineSection').style.display = isChampionship ? 'block' : 'none';
+  }
+
+  // ============================================
+  // DATA LOADING
+  // ============================================
+  async function loadMasterList() {
+    try {
+      const result = await PokerAPI.getPlayerList();
+      masterList = result.players || [];
+      playerDirectory = result.directory || masterList.map(n => ({ name: n, aliases: [] }));
+    } catch (err) {
+      console.error("Failed to load player list:", err);
+    }
+  }
+
+  async function refreshStats() {
+    if (!currentDate) return;
+
+    try {
+      const data = await PokerAPI.getDailyStats({ date: currentDate, venue: currentLocation });
+      game1Data = data.game1 || { checkedIn: [], rsvpList: [], checkedInCount: 0, rsvpPending: 0, totalExpected: 0 };
+      game2Data = data.game2 || { checkedIn: [], rsvpList: [], checkedInCount: 0, rsvpPending: 0, totalExpected: 0 };
+      updateDisplay();
+    } catch (err) {
+      console.error("Refresh failed:", err);
+    }
+  }
+
+  function updateDisplay() {
+    document.getElementById('g1Seated').innerText = game1Data.checkedInCount;
+    document.getElementById('g1Total').innerText = game1Data.totalExpected;
+    document.getElementById('g2Seated').innerText = game2Data.checkedInCount;
+    document.getElementById('g2Total').innerText = game2Data.totalExpected;
+  }
+
+  // ============================================
+  // RSVP SUBMISSION
+  // ============================================
+  async function submitRsvp() {
+    const name = document.getElementById('nameInput').value.trim();
+    if (!name) { showMessage("Please enter your name", "error"); return; }
+
+    // Validate name is in master list or was just registered
+    if (!selectedPlayerValid && !masterList.some(p => p.toLowerCase() === name.toLowerCase())) {
+      showMessage("Please select your name from the list, or register as a new player first.", "error");
+      return;
+    }
+
+    const btn = document.getElementById('rsvpBtn');
+    btn.disabled = true;
+    btn.innerText = "Sending...";
+
+    try {
+      const result = await PokerAPI.rsvp({
+        player: name,
+        date: currentDate,
+        gameNum: selectedGame,
+        venue: currentLocation
+      });
+
+      btn.disabled = false;
+      btn.innerText = "Count Me In!";
+
+      if (result.status === "success") {
+        document.getElementById('nameInput').value = "";
+        selectedPlayerValid = false;
+        const gameText = selectedGame === "both"
+          ? `${gameLabel(1)} and ${gameLabel(2)}`
+          : gameLabel(parseInt(selectedGame));
+        showMessage(`See you at ${gameText}, ${name}! 🎉`, "success");
+        refreshStats();
+        loadMasterList();
+      } else {
+        showMessage(result.message || "Already on the list", "error");
+      }
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerText = "Count Me In!";
+      showMessage("Network error: " + err.message, "error");
+    }
+  }
+
+  function showMessage(text, type) {
+    const msg = document.getElementById('message');
+    msg.innerText = text;
+    msg.className = type;
+    setTimeout(() => { msg.className = ''; }, 4000);
+  }
+
+  // ============================================
+  // AUTOCOMPLETE (existing players only)
+  // ============================================
+  // Player-name matching is shared via PlayerSearch (firebase-api.js): nickname
+  // + alias + fuzzy + ranking, identical to the kiosk, standings and stats.
+  function showSuggestions(val, listId, onSelect) {
+    const list = document.getElementById(listId);
+    list.innerHTML = '';
+    if (!val) { list.style.display = 'none'; return; }
+
+    const matches = PlayerSearch.search(playerDirectory, val, { limit: 8 });
+
+    if (matches.length === 0) {
+      const item = document.createElement('li');
+      item.className = 'player-option';
+      item.style.color = '#666';
+      item.style.fontStyle = 'italic';
+      item.innerHTML = 'No matching players. If you\'re new, tap <strong style="color:#00ff88">Register as New Player</strong> below.';
+      list.appendChild(item);
+      list.style.display = 'block';
+      return;
+    }
+
+    matches.forEach(({ name, aka }) => {
+      const item = document.createElement('li');
+      item.className = 'player-option';
+
+      // If matched via an alias (not the canonical name), show it.
+      if (aka) {
+        item.innerHTML = `${name} <span style="color:#888;font-size:0.85em;">(aka ${aka})</span>`;
+      } else {
+        item.innerText = name;
+      }
+
+      item.onclick = () => onSelect(name);
+      list.appendChild(item);
+    });
+
+    list.style.display = 'block';
+  }
+
+  // ============================================
+  // DECLINE (Unable to Attend - Championship only)
+  // ============================================
+  async function submitDecline() {
+    const name = document.getElementById('declineNameInput').value.trim();
+    if (!name) { showMessage("Please enter your name", "error"); return; }
+
+    if (!declinePlayerValid && !masterList.some(p => p.toLowerCase() === name.toLowerCase())) {
+      showMessage("Please select your name from the list", "error");
+      return;
+    }
+
+    const btn = document.getElementById('declineBtn');
+    btn.disabled = true;
+    btn.innerText = "Sending...";
+
+    try {
+      const result = await PokerAPI.rsvp({
+        player: name,
+        date: currentDate,
+        gameNum: selectedDeclineGame,
+        venue: currentLocation,
+        status: 'declined'
+      });
+
+      btn.disabled = false;
+      btn.innerText = "Can't Make It";
+
+      const gameText = selectedDeclineGame === "both"
+        ? `${gameLabel(1)} and ${gameLabel(2)}`
+        : gameLabel(parseInt(selectedDeclineGame));
+      showMessage(`Got it — ${name} can't make ${gameText}. Thanks for letting us know!`, "success");
+      document.getElementById('declineNameInput').value = "";
+      declinePlayerValid = false;
+      refreshStats();
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerText = "Can't Make It";
+      showMessage("Network error: " + err.message, "error");
+    }
+  }
+
+  // ============================================
+  // NEW PLAYER REGISTRATION
+  // ============================================
+  function openNewPlayer() {
+    document.getElementById('newFirstName').value = '';
+    document.getElementById('newLastName').value = '';
+    document.getElementById('matchWarning').style.display = 'none';
+    document.getElementById('btnAddNewPlayer').disabled = true;
+    document.getElementById('newPlayerModal').classList.add('active');
+    setTimeout(() => document.getElementById('newFirstName').focus(), 100);
+  }
+
+  function closeNewPlayer() {
+    document.getElementById('newPlayerModal').classList.remove('active');
+  }
+
+  function validateNewPlayer() {
+    const first = document.getElementById('newFirstName').value.trim();
+    const last = document.getElementById('newLastName').value.trim();
+    const btn = document.getElementById('btnAddNewPlayer');
+    const warning = document.getElementById('matchWarning');
+    const matchList = document.getElementById('matchList');
+
+    btn.disabled = !first || !last;
+
+    if (first.length >= 2) {
+      const fullTyped = (first + ' ' + last).toLowerCase();
+      const similarRaw = masterList.filter(p => {
+        const pLower = p.toLowerCase();
+        return pLower.includes(first.toLowerCase()) ||
+               (last.length >= 2 && pLower.includes(last.toLowerCase())) ||
+               levenshteinClose(fullTyped, pLower);
+      });
+      const similar = PlayerSearch.sortByRelevance(similarRaw, fullTyped, 5);
+
+      if (similar.length > 0) {
+        matchList.innerHTML = similar.map(name =>
+          `<span onclick="selectExistingFromModal('${name.replace(/'/g, "\\'")}')">${name} (tap to select)</span>`
+        ).join('');
+        warning.style.display = 'block';
+      } else {
+        warning.style.display = 'none';
+      }
+    } else {
+      warning.style.display = 'none';
+    }
+  }
+
+  function levenshteinClose(a, b) {
+    if (a.length < 3 || b.length < 3) return false;
+    const maxLen = Math.max(a.length, b.length);
+    return PlayerSearch.levenshtein(a, b) / maxLen <= 0.35;
+  }
+
+  window.selectExistingFromModal = function(name) {
+    closeNewPlayer();
+    document.getElementById('nameInput').value = name;
+    selectedPlayerValid = true;
+  };
+
+  function confirmNewPlayer() {
+    const first = document.getElementById('newFirstName').value.trim();
+    const last = document.getElementById('newLastName').value.trim();
+    if (!first || !last) return;
+
+    const fullName = first + ' ' + last;
+    closeNewPlayer();
+    document.getElementById('nameInput').value = fullName;
+    selectedPlayerValid = true;
+    // Add to local list so they can also RSVP for game 2 etc.
+    if (!masterList.some(p => p.toLowerCase() === fullName.toLowerCase())) {
+      masterList.push(fullName);
+    }
+  }
+</script>
+<script src="/update-check.js"></script>
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="./clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/"></script>
+</body>
+</html>

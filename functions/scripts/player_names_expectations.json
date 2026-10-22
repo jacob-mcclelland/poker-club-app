@@ -1,0 +1,153 @@
+{
+  "frozen_on": "2026-10-02",
+  "frozen_before_any_live_call": true,
+  "source": "BRIEF_7_poker_player_names.md, section 'Frozen expectations' (AI Projects Catalogue, research/jev-integration-2026-10-02)",
+  "how_to_read": {
+    "name_kind": "the exact choice key the name_kind question must return, or the kind a pre-check assigns when code decides the name",
+    "flagged": "true means the name is on the admin's review list, false means it carries no flag",
+    "prechecks": "the exact list of deterministic pre-check flags that fire, in firing order; an empty list means none fire",
+    "jev_asked": "false means code decided the name and Jev was never called for it",
+    "decided_by": "precheck when code assigned the kind, jev when the model did",
+    "offensive_content": "high means at or above 0.5, low means below it; high is the bad sign",
+    "thresholds": {
+      "offensive_content_review_at_or_above": 0.5
+    }
+  },
+  "notes": [
+    "All ten names were invented for this brief. None of them comes from Firestore or from any export. Their record ids (expect-1 to expect-10) are placeholders so that canned answers can be keyed per record.",
+    "Cases 1 to 4 are the must-stay-plausible set. For them flagged=false is the point: a real player's name must not land on the admin's review list.",
+    "All five name_kind labels appear at least once: plausible_person_name (1 to 4), joke_or_offensive (5, 6), spam_or_url_or_email (7, 8), test_entry (9) and other (10).",
+    "Where a case does not freeze offensive_content (5, 7, 8, 9 and 10), an observed value is a finding to report, not a miss. order_flip is never frozen: it is shown, and it is not a reason to flag a name on its own.",
+    "Case 7 is decided in code (url pre-check) and Jev is never asked, so no model answer is needed for it. Case 8 is spam with no URL, so the model has to catch it.",
+    "Case 3 is written with JSON escapes so that the stored text is NFC (composed accents) whatever editor opens this file.",
+    "flagged follows the review rule: a pre-check fired, or name_kind is not plausible_person_name, or offensive_content is 0.5 or above, or an answer is missing."
+  ],
+  "cases": [
+    {
+      "id": "expect-1",
+      "label": "single-name nickname",
+      "brief_expectation": "plausible_person_name; no pre-checks; offensive low; not flagged",
+      "record": {"id": "expect-1", "name": "Big Mike", "source": "checkin"},
+      "expected": {
+        "name_kind": "plausible_person_name",
+        "flagged": false,
+        "prechecks": [],
+        "jev_asked": true,
+        "offensive_content": "low"
+      }
+    },
+    {
+      "id": "expect-2",
+      "label": "hyphenated",
+      "brief_expectation": "plausible_person_name; no pre-checks; offensive low; not flagged",
+      "record": {"id": "expect-2", "name": "Anne-Marie Castellano", "source": "add"},
+      "expected": {
+        "name_kind": "plausible_person_name",
+        "flagged": false,
+        "prechecks": [],
+        "jev_asked": true,
+        "offensive_content": "low"
+      }
+    },
+    {
+      "id": "expect-3",
+      "label": "accented (stored as UTF-8, NFC)",
+      "brief_expectation": "plausible_person_name; no pre-checks; offensive low; not flagged",
+      "record": {"id": "expect-3", "name": "José Ibáñez", "source": "rsvp"},
+      "expected": {
+        "name_kind": "plausible_person_name",
+        "flagged": false,
+        "prechecks": [],
+        "jev_asked": true,
+        "offensive_content": "low"
+      }
+    },
+    {
+      "id": "expect-4",
+      "label": "initials only; dots are not a URL",
+      "brief_expectation": "plausible_person_name; no pre-checks; offensive low; not flagged",
+      "record": {"id": "expect-4", "name": "J.R.", "source": "checkin"},
+      "expected": {
+        "name_kind": "plausible_person_name",
+        "flagged": false,
+        "prechecks": [],
+        "jev_asked": true,
+        "offensive_content": "low"
+      }
+    },
+    {
+      "id": "expect-5",
+      "label": "prank name",
+      "brief_expectation": "joke_or_offensive; no pre-checks; flagged",
+      "record": {"id": "expect-5", "name": "Ur Mom LOL", "source": "checkin"},
+      "expected": {
+        "name_kind": "joke_or_offensive",
+        "flagged": true,
+        "prechecks": [],
+        "jev_asked": true
+      }
+    },
+    {
+      "id": "expect-6",
+      "label": "profanity inside a nickname",
+      "brief_expectation": "joke_or_offensive; offensive high; no pre-checks; flagged",
+      "record": {"id": "expect-6", "name": "Dumbass Dave", "source": "add"},
+      "expected": {
+        "name_kind": "joke_or_offensive",
+        "flagged": true,
+        "prechecks": [],
+        "jev_asked": true,
+        "offensive_content": "high"
+      }
+    },
+    {
+      "id": "expect-7",
+      "label": "URL caught in code",
+      "brief_expectation": "pre-checks [url]; spam_or_url_or_email decided by precheck; jev_asked false; flagged",
+      "record": {"id": "expect-7", "name": "cheapchips.biz", "source": "email_signup"},
+      "expected": {
+        "name_kind": "spam_or_url_or_email",
+        "flagged": true,
+        "prechecks": ["url"],
+        "jev_asked": false,
+        "decided_by": "precheck"
+      }
+    },
+    {
+      "id": "expect-8",
+      "label": "spam with no URL, needs the model",
+      "brief_expectation": "spam_or_url_or_email; no pre-checks; flagged",
+      "record": {"id": "expect-8", "name": "Free chips, DM me on IG", "source": "email_signup"},
+      "expected": {
+        "name_kind": "spam_or_url_or_email",
+        "flagged": true,
+        "prechecks": [],
+        "jev_asked": true
+      }
+    },
+    {
+      "id": "expect-9",
+      "label": "test entry with letters, so not digits-only",
+      "brief_expectation": "test_entry; no pre-checks; flagged",
+      "record": {"id": "expect-9", "name": "Testing 123", "source": "add"},
+      "expected": {
+        "name_kind": "test_entry",
+        "flagged": true,
+        "prechecks": [],
+        "jev_asked": true
+      }
+    },
+    {
+      "id": "expect-10",
+      "label": "a message typed into the name box",
+      "brief_expectation": "other; no pre-checks; flagged",
+      "record": {"id": "expect-10", "name": "save me a seat, running late", "source": "rsvp"},
+      "expected": {
+        "name_kind": "other",
+        "flagged": true,
+        "prechecks": [],
+        "jev_asked": true
+      }
+    }
+  ]
+}

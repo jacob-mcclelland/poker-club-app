@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>♠ Game Breakdown - All-In Poker Club ♠</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16.png">
+  <link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: transparent;
+      color: #333;
+      margin: 0;
+      padding: 10px 10px 80px;   /* room to scroll the last row clear of the timer button */
+    }
+
+    .widget-container {
+      background-color: #0a0a0a;
+      color: #ffffff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Back link */
+    .back-link {
+      display: inline-block;
+      color: #555;
+      font-size: 0.8rem;
+      text-decoration: none;
+      margin-bottom: 12px;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: #888; }
+
+    /* Header */
+    .widget-header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #222;
+    }
+    .widget-title {
+      color: #d4af37;
+      font-size: 1.3rem;
+      margin: 0 0 5px 0;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    }
+    .widget-subtitle {
+      color: #666;
+      font-size: 0.8rem;
+    }
+    .season-name {
+      color: #888;
+      font-size: 0.85rem;
+      margin-top: 6px;
+    }
+
+    /* Venue Toggle */
+    .venue-toggle {
+      flex: 1;
+      padding: 10px 20px;
+      background: #1a1a1a;
+      border: 2px solid #333;
+      border-radius: 8px;
+      color: #888;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+    .venue-toggle:hover { background: #222; border-color: #444; }
+    .venue-toggle.active {
+      background: linear-gradient(135deg, #2a2a1a, #1a1a0a);
+      border-color: #d4af37;
+      color: #d4af37;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #222;
+      margin-bottom: 15px;
+    }
+    .tab {
+      flex: 1;
+      padding: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #555;
+      border-bottom: 3px solid transparent;
+      text-align: center;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+    .tab:hover { color: #888; }
+    .tab.active {
+      color: #ffa500;
+      border-bottom-color: #ffa500;
+    }
+
+    /* Loading & states */
+    .loading, .empty-state {
+      text-align: center;
+      color: #555;
+      padding: 40px 20px;
+    }
+    .loading::after {
+      content: '';
+      animation: dots 1.5s infinite;
+    }
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+
+    /* Game Cards */
+    .game-card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .game-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: #161616;
+      cursor: pointer;
+      user-select: none;
+    }
+    .game-card-header:hover { background: #1c1c1c; }
+    .game-date {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #d4af37;
+    }
+    .game-num-badge {
+      display: inline-block;
+      background: #222;
+      color: #888;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 5px;
+      margin-left: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .game-card-meta {
+      font-size: 0.8rem;
+      color: #555;
+    }
+    .chevron {
+      color: #444;
+      font-size: 0.8rem;
+      transition: transform 0.2s;
+    }
+    .chevron.open { transform: rotate(180deg); }
+
+    /* Game Table */
+    .game-table-wrap { display: none; }
+    .game-table-wrap.open { display: block; }
+    .game-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .game-table th {
+      text-align: left;
+      color: #444;
+      font-size: 0.7rem;
+      padding: 8px 12px;
+      border-bottom: 1px solid #1a1a1a;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+    .game-table th:last-child { text-align: right; }
+    .game-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #161616;
+      font-size: 0.88rem;
+    }
+    .game-table tr:last-child td { border-bottom: none; }
+    .game-table tr:hover td { background: #161616; }
+
+    /* Rank cells */
+    .rank-col { width: 44px; }
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      font-weight: bold;
+      font-size: 0.8rem;
+      background: #1e1e1e;
+      color: #555;
+    }
+    .rank-1 .rank-badge { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; box-shadow: 0 0 10px rgba(255,215,0,0.25); }
+    .rank-2 .rank-badge { background: linear-gradient(135deg, #C0C0C0, #A0A0A0); color: #000; }
+    .rank-3 .rank-badge { background: linear-gradient(135deg, #CD7F32, #B87333); color: #000; }
+    .rank-1 .player-col { color: #FFD700; }
+    .rank-2 .player-col { color: #C0C0C0; }
+    .rank-3 .player-col { color: #CD7F32; }
+
+    .attendance-row td { opacity: 0.5; }
+    .attendance-row:hover td { opacity: 0.7; }
+
+    .pts-col {
+      text-align: right;
+      font-family: 'SF Mono', Monaco, monospace;
+      font-weight: 600;
+      color: #ffa500;
+      white-space: nowrap;
+    }
+    .bounty-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: rgba(255, 68, 68, 0.15);
+      color: #ff6666;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 4px;
+    }
+
+    /* Search box */
+    .search-box {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 10px;
+      border: 1px solid #333;
+      background: #111;
+      color: white;
+      font-size: 1rem;
+      margin-bottom: 15px;
+    }
+    .search-box:focus { outline: none; border-color: #ffa500; }
+    .search-box::placeholder { color: #555; }
+
+    /* Player Stats */
+    .player-summary {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .summary-card {
+      flex: 1;
+      min-width: 70px;
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+    .summary-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #d4af37;
+      font-family: 'SF Mono', Monaco, monospace;
+    }
+    .summary-label {
+      font-size: 0.65rem;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    /* Player history table */
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .history-table th {
+      text-align: left;
+      color: #444;
+      font-size: 0.7rem;
+      padding: 8px 10px;
+      border-bottom: 1px solid #222;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+    .history-table td {
+      padding: 11px 10px;
+      border-bottom: 1px solid #1a1a1a;
+      font-size: 0.88rem;
+    }
+    .history-table tr:last-child td { border-bottom: none; }
+    .history-table tr:hover td { background: #111; }
+    .hist-pts { color: #ffa500; font-weight: 600; font-family: 'SF Mono', Monaco, monospace; }
+    .hist-rank { font-weight: 600; }
+    .hist-rank.win { color: #FFD700; }
+    .hist-rank.top3 { color: #CD7F32; }
+    .hist-rank.placed { color: #aaa; }
+    .hist-rank.attended { color: #444; }
+
+    .player-name-result {
+      color: #d4af37;
+      font-weight: 600;
+      margin-bottom: 14px;
+      font-size: 1rem;
+    }
+
+    .no-results {
+      text-align: center;
+      color: #444;
+      padding: 30px;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="widget-container">
+  <a href="#" class="back-link" data-back-nav onclick="window.BackNav ? BackNav.go() : history.back(); return false;">← Back</a>
+
+  <div class="widget-header">
+    <h1 class="widget-title">♠ ALL-IN POKER CLUB ♠</h1>
+    <div class="widget-subtitle">🂡 Game Breakdown 🂡</div>
+    <div class="season-name" id="seasonName"></div>
+  </div>
+
+  <!-- Venue Toggle -->
+  <div style="display: flex; gap: 10px; margin-bottom: 15px; justify-content: center;">
+    <button class="venue-toggle active" id="venueTightEnd" onclick="switchVenue('Tight End')">Tight End</button>
+    <button class="venue-toggle" id="venueWildCorgi" onclick="switchVenue('Wild Corgi')">Wild Corgi</button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" id="tabGames" onclick="switchTab('games')">🏆 Game Results</div>
+    <div class="tab" id="tabPlayer" onclick="switchTab('player')">🔍 Player Stats</div>
+  </div>
+
+  <!-- Game Results Tab -->
+  <div id="gamesTab">
+    <div id="gamesLoading" class="loading">Loading games</div>
+    <div id="gamesList"></div>
+    <div id="gamesEmpty" class="empty-state" style="display:none;">No games found for this season.</div>
+  </div>
+
+  <!-- Player Stats Tab -->
+  <div id="playerTab" style="display:none;">
+    <input type="text" id="playerSearch" class="search-box"
+      placeholder="Enter player name..."
+      oninput="onPlayerSearch()"
+      autocomplete="off">
+    <div id="playerResults">
+      <div class="no-results" style="color:#333;">Type a name above to see their season history.</div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { PokerAPI, PlayerSearch } from './firebase-api.js?v=8';
+
+  // ============================================
+  // STATE
+  // ============================================
+  let allGames = [];
+  let currentVenue = 'Tight End';
+  let currentTab = 'games';
+  let searchTimeout = null;
+
+  // Expose globals
+  window.switchVenue = switchVenue;
+  window.switchTab = switchTab;
+  window.toggleGame = toggleGame;
+  window.onPlayerSearch = onPlayerSearch;
+
+  // ============================================
+  // INIT
+  // ============================================
+  (function init() {
+    const params = new URLSearchParams(window.location.search);
+    const venueParam = params.get('venue');
+    const playerParam = params.get('player');
+
+    if (venueParam === 'Wild Corgi') {
+      currentVenue = 'Wild Corgi';
+      document.getElementById('venueTightEnd').classList.remove('active');
+      document.getElementById('venueWildCorgi').classList.add('active');
+    }
+
+    if (playerParam) {
+      // Jump straight to player lookup
+      currentTab = 'player';
+      document.getElementById('tabGames').classList.remove('active');
+      document.getElementById('tabPlayer').classList.add('active');
+      document.getElementById('gamesTab').style.display = 'none';
+      document.getElementById('playerTab').style.display = 'block';
+      document.getElementById('playerSearch').value = playerParam;
+    }
+
+    loadData();
+  })();
+
+  // ============================================
+  // DATA LOADING
+  // ============================================
+  async function loadData() {
+    document.getElementById('gamesLoading').style.display = 'block';
+    document.getElementById('gamesList').innerHTML = '';
+    document.getElementById('gamesEmpty').style.display = 'none';
+
+    try {
+      const result = await PokerAPI.getSeasonBreakdown({ venue: currentVenue });
+
+      if (result.status === 'success') {
+        allGames = result.games || [];
+        document.getElementById('seasonName').textContent = result.seasonName || '';
+        document.getElementById('gamesLoading').style.display = 'none';
+
+        if (allGames.length === 0) {
+          document.getElementById('gamesEmpty').style.display = 'block';
+        } else {
+          renderGames();
+        }
+
+        // If player tab was pre-selected from URL, render now that data is loaded
+        if (currentTab === 'player' && document.getElementById('playerSearch').value) {
+          renderPlayerStats(document.getElementById('playerSearch').value);
+        }
+      } else {
+        throw new Error(result.message || 'Failed to load data');
+      }
+    } catch (err) {
+      console.error('Error loading breakdown:', err);
+      document.getElementById('gamesLoading').textContent = 'Failed to load: ' + err.message;
+    }
+  }
+
+  // ============================================
+  // VENUE SWITCHING
+  // ============================================
+  function switchVenue(venue) {
+    currentVenue = venue;
+    document.querySelectorAll('.venue-toggle').forEach(b => b.classList.remove('active'));
+    document.getElementById(venue === 'Tight End' ? 'venueTightEnd' : 'venueWildCorgi').classList.add('active');
+    loadData();
+  }
+
+  // ============================================
+  // TAB SWITCHING
+  // ============================================
+  function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(tab === 'games' ? 'tabGames' : 'tabPlayer').classList.add('active');
+    document.getElementById('gamesTab').style.display = tab === 'games' ? 'block' : 'none';
+    document.getElementById('playerTab').style.display = tab === 'player' ? 'block' : 'none';
+  }
+
+  // ============================================
+  // GAME RESULTS RENDERING
+  // ============================================
+  function renderGames() {
+    const list = document.getElementById('gamesList');
+    if (allGames.length === 0) {
+      list.innerHTML = '';
+      return;
+    }
+
+    list.innerHTML = allGames.map((game, index) => {
+      const dateStr = formatDate(game.date);
+      const playerCount = game.players.length;
+      const isOpen = index < 3; // Expand 3 most recent by default
+      return `
+        <div class="game-card">
+          <div class="game-card-header" onclick="toggleGame(${index})">
+            <div>
+              <span class="game-date">${dateStr}</span>
+              <span class="game-num-badge">Game ${game.gameNum}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span class="game-card-meta">${playerCount} player${playerCount !== 1 ? 's' : ''}</span>
+              <span class="chevron ${isOpen ? 'open' : ''}" id="chevron-${index}">▼</span>
+            </div>
+          </div>
+          <div class="game-table-wrap ${isOpen ? 'open' : ''}" id="game-body-${index}">
+            ${renderGameTable(game)}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderGameTable(game) {
+    if (game.players.length === 0) return '<div class="no-results">No results recorded.</div>';
+
+    const rows = game.players.map(player => {
+      const rankDisplay = getRankDisplay(player);
+      const rankClass = player.rank === 1 ? 'rank-1' : player.rank === 2 ? 'rank-2' : player.rank === 3 ? 'rank-3' : '';
+      const attendClass = player.attendanceOnly ? 'attendance-row' : '';
+      const bountyChip = player.bounties > 0
+        ? `<span class="bounty-chip">💀 ${player.bounties}</span>`
+        : '';
+
+      return `
+        <tr class="${rankClass} ${attendClass}">
+          <td class="rank-col"><span class="rank-badge">${rankDisplay}</span></td>
+          <td class="player-col">${escapeHtml(player.name)}${bountyChip}</td>
+          <td class="pts-col">${player.totalPoints}</td>
+        </tr>
+      `;
+    }).join('');
+
+    return `
+      <table class="game-table">
+        <thead>
+          <tr>
+            <th class="rank-col">#</th>
+            <th>Player</th>
+            <th style="text-align:right;">Pts</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
+  }
+
+  function toggleGame(index) {
+    const body = document.getElementById(`game-body-${index}`);
+    const chevron = document.getElementById(`chevron-${index}`);
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    chevron.classList.toggle('open', !isOpen);
+  }
+
+  // ============================================
+  // PLAYER STATS
+  // ============================================
+  function onPlayerSearch() {
+    clearTimeout(searchTimeout);
+    const query = document.getElementById('playerSearch').value.trim();
+    if (!query) {
+      document.getElementById('playerResults').innerHTML =
+        '<div class="no-results" style="color:#333;">Type a name above to see their season history.</div>';
+      return;
+    }
+    searchTimeout = setTimeout(() => renderPlayerStats(query), 200);
+  }
+
+  function renderPlayerStats(query) {
+    // Find best matching player name across all games (word-boundary +
+    // nickname match, shared with the kiosk/standings via PlayerSearch).
+    const nameSet = new Set();
+    allGames.forEach(game => game.players.forEach(p => nameSet.add(p.name)));
+    const allNames = [...nameSet];
+    const playerName = PlayerSearch.best(allNames, query);
+
+    if (!playerName) {
+      document.getElementById('playerResults').innerHTML =
+        `<div class="no-results">No player found matching "<strong>${escapeHtml(query)}</strong>".</div>`;
+      return;
+    }
+
+    // Gather all games this player appeared in
+    const playerGames = [];
+    allGames.forEach(game => {
+      const entry = game.players.find(p => p.name === playerName);
+      if (entry) {
+        playerGames.push({ date: game.date, gameNum: game.gameNum, entry });
+      }
+    });
+
+    if (playerGames.length === 0) {
+      document.getElementById('playerResults').innerHTML =
+        `<div class="no-results">No games found for <strong>${escapeHtml(playerName)}</strong> this season.</div>`;
+      return;
+    }
+
+    // Aggregate stats
+    let totalPoints = 0;
+    let totalBounties = 0;
+    let wins = 0;
+    let bestRank = null;
+    playerGames.forEach(({ entry }) => {
+      totalPoints += entry.totalPoints || 0;
+      totalBounties += entry.bounties || 0;
+      if (entry.rank === 1) wins++;
+      if (entry.rank !== null && (bestRank === null || entry.rank < bestRank)) {
+        bestRank = entry.rank;
+      }
+    });
+
+    const bestFinishStr = bestRank !== null ? ordinal(bestRank) : '—';
+
+    const summaryHtml = `
+      <div class="player-summary">
+        <div class="summary-card">
+          <div class="summary-value">${totalPoints}</div>
+          <div class="summary-label">Points</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-value">${playerGames.length}</div>
+          <div class="summary-label">Games</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-value">${totalBounties}</div>
+          <div class="summary-label">Bounties</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-value">${wins}</div>
+          <div class="summary-label">Wins</div>
+        </div>
+      </div>
+    `;
+
+    const tableRows = playerGames.map(({ date, gameNum, entry }) => {
+      const rankStr = getRankDisplay(entry);
+      const rankClass = entry.rank === 1 ? 'win' : entry.rank !== null && entry.rank <= 3 ? 'top3' : entry.attendanceOnly ? 'attended' : 'placed';
+      const bountyStr = entry.bounties > 0 ? `<span class="bounty-chip">💀 ${entry.bounties}</span>` : '—';
+      return `
+        <tr>
+          <td style="color:#888;">${formatDate(date)}</td>
+          <td style="color:#666;text-align:center;">${gameNum}</td>
+          <td class="hist-rank ${rankClass}" style="text-align:center;">${rankStr}</td>
+          <td class="hist-pts" style="text-align:right;">${entry.totalPoints}</td>
+          <td style="text-align:right;">${bountyStr}</td>
+        </tr>
+      `;
+    }).join('');
+
+    const tableHtml = `
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th style="text-align:center;">Game</th>
+            <th style="text-align:center;">Place</th>
+            <th style="text-align:right;">Pts</th>
+            <th style="text-align:right;">Bounties</th>
+          </tr>
+        </thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    `;
+
+    document.getElementById('playerResults').innerHTML = `
+      <div class="player-name-result">${escapeHtml(playerName)}</div>
+      ${summaryHtml}
+      ${tableHtml}
+    `;
+  }
+
+  // ============================================
+  // HELPERS
+  // ============================================
+  function getRankDisplay(player) {
+    if (player.attendanceOnly || player.rank === null) return '—';
+    if (player.numTied > 1) return `T${player.rank}`;
+    return player.rank;
+  }
+
+  function ordinal(n) {
+    if (n === 1) return '1st';
+    if (n === 2) return '2nd';
+    if (n === 3) return '3rd';
+    return `${n}th`;
+  }
+
+  function formatDate(dateStr) {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+</script>
+
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="./clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/"></script>
+</body>
+</html>

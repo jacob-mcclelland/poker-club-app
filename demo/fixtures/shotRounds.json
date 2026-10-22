@@ -1,0 +1,212 @@
+{
+ "shots-03536": {
+  "clientId": "demo-client-1",
+  "eventType": "Regular",
+  "gameLabel": "Game 2",
+  "gameNum": 2,
+  "paid": false,
+  "players": [
+   {
+    "name": "Rowan Wexmoor",
+    "payment": "cash",
+    "shots": [
+     {
+      "qty": 1,
+      "type": "House"
+     }
+    ]
+   },
+   {
+    "name": "Jordan Wexmoor",
+    "payment": "card",
+    "shots": [
+     {
+      "qty": 1,
+      "type": "Tequila"
+     }
+    ]
+   },
+   {
+    "name": "Indy Kestrelton",
+    "payment": "card",
+    "shots": [
+     {
+      "qty": 1,
+      "type": "House"
+     }
+    ]
+   },
+   {
+    "name": "Val Thistlecombe",
+    "payment": "cash",
+    "shots": [
+     {
+      "qty": 1,
+      "type": "Lemon drop"
+     }
+    ]
+   }
+  ],
+  "poured": false,
+  "sessionDate": "10/20/2026",
+  "status": "draft",
+  "submittedAt": "2026-10-21T03:05:00.000Z",
+  "submitter": {
+   "name": "Rowan Wexmoor"
+  },
+  "table": "hearts",
+  "timestamp": "2026-10-21T03:05:00.000Z",
+  "updatedAt": "2026-10-21T03:06:00.000Z",
+  "venue": "Tight End"
+ },
+ "shots-03537": {
+  "clientId": "demo-client-2",
+  "eventType": "Regular",
+  "gameLabel": "Game 2",
+  "gameNum": 2,
+  "paid": false,
+  "players": [
+   {
+    "name": "Blake Thistlecombe",
+    "payment": "card",
+    "shots": [
+     {
+      "qty": 1,
+      "type": "House"
+     }
+    ]
+   },
+   {
+    "name": "Tatum Pellbrook",
+    "payment": "cash",
+    "shots": [
+     {
+      "qty": 1,
+      "type": "Tequila"
+     }
+    ]
+   },
+   {
+    "name": "Frankie Larkspurne",
+    "payment": "card",
+    "shots": [
+     {
+      "qty": 1,
+      "type": "Pickle"
+     }
+    ]
+   },
+   {
+    "name": "Avery Orrinsby",
+    "payment": "cash",
+    "shots": [
+     {
+      "qty": 1,
+      "type": "Lemon drop"
+     }
+    ]
+   }
+  ],
+  "poured": false,
+  "sessionDate": "10/20/2026",
+  "status": "pending",
+  "submittedAt": "2026-10-21T03:08:00.000Z",
+  "submitter": {
+   "name": "Blake Thistlecombe"
+  },
+  "table": "diamonds",
+  "timestamp": "2026-10-21T03:08:00.000Z",
+  "updatedAt": "2026-10-21T03:09:00.000Z",
+  "venue": "Tight End"
+ },
+ "shots-03538": {
+  "clientId": "demo-client-3",
+  "eventType": "Regular",
+  "gameLabel": "Game 2",
+  "gameNum": 2,
+  "paid": false,
+  "players": [
+   {
+    "name": "Noel Vossington",
+    "payment": "card",
+    "shots": [
+     {
+      "qty": 1,
+      "type": "Tequila"
+     }
+    ]
+   },
+   {
+    "name": "Jordan Wexmoor",
+    "payment": "card",
+    "shots": [
+     {
+      "qty": 1,
+      "type": "Pickle"
+     }
+    ]
+   },
+   {
+    "name": "Kendall Everhollow",
+    "payment": "card",
+    "shots": [
+     {
+      "qty": 1,
+      "type": "Pickle"
+     }
+    ]
+   }
+  ],
+  "poured": true,
+  "sessionDate": "10/20/2026",
+  "status": "pending",
+  "submittedAt": "2026-10-21T03:11:00.000Z",
+  "submitter": {
+   "name": "Noel Vossington"
+  },
+  "table": "clubs",
+  "timestamp": "2026-10-21T03:11:00.000Z",
+  "updatedAt": "2026-10-21T03:12:00.000Z",
+  "venue": "Tight End"
+ },
+ "shots-03539": {
+  "clientId": "demo-client-4",
+  "eventType": "Regular",
+  "gameLabel": "Game 2",
+  "gameNum": 2,
+  "paid": true,
+  "players": [
+   {
+    "name": "Jordan Dellacourt",
+    "payment": "card",
+    "shots": [
+     {
+      "qty": 1,
+      "type": "House"
+     }
+    ]
+   },
+   {
+    "name": "Drew Ashgrove",
+    "payment": "card",
+    "shots": [
+     {
+      "qty": 1,
+      "type": "Tequila"
+     }
+    ]
+   }
+  ],
+  "poured": true,
+  "sessionDate": "10/20/2026",
+  "status": "closed",
+  "submittedAt": "2026-10-21T03:14:00.000Z",
+  "submitter": {
+   "name": "Jordan Dellacourt"
+  },
+  "table": "spades",
+  "timestamp": "2026-10-21T03:14:00.000Z",
+  "updatedAt": "2026-10-21T03:15:00.000Z",
+  "venue": "Tight End"
+ }
+}

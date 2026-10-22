@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Event Content — All-In Poker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --surface2: #1c1c1c;
+      --border: rgba(255,255,255,0.1);
+      --gold: #d4af37;
+      --text: #f0f0f0;
+      --muted: rgba(255,255,255,0.45);
+      --green: #27ae60;
+      --red: #e74c3c;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; }
+
+
+    /* ── HEADER ── */
+    header {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 0.9rem 1.25rem; display: flex; align-items: center; position: sticky; top: 0; z-index: 10;
+    }
+    .header-brand { font-family: 'Playfair Display', serif; font-size: 1rem; }
+    .header-sub { font-size: 0.72rem; color: var(--muted); margin-left: auto; }
+    html.back-nav-on header { padding-left: 70px; }
+
+    /* ── MAIN ── */
+    main { max-width: 680px; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
+    .section-label {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 1rem;
+    }
+    .loading { text-align: center; color: var(--muted); padding: 2.5rem; font-size: 0.88rem; }
+
+    /* ── EVENT ITEM ── */
+    .event-item {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      margin-bottom: 0.7rem; overflow: hidden;
+    }
+    .event-item-header {
+      display: flex; align-items: center; gap: 0.85rem; padding: 0.85rem 1rem; cursor: pointer;
+      user-select: none; -webkit-tap-highlight-color: transparent;
+    }
+    .event-thumb {
+      width: 50px; height: 50px; border-radius: 6px; flex-shrink: 0;
+      background: var(--surface2); display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; overflow: hidden;
+    }
+    .event-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .event-info { flex: 1; min-width: 0; }
+    .event-info-date { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); }
+    .event-info-theme { font-weight: 600; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 0.1rem 0; }
+    .event-info-venue { font-size: 0.7rem; color: var(--muted); }
+    .event-badge {
+      flex-shrink: 0; font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; padding: 0.18rem 0.45rem; border-radius: 4px;
+    }
+    .badge-done { background: rgba(39,174,96,0.12); color: var(--green); border: 1px solid rgba(39,174,96,0.25); }
+    .badge-empty { background: rgba(255,255,255,0.04); color: var(--muted); border: 1px solid var(--border); }
+    .chevron { color: var(--muted); flex-shrink: 0; transition: transform 0.2s; }
+    .event-item.open .chevron { transform: rotate(180deg); }
+
+    /* ── EDIT PANEL ── */
+    .edit-panel { display: none; padding: 0 1rem 1.1rem; border-top: 1px solid var(--border); }
+    .event-item.open .edit-panel { display: block; }
+
+    /* ── DROP ZONE ── */
+    .drop-zone {
+      position: relative; border: 2px dashed var(--border); border-radius: 10px;
+      background: var(--surface2); cursor: pointer; margin: 0.9rem 0 1rem;
+      transition: border-color 0.2s; overflow: hidden;
+    }
+    .drop-zone:hover, .drop-zone.dragover { border-color: var(--gold); }
+    .drop-zone input[type=file] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .dz-preview {
+      width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: none; border-radius: 8px;
+    }
+    .dz-preview.visible { display: block; }
+    .dz-hint {
+      padding: 2rem; text-align: center; color: var(--muted); font-size: 0.82rem; line-height: 1.6;
+    }
+    .dz-hint-icon { font-size: 2rem; margin-bottom: 0.4rem; }
+    .dz-hint small { display: block; color: rgba(255,255,255,0.22); margin-top: 0.3rem; font-size: 0.72rem; }
+
+    /* ── DESCRIPTION ── */
+    .field-label {
+      font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--muted); margin-bottom: 0.4rem;
+    }
+    textarea {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+      border-radius: 8px; padding: 0.75rem; font-family: inherit; font-size: 0.88rem;
+      line-height: 1.6; resize: vertical; min-height: 130px;
+    }
+    textarea:focus { outline: none; border-color: var(--gold); }
+
+    /* ── ACTIONS ── */
+    .edit-actions { display: flex; gap: 0.7rem; margin-top: 0.9rem; }
+    .btn-save {
+      flex: 1; background: var(--gold); color: #000; border: none; padding: 0.75rem;
+      border-radius: 8px; font-weight: 700; font-size: 0.95rem; cursor: pointer;
+    }
+    .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-cancel {
+      background: transparent; color: var(--muted); border: 1px solid var(--border);
+      padding: 0.75rem 1rem; border-radius: 8px; font-weight: 600; font-size: 0.88rem;
+      cursor: pointer; white-space: nowrap;
+    }
+    .save-status { font-size: 0.78rem; margin-top: 0.5rem; text-align: center; min-height: 1rem; }
+    .save-status.success { color: var(--green); }
+    .save-status.error { color: var(--red); }
+  </style>
+<style>
+  /* Auth guard (markup contract shared with admin-auth.js) */
+  #authGuard { position:fixed; inset:0; background:#0a0a0f; z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:16px; }
+  #authGuard .spinner { width:40px; height:40px; border:3px solid rgba(255,255,255,0.1); border-top-color:#d4af37; border-radius:50%; animation:authspin 1s linear infinite; }
+  @keyframes authspin { to { transform:rotate(360deg); } }
+  #authMsg { color:#d4af37; font-weight:700; font-size:0.9rem; letter-spacing:1px; text-transform:uppercase; }
+  #loginBtn { background:#d4af37; color:#000; border:none; border-radius:8px; padding:11px 28px; font-size:0.95rem; font-weight:700; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<!-- AUTH GATE -->
+<div id="authGuard">
+  <div class="spinner"></div>
+  <p id="authMsg">Verifying…</p>
+  <button id="loginBtn" onclick="triggerLogin()" style="display:none">Sign in with Google</button>
+</div>
+
+<!-- APP -->
+<div id="app" hidden>
+  <header>
+    <div class="header-brand">♠ All-In Poker</div>
+    <div class="header-sub">Event Content Manager</div>
+  </header>
+  <main>
+    <div class="section-label">Upcoming Events</div>
+    <div id="event-list"><div class="loading">Loading events…</div></div>
+  </main>
+</div>
+
+<script type="module">
+import { functions, storage } from '../firebase-api.js?v=6';
+import { requireAdmin, triggerLogin } from './admin-auth.js';
+import { httpsCallable } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js";
+import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+const getScheduleFn   = httpsCallable(functions, 'getSchedule');
+const saveContentFn   = httpsCallable(functions, 'saveEventContent', { timeout: 120000 });
+
+const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function parseDate(str) {
+  const [m, d, y] = str.split('/').map(Number);
+  return new Date(y, m - 1, d);
+}
+function formatDate(d) {
+  return `${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}`;
+}
+function venueLabel(loc) {
+  if (!loc) return '';
+  const l = loc.toLowerCase();
+  if (l.includes('corgi') || l.includes('wc')) return '🐾 Wild Corgi Pub';
+  if (l.includes('tight') || l.includes('te')) return '🎯 Tight End Bar';
+  return loc;
+}
+
+// ─── Auth Gate (Google sign-in + admin role, same as other admin pages) ───
+window.triggerLogin = triggerLogin;
+(async () => {
+  const session = await requireAdmin();
+  if (!session) return;
+  document.getElementById('app').hidden = false;
+  loadEvents();
+})();
+
+// ─── State ───
+let events = [];
+const pendingFiles = {}; // eventKey → File object
+
+// ─── Load Events ───
+async function loadEvents() {
+  try {
+    const res = await getScheduleFn({ historical: false, includeDrafts: true });
+    const today = new Date(); today.setHours(0,0,0,0);
+    events = (res.data?.schedule || [])
+      .map(g => ({ ...g, _date: parseDate(g.date) }))
+      .filter(g => g._date >= today)
+      .sort((a, b) => a._date - b._date);
+    renderList();
+  } catch (err) {
+    document.getElementById('event-list').innerHTML =
+      `<div class="loading">Error: ${err.message}</div>`;
+  }
+}
+
+// ─── Render List ───
+function renderList() {
+  const list = document.getElementById('event-list');
+  if (!events.length) {
+    list.innerHTML = '<div class="loading">No upcoming events found.</div>';
+    return;
+  }
+
+  list.innerHTML = events.map((g, i) => {
+    const hasContent = !!(g.description || g.image);
+    const venue = g.location || g.venue || '';
+    const theme = g.title || g.theme || 'Poker Night';
+    const isCorgi = venue.toLowerCase().includes('corgi');
+    const thumbHtml = g.image
+      ? `<img src="${g.image}" alt="${theme}">`
+      : (isCorgi ? '🐾' : '♠️');
+
+    return `
+    <div class="event-item" id="ei-${i}">
+      <div class="event-item-header" onclick="togglePanel(${i})">
+        <div class="event-thumb">${thumbHtml}</div>
+        <div class="event-info">
+          <div class="event-info-date">${formatDate(g._date)}</div>
+          <div class="event-info-theme">${theme}</div>
+          <div class="event-info-venue">${venueLabel(venue)}</div>
+        </div>
+        <span class="event-badge ${hasContent ? 'badge-done' : 'badge-empty'}">${hasContent ? '✓ Done' : 'Empty'}</span>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="edit-panel" id="ep-${i}">
+        <div class="drop-zone" id="dz-${i}">
+          <img class="dz-preview${g.image ? ' visible' : ''}" id="dz-img-${i}" src="${g.image || ''}" alt="Preview">
+          <div class="dz-hint" id="dz-hint-${i}"${g.image ? ' style="display:none"' : ''}>
+            <div class="dz-hint-icon">📷</div>
+            Tap to choose an image, or drag &amp; drop here
+            <small>16:9 recommended · JPG or PNG</small>
+          </div>
+          <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" onchange="onFileChosen(${i}, this)">
+        </div>
+        <div class="field-label">Event Title <span style="font-weight:400;text-transform:none;letter-spacing:0;color:rgba(255,255,255,0.3)">(optional — overrides theme name on schedule)</span></div>
+        <input type="text" id="title-${i}" placeholder="${g.theme || 'e.g. Neon Night at the Tight End'}" value="${g.title || ''}" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:0.7rem 0.75rem;font-family:inherit;font-size:0.88rem;margin-bottom:0.9rem;">
+        <div class="field-label">Description</div>
+        <textarea id="desc-${i}" placeholder="Paste or type the event description…">${g.description || ''}</textarea>
+        <div class="field-label" style="margin-top:0.9rem;">Facebook Event URL <span style="font-weight:400;text-transform:none;letter-spacing:0;color:rgba(255,255,255,0.3)">(optional — makes the event card clickable on the website)</span></div>
+        <input type="url" id="fburl-${i}" placeholder="https://www.facebook.com/events/..." value="${g.facebookEventUrl || ''}" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:0.7rem 0.75rem;font-family:inherit;font-size:0.88rem;margin-bottom:0.9rem;">
+        <div class="edit-actions">
+          <button class="btn-cancel" onclick="togglePanel(${i})">Cancel</button>
+          <button class="btn-save" id="btn-${i}" onclick="saveContent(${i})">Save</button>
+        </div>
+        <div class="save-status" id="st-${i}"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Wire drag-and-drop for desktop
+  events.forEach((_, i) => {
+    const dz = document.getElementById(`dz-${i}`);
+    dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('dragover'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault(); dz.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file) handleFile(i, file);
+    });
+  });
+}
+
+// ─── Toggle Panel ───
+window.togglePanel = function(i) {
+  document.getElementById(`ei-${i}`).classList.toggle('open');
+};
+
+// ─── Image Handling ───
+window.onFileChosen = function(i, input) {
+  if (input.files[0]) handleFile(i, input.files[0]);
+};
+
+function handleFile(i, file) {
+  const key = eventKey(i);
+  pendingFiles[key] = file;
+
+  const img = document.getElementById(`dz-img-${i}`);
+  img.src = URL.createObjectURL(file);
+  img.classList.add('visible');
+  document.getElementById(`dz-hint-${i}`).style.display = 'none';
+}
+
+function eventKey(i) {
+  const g = events[i];
+  return `${g.date}|${g.location || g.venue}`;
+}
+
+function normalizeKey(date, venue) {
+  const [m, d, y] = date.split('/');
+  const v = venue.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}_${v}`;
+}
+
+// ─── Save ───
+window.saveContent = async function(i) {
+  const g = events[i];
+  const btn    = document.getElementById(`btn-${i}`);
+  const status = document.getElementById(`st-${i}`);
+  const title  = document.getElementById(`title-${i}`).value.trim();
+  const desc   = document.getElementById(`desc-${i}`).value.trim();
+  const fbUrl  = document.getElementById(`fburl-${i}`).value.trim();
+  const file   = pendingFiles[eventKey(i)];
+
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  status.textContent = '';
+  status.className = 'save-status';
+
+  try {
+    let imageUrl = events[i].image || null;
+
+    // Upload image directly to Firebase Storage from the browser
+    if (file) {
+      status.textContent = 'Uploading image…';
+      const ext = file.type === 'image/png' ? 'png' : file.type === 'image/gif' ? 'gif' : 'jpg';
+      const key = normalizeKey(g.date, g.location || g.venue || '');
+      const storageRef = ref(storage, `event-images/${key}.${ext}`);
+      await uploadBytes(storageRef, file, { contentType: file.type });
+      imageUrl = await getDownloadURL(storageRef);
+      status.textContent = 'Saving…';
+    }
+
+    // Save description + imageUrl + facebookEventUrl to Firestore via Cloud Function
+    await saveContentFn({
+      date:        g.date,
+      venue:       g.location || g.venue || '',
+      title,
+      description: desc,
+      imageUrl:    imageUrl,
+      facebookEventUrl: fbUrl
+    });
+
+    // Update local state
+    events[i].title = title;
+    events[i].description = desc;
+    events[i].facebookEventUrl = fbUrl;
+    if (imageUrl) events[i].image = imageUrl;
+    delete pendingFiles[eventKey(i)];
+
+    status.textContent = '✓ Saved!';
+    status.className = 'save-status success';
+    btn.textContent = 'Save';
+    btn.disabled = false;
+
+    setTimeout(() => {
+      document.getElementById(`ei-${i}`).classList.remove('open');
+      renderList();
+    }, 1200);
+
+  } catch (err) {
+    status.textContent = '✗ ' + (err.message || 'Save failed');
+    status.className = 'save-status error';
+    btn.textContent = 'Save';
+    btn.disabled = false;
+  }
+};
+</script>
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="/clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/admin/" data-z="10000"></script>
+</body>
+</html>

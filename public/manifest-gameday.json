@@ -1,0 +1,17 @@
+{
+  "name": "Staff - All-In Poker Club",
+  "short_name": "Game Day",
+  "description": "Staff tools for All-In Poker Club",
+  "start_url": "/gameday.html",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#00aaff",
+  "icons": [
+    {
+      "src": "/img/gameday-icon-premium.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Season Admin — Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/img/favicon-admin.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#050508; --card-bg:rgba(20,20,25,0.7); --border:rgba(255,255,255,0.08); --gold:#d4af37; --blue:#3b82f6; --green:#10b981; --red:#ef4444; --text:#f8fafc; --muted:#94a3b8; }
+    * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+    body { background:var(--bg); color:var(--text); font-family:'Inter',-apple-system,sans-serif; min-height:100vh; display:flex; flex-direction:column; overflow-x:hidden; }
+    #authGuard { position:fixed; inset:0; background:var(--bg); z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:16px; }
+    .spinner { width:40px; height:40px; border:3px solid rgba(255,255,255,0.1); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    #authMsg { color:var(--gold); font-weight:700; font-size:0.9rem; letter-spacing:1px; text-transform:uppercase; }
+    .header { padding:44px 20px 20px; text-align:center; position:relative; }
+    .back-btn { position:absolute; left:16px; top:48px; background:var(--card-bg); border:1px solid var(--border); color:var(--gold); padding:8px 16px; border-radius:10px; cursor:pointer; font-size:0.85rem; font-weight:700; font-family:inherit; transition:all 0.2s; }
+    .back-btn:active { transform:scale(0.96); }
+    h1 { font-weight:800; font-size:1.6rem; text-transform:uppercase; letter-spacing:2px; background:linear-gradient(to bottom,#fff 30%,#888); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .sub { margin-top:4px; color:var(--blue); font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:3px; }
+    .main-content { padding:0 20px 80px; flex:1; max-width:600px; margin:0 auto; width:100%; }
+    .section-label { font-size:0.72rem; font-weight:800; color:var(--muted); text-transform:uppercase; letter-spacing:2px; margin:24px 0 12px 2px; display:flex; align-items:center; gap:10px; }
+    .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+    .card { background:var(--card-bg); border:1px solid var(--border); border-radius:16px; padding:20px; margin-bottom:12px; }
+    .lbl { font-size:0.72rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; }
+    .input { width:100%; background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:1rem; padding:12px 14px; outline:none; font-family:inherit; transition:border-color 0.2s; appearance:none; -webkit-appearance:none; }
+    .input:focus { border-color:var(--blue); }
+    .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+    .btn { padding:12px 20px; border-radius:10px; border:none; font-size:0.9rem; font-weight:700; cursor:pointer; transition:all 0.2s; font-family:inherit; }
+    .btn:active { transform:scale(0.97); }
+    .btn-blue { background:var(--blue); color:#fff; }
+    .btn-gold { background:var(--gold); color:#000; }
+    .btn-full { width:100%; margin-top:12px; }
+    .btn-sm { padding:5px 12px; font-size:0.75rem; border-radius:7px; background:rgba(59,130,246,0.15); border:1px solid rgba(59,130,246,0.3); color:var(--blue); cursor:pointer; font-family:inherit; font-weight:700; }
+    .season-row { display:flex; flex-direction:column; gap:6px; padding:12px 16px; background:rgba(0,0,0,0.3); border-radius:10px; border:1px solid var(--border); margin-bottom:8px; }
+    .season-row-top { display:flex; justify-content:space-between; align-items:center; }
+    .season-row-bottom { display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; color:var(--muted); }
+    .badge-active { background:var(--green); color:#000; font-size:0.65rem; font-weight:800; padding:3px 8px; border-radius:5px; text-transform:uppercase; letter-spacing:1px; }
+    .badge-upcoming { background:var(--blue); color:#000; font-size:0.65rem; font-weight:800; padding:3px 8px; border-radius:5px; text-transform:uppercase; letter-spacing:1px; }
+    .badge-ended { background:rgba(148,163,184,0.25); color:var(--muted); font-size:0.65rem; font-weight:800; padding:3px 8px; border-radius:5px; text-transform:uppercase; letter-spacing:1px; }
+    .btn-danger { background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:var(--red); }
+    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); padding:10px 22px; border-radius:10px; font-weight:700; font-size:0.9rem; z-index:500; display:none; white-space:nowrap; }
+    .toast.success { background:var(--green); color:#000; }
+    .toast.error { background:var(--red); color:#fff; }
+    @media (max-width:480px) { .input { font-size:16px; } }
+  </style>
+</head>
+<body>
+
+  <div id="authGuard">
+    <div class="spinner"></div>
+    <p id="authMsg">Verifying…</p>
+  </div>
+
+  <div class="header">
+    <button class="back-btn" data-back-nav onclick="window.BackNav ? BackNav.go() : history.back()">&#8592; Back</button>
+    <h1>Season Admin</h1>
+    <div class="sub">Boot &amp; Configure Seasons</div>
+  </div>
+
+  <div class="main-content">
+
+    <div class="section-label">Active Seasons</div>
+    <div id="seasonsList"><div style="color:var(--muted);padding:8px 0;">Loading…</div></div>
+
+    <div class="section-label">Create New Season</div>
+    <div class="card">
+      <div>
+        <div class="lbl">Season Name (optional — auto-generated if blank)</div>
+        <input id="newName" type="text" class="input" placeholder="e.g. Summer 2026">
+      </div>
+      <div class="grid-2" style="margin-top:12px;">
+        <div>
+          <div class="lbl">Venue</div>
+          <select id="newVenue" class="input">
+            <option value="Tight End">Tight End Bar</option>
+            <option value="Wild Corgi">Wild Corgi Pub</option>
+          </select>
+        </div>
+        <div>
+          <div class="lbl">Season Number</div>
+          <input id="newNumber" type="number" class="input" placeholder="e.g. 7">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <div class="lbl">Start Date</div>
+          <input id="newStart" type="date" class="input">
+        </div>
+        <div>
+          <div class="lbl">End Date (optional)</div>
+          <input id="newEnd" type="date" class="input">
+        </div>
+      </div>
+      <div>
+        <div class="lbl">Championship Date (optional)</div>
+        <input id="newChamp" type="date" class="input">
+      </div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:12px;line-height:1.5;">
+        Leave <strong>End Date</strong> blank and the season runs until the next season
+        for this venue starts — no need to guess when it wraps. Big Stack and
+        Championship nights never count toward standings either way.
+      </div>
+      <button class="btn btn-blue btn-full" onclick="createSeason()">Boot New Season</button>
+    </div>
+
+    <div class="section-label">Title Holders</div>
+    <div class="card">
+      <div style="font-weight:700; color:var(--gold); margin-bottom:14px;">Tight End Bar</div>
+      <div class="grid-2">
+        <div>
+          <div class="lbl">Champion</div>
+          <input id="te-champion" type="text" class="input" placeholder="Name">
+        </div>
+        <div>
+          <div class="lbl">Gladiator</div>
+          <input id="te-gladiator" type="text" class="input" placeholder="Name">
+        </div>
+      </div>
+      <div style="font-weight:700; color:var(--blue); margin:16px 0 14px;">Wild Corgi Pub</div>
+      <div class="grid-2">
+        <div>
+          <div class="lbl">Champion</div>
+          <input id="wc-champion" type="text" class="input" placeholder="Name">
+        </div>
+        <div>
+          <div class="lbl">Gladiator</div>
+          <input id="wc-gladiator" type="text" class="input" placeholder="Name">
+        </div>
+      </div>
+      <button class="btn btn-gold btn-full" onclick="saveTitles()">Save Title Holders</button>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { db, functions, httpsCallable } from '../firebase-api.js?v=6';
+    import { requireAdmin } from './admin-auth.js';
+    import {
+      doc, getDoc, updateDoc
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    function toast(msg, type='success') {
+      const el = document.getElementById('toast');
+      el.textContent = msg; el.className = 'toast ' + type; el.style.display = 'block';
+      clearTimeout(el._t); el._t = setTimeout(() => el.style.display = 'none', 2800);
+    }
+
+    function escHtml(s) {
+      return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    // A season's "current" badge is a plain readout of the same window a
+    // season occupies on the calendar (today between startDate/endDate) —
+    // it does NOT try to replicate getLeaderboard's pick-one-per-venue
+    // auto-detect tie-break logic (latest startDate wins among endDate>=today
+    // matches). This is deliberately just descriptive, not authoritative,
+    // so multiple overlapping seasons for a venue can each show their real
+    // window without the admin UI claiming to know which one the
+    // leaderboard will actually pick.
+    function seasonBadge(s, effectiveEnd) {
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      const start = s.startDate ? new Date(s.startDate) : null;
+      const end   = effectiveEnd ? new Date(effectiveEnd) : null;
+      if (end && end < today) return '<span class="badge-ended">Ended</span>';
+      if (start && start > today) return '<span class="badge-upcoming">Upcoming</span>';
+      return '<span class="badge-active">Current</span>';
+    }
+
+    // Mirror of resolveSeasonEnd in functions/index.js: a blank endDate means
+    // the season runs until the next season for that venue starts.
+    function effectiveEnd(season, allSeasons) {
+      if (season.endDate) return { date: season.endDate, derived: false, nextName: null };
+      const start = season.startDate ? new Date(season.startDate) : null;
+      if (!start || isNaN(start)) return { date: null, derived: false, nextName: null };
+      let next = null;
+      allSeasons.forEach(s => {
+        if (s.id === season.id || s.venue !== season.venue) return;
+        const st = s.startDate ? new Date(s.startDate) : null;
+        if (!st || isNaN(st) || st <= start) return;
+        if (!next || st < new Date(next.startDate)) next = s;
+      });
+      if (!next) return { date: null, derived: true, nextName: null };
+      const prev = new Date(new Date(next.startDate).getTime() - 86400000);
+      return {
+        date: `${prev.getMonth() + 1}/${prev.getDate()}/${prev.getFullYear()}`,
+        derived: true,
+        nextName: next.name || `Season ${next.seasonNumber ?? '?'}`
+      };
+    }
+
+    async function loadSeasons() {
+      const box = document.getElementById('seasonsList');
+      try {
+        const listSeasonsFn = httpsCallable(functions, 'listSeasons');
+        const result = await listSeasonsFn({});
+        const seasons = result.data.seasons || [];
+        if (!seasons.length) { box.innerHTML = '<div style="color:var(--muted)">No seasons found.</div>'; return; }
+        let html = '';
+        seasons.forEach(s => {
+          const label = s.name || `${s.venue} — Season ${s.seasonNumber ?? '?'}`;
+          const eff = effectiveEnd(s, seasons);
+          let range;
+          if (!s.startDate) {
+            range = '<span style="color:var(--red)">No start date set</span>';
+          } else if (!eff.derived) {
+            range = `${s.startDate} – ${eff.date}`;
+          } else if (eff.date) {
+            range = `${s.startDate} – <span style="color:var(--blue)">${eff.date}</span>`
+                  + `<span style="color:var(--muted)"> (ends when ${escHtml(eff.nextName)} starts)</span>`;
+          } else {
+            range = `${s.startDate} – <span style="color:var(--green)">ongoing</span>`
+                  + '<span style="color:var(--muted)"> (until next season starts)</span>';
+          }
+          html += `<div class="season-row">
+            <div class="season-row-top">
+              <strong style="color:var(--gold)">${escHtml(label)}</strong>
+              ${seasonBadge(s, eff.date)}
+            </div>
+            <div class="season-row-bottom">
+              <span>${range}</span>
+              <button class="btn-sm btn-danger" onclick="deleteSeasonRow('${s.id}', '${escHtml(label).replace(/'/g, "\\'")}')">Delete</button>
+            </div>
+          </div>`;
+        });
+        box.innerHTML = html;
+      } catch(e) { box.innerHTML = `<div style="color:var(--red)">${e.message}</div>`; }
+    }
+
+    window.deleteSeasonRow = async function(id, label) {
+      if (!confirm(`Delete season "${label}"? This cannot be undone.`)) return;
+      try {
+        const deleteSeasonFn = httpsCallable(functions, 'deleteSeason');
+        await deleteSeasonFn({ seasonId: id });
+        toast('Season deleted');
+        loadSeasons();
+      } catch(e) { toast(e.message, 'error'); }
+    };
+
+    window.createSeason = async function() {
+      const nameInput = document.getElementById('newName').value.trim();
+      const venue     = document.getElementById('newVenue').value;
+      const num       = parseInt(document.getElementById('newNumber').value);
+      const startIso  = document.getElementById('newStart').value;
+      const endIso    = document.getElementById('newEnd').value;
+      const champIso  = document.getElementById('newChamp').value;
+
+      if (!num) return toast('Season number required', 'error');
+      if (!startIso) return toast('Start date required', 'error');
+      // End date is optional — blank means "runs until the next season starts".
+
+      const toMdy = iso => iso ? (p => p[1] + '/' + p[2] + '/' + p[0])(iso.split('-')) : '';
+      const startDate = toMdy(startIso);
+      const endDate = endIso ? toMdy(endIso) : null;
+      const championshipDate = champIso ? toMdy(champIso) : null;
+      const name = nameInput || `${venue} — Season ${num}`;
+
+      try {
+        const saveSeasonFn = httpsCallable(functions, 'saveSeason');
+        await saveSeasonFn({ name, venue, seasonNumber: num, startDate, endDate, championshipDate });
+        toast('Season booted!');
+        document.getElementById('newName').value = '';
+        document.getElementById('newNumber').value = '';
+        document.getElementById('newStart').value = '';
+        document.getElementById('newEnd').value = '';
+        document.getElementById('newChamp').value = '';
+        loadSeasons();
+      } catch(e) { toast(e.message, 'error'); }
+    };
+
+    window.saveTitles = async function() {
+      const data = {
+        'Tight End': { champion: document.getElementById('te-champion').value, gladiator: document.getElementById('te-gladiator').value },
+        'Wild Corgi': { champion: document.getElementById('wc-champion').value,  gladiator: document.getElementById('wc-gladiator').value }
+      };
+      try {
+        await updateDoc(doc(db, 'config', 'champions'), data);
+        toast('Title holders saved');
+      } catch(e) { toast(e.message, 'error'); }
+    };
+
+    async function init() {
+      const session = await requireAdmin();
+      if (!session) return;
+      loadSeasons();
+      try {
+        const snap = await getDoc(doc(db, 'config', 'champions'));
+        if (snap.exists()) {
+          const c = snap.data();
+          document.getElementById('te-champion').value  = c['Tight End']?.champion  || '';
+          document.getElementById('te-gladiator').value = c['Tight End']?.gladiator || '';
+          document.getElementById('wc-champion').value  = c['Wild Corgi']?.champion  || '';
+          document.getElementById('wc-gladiator').value = c['Wild Corgi']?.gladiator || '';
+        }
+      } catch(e) { /* non-fatal */ }
+    }
+
+    init();
+  </script>
+
+  <!-- Round timer button (bottom-left) while a venue clock runs tonight; same as index.html -->
+  <script type="module" src="/clock-fab.js?v=3"></script>
+  <script src="/back-nav.js?v=1" data-home="/admin/"></script>
+</body>
+</html>
