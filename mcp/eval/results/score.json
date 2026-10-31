@@ -1,0 +1,377 @@
+{
+ "summary": {
+  "scoredAt": "2026-10-31T16:22:03.593Z",
+  "questions": 30,
+  "passed": 30,
+  "passRate": "100.0%",
+  "toolCalls": 34,
+  "byType": [
+   {
+    "type": "standings",
+    "questions": 4,
+    "passed": 4,
+    "toolCalls": 4,
+    "passRate": "100.0%"
+   },
+   {
+    "type": "player_history",
+    "questions": 5,
+    "passed": 5,
+    "toolCalls": 5,
+    "passRate": "100.0%"
+   },
+   {
+    "type": "seating",
+    "questions": 4,
+    "passed": 4,
+    "toolCalls": 4,
+    "passRate": "100.0%"
+   },
+   {
+    "type": "structure",
+    "questions": 4,
+    "passed": 4,
+    "toolCalls": 4,
+    "passRate": "100.0%"
+   },
+   {
+    "type": "ties",
+    "questions": 4,
+    "passed": 4,
+    "toolCalls": 4,
+    "passRate": "100.0%"
+   },
+   {
+    "type": "unknown_names",
+    "questions": 5,
+    "passed": 5,
+    "toolCalls": 5,
+    "passRate": "100.0%"
+   },
+   {
+    "type": "multi_step",
+    "questions": 4,
+    "passed": 4,
+    "toolCalls": 8,
+    "passRate": "100.0%"
+   }
+  ],
+  "failures": {}
+ },
+ "rows": [
+  {
+   "id": "q01",
+   "type": "standings",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": "Alex Pellbrook",
+   "answer": "Alex Pellbrook"
+  },
+  {
+   "id": "q02",
+   "type": "standings",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": 545,
+   "answer": 545
+  },
+  {
+   "id": "q03",
+   "type": "standings",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": [
+    "Shay Rastervale"
+   ],
+   "answer": [
+    "Shay Rastervale"
+   ]
+  },
+  {
+   "id": "q04",
+   "type": "standings",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": 15,
+   "answer": 15
+  },
+  {
+   "id": "q05",
+   "type": "player_history",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": 11,
+   "answer": 11
+  },
+  {
+   "id": "q06",
+   "type": "player_history",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": 2,
+   "answer": 2
+  },
+  {
+   "id": "q07",
+   "type": "player_history",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": 14,
+   "answer": 14
+  },
+  {
+   "id": "q08",
+   "type": "player_history",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": "10/8/2026",
+   "answer": "10/8/2026"
+  },
+  {
+   "id": "q09",
+   "type": "player_history",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": 435,
+   "answer": 435
+  },
+  {
+   "id": "q10",
+   "type": "seating",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": 41,
+   "answer": 41
+  },
+  {
+   "id": "q11",
+   "type": "seating",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": "Alex Pellbrook",
+   "answer": "Alex Pellbrook"
+  },
+  {
+   "id": "q12",
+   "type": "seating",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": "Alex Pellbrook",
+   "answer": "Alex Pellbrook"
+  },
+  {
+   "id": "q13",
+   "type": "seating",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": 2,
+   "answer": 2
+  },
+  {
+   "id": "q14",
+   "type": "structure",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": "1000/2000",
+   "answer": "1000/2000"
+  },
+  {
+   "id": "q15",
+   "type": "structure",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": 76,
+   "answer": 76
+  },
+  {
+   "id": "q16",
+   "type": "structure",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": 90,
+   "answer": 90
+  },
+  {
+   "id": "q17",
+   "type": "structure",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": "Championship",
+   "answer": "Championship"
+  },
+  {
+   "id": "q18",
+   "type": "ties",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": {
+    "players": [
+     "Yael Thistlecombe",
+     "Shay Rastervale"
+    ],
+    "points": 85
+   },
+   "answer": {
+    "players": [
+     "Shay Rastervale",
+     "Yael Thistlecombe"
+    ],
+    "points": 85
+   }
+  },
+  {
+   "id": "q19",
+   "type": "ties",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": [
+    "Finley Vossington",
+    "Tatum Pellbrook"
+   ],
+   "answer": [
+    "Finley Vossington",
+    "Tatum Pellbrook"
+   ]
+  },
+  {
+   "id": "q20",
+   "type": "ties",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": "Parker Rastervale",
+   "answer": "Parker Rastervale"
+  },
+  {
+   "id": "q21",
+   "type": "ties",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": 60,
+   "answer": 60
+  },
+  {
+   "id": "q22",
+   "type": "unknown_names",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": {
+    "error": "unknown_player"
+   },
+   "answer": {
+    "error": "unknown_player"
+   }
+  },
+  {
+   "id": "q23",
+   "type": "unknown_names",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": {
+    "error": "unknown_player"
+   },
+   "answer": {
+    "error": "unknown_player"
+   }
+  },
+  {
+   "id": "q24",
+   "type": "unknown_names",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": {
+    "error": "unknown_season"
+   },
+   "answer": {
+    "error": "unknown_season"
+   }
+  },
+  {
+   "id": "q25",
+   "type": "unknown_names",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": {
+    "error": "unknown_venue"
+   },
+   "answer": {
+    "error": "unknown_venue"
+   }
+  },
+  {
+   "id": "q26",
+   "type": "unknown_names",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 1,
+   "expected": 0,
+   "answer": 0
+  },
+  {
+   "id": "q27",
+   "type": "multi_step",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 2,
+   "expected": {
+    "name": "Cameron Yarrowdale",
+    "rank": 3
+   },
+   "answer": {
+    "name": "Cameron Yarrowdale",
+    "rank": 3
+   }
+  },
+  {
+   "id": "q28",
+   "type": "multi_step",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 2,
+   "expected": 2,
+   "answer": 2
+  },
+  {
+   "id": "q29",
+   "type": "multi_step",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 2,
+   "expected": "Val Thistlecombe",
+   "answer": "Val Thistlecombe"
+  },
+  {
+   "id": "q30",
+   "type": "multi_step",
+   "pass": true,
+   "failure": null,
+   "toolCalls": 2,
+   "expected": 15,
+   "answer": 15
+  }
+ ]
+}
