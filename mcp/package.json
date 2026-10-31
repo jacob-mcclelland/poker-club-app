@@ -12,7 +12,7 @@
   },
   "scripts": {
     "start": "node server.js",
-    "test": "node --test test/",
+    "test": "node --test test/*.test.js",
     "eval:build": "node eval/build-questions.js",
     "eval:score": "node eval/score.js"
   },
