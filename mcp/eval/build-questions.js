@@ -139,4 +139,7 @@ if (Q.length !== 30) throw new Error(`expected 30 questions, built ${Q.length}`)
 fs.writeFileSync(path.join(__dirname, 'questions.jsonl'), Q.map(q => JSON.stringify(q)).join('\n') + '\n');
 const byType = Q.reduce((m, q) => ({ ...m, [q.type]: (m[q.type] || 0) + 1 }), {});
 console.log(`wrote ${Q.length} questions: ${Object.entries(byType).map(([k, v]) => `${k} ${v}`).join(', ')}`);
-if (process.argv.includes('--show')) for (const q of Q) console.log(`${q.id} [${q.type}] ${q.question}  (format: ${JSON.stringify(q.answer_format)})`);
+// --show prints question text only. The development run also printed each
+// answer format, which told the answerer which questions expected an error;
+// that is why that run is labelled a developer demonstration (README).
+if (process.argv.includes('--show')) for (const q of Q) console.log(`${q.id} ${q.question}`);

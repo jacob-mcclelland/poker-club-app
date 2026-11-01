@@ -3,8 +3,7 @@
 // Scores eval/results/answers.jsonl against eval/questions.jsonl, once.
 // Writes results/score.json (per question) and results/report.md (tables).
 // Refuses to run if a score already exists: answers are frozen before scoring
-// and scored a single time. --force exists only for re-rendering a report
-// after a scorer bug, and the README must say so if it is ever used.
+// and scored a single time. There is no override.
 //
 // Failure kinds:
 //   wrong_value         a number, date or text that does not match
@@ -14,7 +13,7 @@
 //   false_error         reported an error where an answer exists
 //   wrong_error_code    reported the wrong kind of error
 //   format_error        answer missing or in the wrong shape
-//   no_tool_evidence    no recorded tool call for the question
+//   no_tool_evidence    a cited tool call is not in the call log for that question
 
 const fs = require('fs');
 const path = require('path');
@@ -23,7 +22,7 @@ const DIR = __dirname;
 const OUT = path.join(DIR, 'results');
 const readJsonl = (f) => fs.readFileSync(f, 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse);
 
-if (fs.existsSync(path.join(OUT, 'score.json')) && !process.argv.includes('--force')) {
+if (fs.existsSync(path.join(OUT, 'score.json'))) {
   console.error('results/score.json exists: these answers were already scored once.');
   process.exit(1);
 }
@@ -31,15 +30,18 @@ if (fs.existsSync(path.join(OUT, 'score.json')) && !process.argv.includes('--for
 const questions = readJsonl(path.join(DIR, 'questions.jsonl'));
 const answers = new Map(readJsonl(path.join(OUT, 'answers.jsonl')).map(a => [a.id, a]));
 
+const log = readJsonl(path.join(OUT, 'tool-calls.jsonl'));
 const { compare } = require('./compare');
+const { checkEvidence } = require('./evidence');
 
 const rows = questions.map(q => {
   const a = answers.get(q.id);
   let failure = null;
+  const ev = a ? checkEvidence(q.id, q.question, a.tool_calls, log) : null;
   if (!a) failure = 'format_error';
-  else if (!a.tool_calls || !a.tool_calls.length) failure = 'no_tool_evidence';
+  else if (!ev.ok) failure = 'no_tool_evidence';
   else failure = compare(q.answer_format, q.expected, a.answer);
-  return { id: q.id, type: q.type, pass: !failure, failure, toolCalls: a && a.tool_calls ? a.tool_calls.length : 0, expected: q.expected, answer: a ? a.answer : null };
+  return { id: q.id, type: q.type, pass: !failure, failure, toolCalls: ev ? ev.matched.length : 0, unsourcedArgs: ev ? ev.unsourced : [], expected: q.expected, answer: a ? a.answer : null };
 });
 
 const pct = (n, d) => (d ? `${(100 * n / d).toFixed(1)}%` : 'n/a');
