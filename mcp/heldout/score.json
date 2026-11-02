@@ -1,0 +1,77 @@
+{
+ "scoredAt": "2026-11-01T23:34:17.847Z",
+ "cases": 53,
+ "passed": 53,
+ "passRate": "100.0%",
+ "loggedCalls": 73,
+ "citedCalls": 69,
+ "gradedByCode": 52,
+ "gradedByGrader": 1,
+ "answersWithUnsourcedArgs": 1,
+ "byCategory": [
+  {
+   "category": "straightforward",
+   "cases": 15,
+   "passed": 15,
+   "calls": 16,
+   "passRate": "100.0%"
+  },
+  {
+   "category": "multi_step",
+   "cases": 7,
+   "passed": 7,
+   "calls": 15,
+   "passRate": "100.0%"
+  },
+  {
+   "category": "tie",
+   "cases": 5,
+   "passed": 5,
+   "calls": 6,
+   "passRate": "100.0%"
+  },
+  {
+   "category": "ambiguous",
+   "cases": 3,
+   "passed": 3,
+   "calls": 4,
+   "passRate": "100.0%"
+  },
+  {
+   "category": "unanswerable",
+   "cases": 4,
+   "passed": 4,
+   "calls": 5,
+   "passRate": "100.0%"
+  },
+  {
+   "category": "near_duplicate",
+   "cases": 6,
+   "passed": 6,
+   "calls": 9,
+   "passRate": "100.0%"
+  },
+  {
+   "category": "unknown_entity",
+   "cases": 6,
+   "passed": 6,
+   "calls": 6,
+   "passRate": "100.0%"
+  },
+  {
+   "category": "adversarial",
+   "cases": 4,
+   "passed": 4,
+   "calls": 5,
+   "passRate": "100.0%"
+  },
+  {
+   "category": "championship",
+   "cases": 3,
+   "passed": 3,
+   "calls": 3,
+   "passRate": "100.0%"
+  }
+ ],
+ "failures": {}
+}

@@ -1,0 +1,34 @@
+{"qid":"q01","tool":"get_season_standings","args":{"venue":"Tight End","season":"Fall 2026","limit":3},"isError":false,"at":"2026-10-31T16:20:23.290Z"}
+{"qid":"q02","tool":"get_season_standings","args":{"venue":"Wild Corgi","season":"Fall 2026","limit":3},"isError":false,"at":"2026-10-31T16:20:23.874Z"}
+{"qid":"q03","tool":"get_season_standings","args":{"venue":"Tight End","season":"Summer 2026"},"isError":false,"at":"2026-10-31T16:20:24.371Z"}
+{"qid":"q04","tool":"get_season_standings","args":{"venue":"Wild Corgi","season":"Fall 2026"},"isError":false,"at":"2026-10-31T16:20:24.855Z"}
+{"qid":"q05","tool":"get_player_season_history","args":{"player":"Tatum Pellbrook","venue":"Tight End","season":"Fall 2026"},"isError":false,"at":"2026-10-31T16:20:31.151Z"}
+{"qid":"q06","tool":"get_player_season_history","args":{"player":"Oakley Kestrelton","venue":"Wild Corgi","season":"Summer 2026"},"isError":false,"at":"2026-10-31T16:20:31.737Z"}
+{"qid":"q07","tool":"get_player_season_history","args":{"player":"Frankie Larkspurne","venue":"Tight End","season":"Fall 2026"},"isError":false,"at":"2026-10-31T16:20:32.346Z"}
+{"qid":"q08","tool":"get_player_season_history","args":{"player":"Yael Thistlecombe","venue":"Wild Corgi","season":"Fall 2026"},"isError":false,"at":"2026-10-31T16:20:32.859Z"}
+{"qid":"q09","tool":"get_player_season_history","args":{"player":"Yaely","venue":"Wild Corgi","season":"Fall 2026"},"isError":false,"at":"2026-10-31T16:20:33.389Z"}
+{"qid":"q10","tool":"get_game_seating","args":{"venue":"Tight End","date":"9/8/2026","game":1},"isError":false,"at":"2026-10-31T16:20:38.935Z"}
+{"qid":"q11","tool":"get_game_seating","args":{"venue":"Wild Corgi","date":"9/3/2026","game":2},"isError":false,"at":"2026-10-31T16:20:39.458Z"}
+{"qid":"q12","tool":"get_game_seating","args":{"venue":"Tight End","date":"8/11/2026","game":1},"isError":false,"at":"2026-10-31T16:20:39.984Z"}
+{"qid":"q13","tool":"get_game_seating","args":{"venue":"Wild Corgi","date":"8/13/2026","game":1},"isError":false,"at":"2026-10-31T16:20:40.529Z"}
+{"qid":"q14","tool":"get_game_structure","args":{},"isError":false,"at":"2026-10-31T16:20:45.384Z"}
+{"qid":"q15","tool":"get_game_structure","args":{},"isError":false,"at":"2026-10-31T16:20:45.849Z"}
+{"qid":"q16","tool":"get_game_structure","args":{},"isError":false,"at":"2026-10-31T16:20:46.271Z"}
+{"qid":"q17","tool":"get_game_structure","args":{"venue":"Tight End","date":"11/17/2026"},"isError":false,"at":"2026-10-31T16:20:46.702Z"}
+{"qid":"q18","tool":"get_game_seating","args":{"venue":"Tight End","date":"6/30/2026","game":2},"isError":false,"at":"2026-10-31T16:20:51.124Z"}
+{"qid":"q19","tool":"get_season_standings","args":{"venue":"Wild Corgi","season":"Summer 2026"},"isError":false,"at":"2026-10-31T16:20:51.578Z"}
+{"qid":"q20","tool":"get_season_standings","args":{"venue":"Tight End","season":"Fall 2026"},"isError":false,"at":"2026-10-31T16:20:52.132Z"}
+{"qid":"q21","tool":"get_game_structure","args":{},"isError":false,"at":"2026-10-31T16:20:52.641Z"}
+{"qid":"q22","tool":"get_player_season_history","args":{"player":"Morgan Quillsby","venue":"Tight End","season":"Fall 2026"},"isError":true,"at":"2026-10-31T16:20:58.102Z"}
+{"qid":"q23","tool":"get_player_season_history","args":{"player":"Drew Ashgroee","venue":"Tight End","season":"Fall 2026"},"isError":true,"at":"2026-10-31T16:20:58.498Z"}
+{"qid":"q24","tool":"get_season_standings","args":{"venue":"Wild Corgi","season":"Spring 2025","limit":1},"isError":true,"at":"2026-10-31T16:20:58.883Z"}
+{"qid":"q25","tool":"get_season_standings","args":{"venue":"Lucky Duck","limit":1},"isError":true,"at":"2026-10-31T16:20:59.327Z"}
+{"qid":"q26","tool":"get_player_season_history","args":{"player":"Drew Hollowmere","venue":"Wild Corgi","season":"Fall 2026"},"isError":false,"at":"2026-10-31T16:20:59.790Z"}
+{"qid":"q27","tool":"get_game_seating","args":{"venue":"Tight End","date":"9/29/2026","game":1},"isError":false,"at":"2026-10-31T16:21:04.260Z"}
+{"qid":"q27","tool":"get_player_season_history","args":{"player":"Cameron Yarrowdale","venue":"Tight End","season":"Fall 2026"},"isError":false,"at":"2026-10-31T16:21:08.508Z"}
+{"qid":"q28","tool":"get_season_standings","args":{"venue":"Wild Corgi","season":"Fall 2026","limit":1},"isError":false,"at":"2026-10-31T16:21:08.951Z"}
+{"qid":"q29","tool":"get_game_seating","args":{"venue":"Wild Corgi","date":"9/24/2026","game":2},"isError":false,"at":"2026-10-31T16:21:09.506Z"}
+{"qid":"q30","tool":"get_season_standings","args":{"venue":"Tight End","season":"Fall 2026","limit":1},"isError":false,"at":"2026-10-31T16:21:09.992Z"}
+{"qid":"q30","tool":"get_season_standings","args":{"venue":"Wild Corgi","season":"Fall 2026","limit":1},"isError":false,"at":"2026-10-31T16:21:10.453Z"}
+{"qid":"q28","tool":"get_player_season_history","args":{"player":"Yael Thistlecombe","venue":"Wild Corgi","season":"Fall 2026"},"isError":false,"at":"2026-10-31T16:21:15.434Z"}
+{"qid":"q29","tool":"get_season_standings","args":{"venue":"Wild Corgi","season":"Fall 2026"},"isError":false,"at":"2026-10-31T16:21:15.980Z"}

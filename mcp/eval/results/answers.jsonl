@@ -1,0 +1,30 @@
+{"id":"q01","answer":"Alex Pellbrook","tool_calls":[{"tool":"get_season_standings","args":{"venue":"Tight End","season":"Fall 2026","limit":3},"isError":false}]}
+{"id":"q02","answer":545,"tool_calls":[{"tool":"get_season_standings","args":{"venue":"Wild Corgi","season":"Fall 2026","limit":3},"isError":false}]}
+{"id":"q03","answer":["Shay Rastervale"],"tool_calls":[{"tool":"get_season_standings","args":{"venue":"Tight End","season":"Summer 2026"},"isError":false}]}
+{"id":"q04","answer":15,"tool_calls":[{"tool":"get_season_standings","args":{"venue":"Wild Corgi","season":"Fall 2026"},"isError":false}]}
+{"id":"q05","answer":11,"tool_calls":[{"tool":"get_player_season_history","args":{"player":"Tatum Pellbrook","venue":"Tight End","season":"Fall 2026"},"isError":false}]}
+{"id":"q06","answer":2,"tool_calls":[{"tool":"get_player_season_history","args":{"player":"Oakley Kestrelton","venue":"Wild Corgi","season":"Summer 2026"},"isError":false}]}
+{"id":"q07","answer":14,"tool_calls":[{"tool":"get_player_season_history","args":{"player":"Frankie Larkspurne","venue":"Tight End","season":"Fall 2026"},"isError":false}]}
+{"id":"q08","answer":"10/8/2026","tool_calls":[{"tool":"get_player_season_history","args":{"player":"Yael Thistlecombe","venue":"Wild Corgi","season":"Fall 2026"},"isError":false}]}
+{"id":"q09","answer":435,"tool_calls":[{"tool":"get_player_season_history","args":{"player":"Yaely","venue":"Wild Corgi","season":"Fall 2026"},"isError":false}]}
+{"id":"q10","answer":41,"tool_calls":[{"tool":"get_game_seating","args":{"venue":"Tight End","date":"9/8/2026","game":1},"isError":false}]}
+{"id":"q11","answer":"Alex Pellbrook","tool_calls":[{"tool":"get_game_seating","args":{"venue":"Wild Corgi","date":"9/3/2026","game":2},"isError":false}]}
+{"id":"q12","answer":"Alex Pellbrook","tool_calls":[{"tool":"get_game_seating","args":{"venue":"Tight End","date":"8/11/2026","game":1},"isError":false}]}
+{"id":"q13","answer":2,"tool_calls":[{"tool":"get_game_seating","args":{"venue":"Wild Corgi","date":"8/13/2026","game":1},"isError":false}]}
+{"id":"q14","answer":"1000/2000","tool_calls":[{"tool":"get_game_structure","args":{},"isError":false}]}
+{"id":"q15","answer":76,"tool_calls":[{"tool":"get_game_structure","args":{},"isError":false}]}
+{"id":"q16","answer":90,"tool_calls":[{"tool":"get_game_structure","args":{},"isError":false}]}
+{"id":"q17","answer":"Championship","tool_calls":[{"tool":"get_game_structure","args":{"venue":"Tight End","date":"11/17/2026"},"isError":false}]}
+{"id":"q18","answer":{"players":["Shay Rastervale","Yael Thistlecombe"],"points":85},"tool_calls":[{"tool":"get_game_seating","args":{"venue":"Tight End","date":"6/30/2026","game":2},"isError":false}]}
+{"id":"q19","answer":["Finley Vossington","Tatum Pellbrook"],"tool_calls":[{"tool":"get_season_standings","args":{"venue":"Wild Corgi","season":"Summer 2026"},"isError":false}]}
+{"id":"q20","answer":"Parker Rastervale","tool_calls":[{"tool":"get_season_standings","args":{"venue":"Tight End","season":"Fall 2026"},"isError":false}]}
+{"id":"q21","answer":60,"tool_calls":[{"tool":"get_game_structure","args":{},"isError":false}]}
+{"id":"q22","answer":{"error":"unknown_player"},"tool_calls":[{"tool":"get_player_season_history","args":{"player":"Morgan Quillsby","venue":"Tight End","season":"Fall 2026"},"isError":true}]}
+{"id":"q23","answer":{"error":"unknown_player"},"tool_calls":[{"tool":"get_player_season_history","args":{"player":"Drew Ashgroee","venue":"Tight End","season":"Fall 2026"},"isError":true}]}
+{"id":"q24","answer":{"error":"unknown_season"},"tool_calls":[{"tool":"get_season_standings","args":{"venue":"Wild Corgi","season":"Spring 2025","limit":1},"isError":true}]}
+{"id":"q25","answer":{"error":"unknown_venue"},"tool_calls":[{"tool":"get_season_standings","args":{"venue":"Lucky Duck","limit":1},"isError":true}]}
+{"id":"q26","answer":0,"tool_calls":[{"tool":"get_player_season_history","args":{"player":"Drew Hollowmere","venue":"Wild Corgi","season":"Fall 2026"},"isError":false}]}
+{"id":"q27","answer":{"name":"Cameron Yarrowdale","rank":3},"tool_calls":[{"tool":"get_game_seating","args":{"venue":"Tight End","date":"9/29/2026","game":1},"isError":false},{"tool":"get_player_season_history","args":{"player":"Cameron Yarrowdale","venue":"Tight End","season":"Fall 2026"},"isError":false}]}
+{"id":"q28","answer":2,"tool_calls":[{"tool":"get_season_standings","args":{"venue":"Wild Corgi","season":"Fall 2026","limit":1},"isError":false},{"tool":"get_player_season_history","args":{"player":"Yael Thistlecombe","venue":"Wild Corgi","season":"Fall 2026"},"isError":false}]}
+{"id":"q29","answer":"Val Thistlecombe","tool_calls":[{"tool":"get_game_seating","args":{"venue":"Wild Corgi","date":"9/24/2026","game":2},"isError":false},{"tool":"get_season_standings","args":{"venue":"Wild Corgi","season":"Fall 2026"},"isError":false}]}
+{"id":"q30","answer":15,"tool_calls":[{"tool":"get_season_standings","args":{"venue":"Tight End","season":"Fall 2026","limit":1},"isError":false},{"tool":"get_season_standings","args":{"venue":"Wild Corgi","season":"Fall 2026","limit":1},"isError":false}]}
